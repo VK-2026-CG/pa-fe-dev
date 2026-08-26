@@ -1,0 +1,2 @@
+import { resolveCdk } from '@/cdk/registry';
+export default async function Page({params}:{params:Promise<{importId:string}>}){const Cdk=resolveCdk('contest-admin');return <Cdk page="contest-import" params={await params}/>;}

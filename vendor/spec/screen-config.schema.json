@@ -1,0 +1,289 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://specs.pruaction.internal/domains/insights/config/screen-config.schema.json",
+  "title": "PRUAction Performance Module Config (C4)",
+  "description": "Per-country composition config for the Performance module (P4 agent + P2/P3 Agent Leader). Composes screens from standardized widgets; contains NO styling (DLS owns look & feel) and NO labels (i18n owns text). Consumed by both the Next.js BFF (to build VMs) and the UI shell. v2.0.0: dashboard/history/customize are configured PER SCOPE (SELF | TEAM).",
+  "type": "object",
+  "required": ["configVersion", "country", "module", "screens"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "configVersion": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+    "country": { "type": "string", "pattern": "^[A-Z]{2}$" },
+    "module": { "const": "performance" },
+    "screens": {
+      "type": "object",
+      "required": ["dashboard", "metricDetail", "history", "customize"],
+      "additionalProperties": false,
+      "properties": {
+        "dashboard": { "$ref": "#/$defs/dashboardScreen" },
+        "metricDetail": { "$ref": "#/$defs/metricDetailScreen" },
+        "history": { "$ref": "#/$defs/historyScreen" },
+        "customize": { "$ref": "#/$defs/customizeScreen" }
+      }
+    }
+  },
+  "$defs": {
+    "metricCode": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]{1,39}$" },
+    "periodType": { "enum": ["MTD", "QTD", "YTD"] },
+    "businessLine": { "enum": ["ALL", "INSURANCE", "TAKAFUL"] },
+    "scope": { "enum": ["SELF", "TEAM"] },
+    "teamView": { "enum": ["DIRECT", "GROUP"] },
+    "historyWindow": { "enum": ["CURRENT_YEAR", "VS_LAST_YEAR", "VS_LAST_2_YEARS"] },
+    "routeRef": {
+      "type": "object",
+      "required": ["route"],
+      "additionalProperties": false,
+      "properties": {
+        "route": { "type": "string", "minLength": 1 },
+        "params": { "type": "object", "additionalProperties": { "type": "string" } }
+      }
+    },
+    "quickLink": {
+      "type": "object",
+      "required": ["id", "iconToken", "nav", "order", "visible"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]{1,39}$" },
+        "iconToken": { "type": "string" },
+        "nav": { "$ref": "#/$defs/routeRef" },
+        "order": { "type": "integer", "minimum": 1 },
+        "visible": { "type": "boolean" }
+      }
+    },
+    "moreAction": {
+      "type": "object",
+      "required": ["id", "iconToken", "nav", "order"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]{1,39}$" },
+        "iconToken": { "type": "string" },
+        "nav": { "$ref": "#/$defs/routeRef" },
+        "order": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "sectionRef": {
+      "type": "object",
+      "required": ["id", "widget", "order", "visible"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "widget": { "type": "string", "pattern": "^w\\.[a-z0-9.-]+$" },
+        "widgetVariant": { "type": "string" },
+        "order": { "type": "integer", "minimum": 1 },
+        "visible": { "type": "boolean" }
+      }
+    },
+    "cardRow": {
+      "type": "object",
+      "required": ["widget"],
+      "additionalProperties": false,
+      "properties": {
+        "visible": { "type": "boolean", "default": true },
+        "maxCount": { "type": "integer", "minimum": 1, "maximum": 12 },
+        "widget": { "const": "w.metric.card" },
+        "widgetVariant": { "type": "string" },
+        "cardOverrides": {
+          "type": "object",
+          "description": "Per-metric card tweaks keyed by metricCode.",
+          "propertyNames": { "pattern": "^[A-Z][A-Z0-9_]{1,39}$" },
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": { "showGoal": { "type": "boolean" } }
+          }
+        }
+      }
+    },
+    "dashboardScope": {
+      "type": "object",
+      "description": "Dashboard composition for one scope (SELF or TEAM).",
+      "required": ["quickLinks", "metricTracking", "milestones"],
+      "additionalProperties": false,
+      "properties": {
+        "features": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "basisToggle": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": { "visible": { "type": "boolean" } }
+            },
+            "teamViewToggle": {
+              "type": "object",
+              "description": "The \"Group\" toggle (TEAM scope only).",
+              "additionalProperties": false,
+              "properties": {
+                "visible": { "type": "boolean" },
+                "default": { "$ref": "#/$defs/teamView" }
+              }
+            },
+            "recommendations": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "enabled": { "type": "boolean" },
+                "aiPanel": {
+                  "type": "boolean",
+                  "description": "Render the expanded AI panel (w.reco.panel) instead of a nav-only banner."
+                },
+                "nav": { "$ref": "#/$defs/routeRef" }
+              }
+            }
+          }
+        },
+        "quickLinks": { "type": "array", "items": { "$ref": "#/$defs/quickLink" } },
+        "metricTracking": {
+          "type": "object",
+          "required": ["periodOptions", "defaultPeriod", "businessLineTabs", "defaultBusinessLine", "priorityCards"],
+          "additionalProperties": false,
+          "properties": {
+            "periodOptions": {
+              "type": "array",
+              "minItems": 1,
+              "items": { "$ref": "#/$defs/periodType" }
+            },
+            "defaultPeriod": { "$ref": "#/$defs/periodType" },
+            "businessLineTabs": {
+              "type": "array",
+              "minItems": 1,
+              "items": { "$ref": "#/$defs/businessLine" }
+            },
+            "defaultBusinessLine": { "$ref": "#/$defs/businessLine" },
+            "priorityCards": { "$ref": "#/$defs/cardRow" },
+            "focusCards": {
+              "allOf": [{ "$ref": "#/$defs/cardRow" }],
+              "description": "\"Other Focus Metrics (n)\" row (v2.0.0). Hidden when absent or visible:false; cards never show goals."
+            }
+          }
+        },
+        "milestones": {
+          "type": "object",
+          "required": ["visible", "widget"],
+          "additionalProperties": false,
+          "properties": {
+            "visible": { "type": "boolean" },
+            "addEnabled": { "type": "boolean" },
+            "setGoalEnabled": { "type": "boolean", "description": "\"Set Goal\" header action (v2.0.0)." },
+            "programs": { "type": "array", "items": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]{1,39}$" } },
+            "widget": { "const": "w.milestone.card" },
+            "widgetVariant": { "type": "string" }
+          }
+        },
+        "moreActions": {
+          "type": "array",
+          "description": "⋯ bottom-sheet actions (w.sheet.more-action), e.g. SET_GOALS / CUSTOMIZE_METRICS / HISTORICAL_DATA.",
+          "items": { "$ref": "#/$defs/moreAction" }
+        },
+        "footerLinks": { "type": "array", "items": { "$ref": "#/$defs/quickLink" } }
+      }
+    },
+    "dashboardScreen": {
+      "type": "object",
+      "required": ["screenId", "scopes"],
+      "additionalProperties": false,
+      "properties": {
+        "screenId": { "const": "S-P4-01" },
+        "scopeSwitcherEnabled": {
+          "type": "boolean",
+          "description": "Show the header persona switcher for users holding the leader entitlement."
+        },
+        "scopes": {
+          "type": "object",
+          "required": ["SELF"],
+          "additionalProperties": false,
+          "properties": {
+            "SELF": { "$ref": "#/$defs/dashboardScope" },
+            "TEAM": { "$ref": "#/$defs/dashboardScope" }
+          }
+        }
+      }
+    },
+    "metricDetailScreen": {
+      "type": "object",
+      "required": ["screenId", "sectionOrder", "sections"],
+      "additionalProperties": false,
+      "properties": {
+        "screenId": { "const": "S-P4-02" },
+        "sectionOrder": {
+          "type": "array",
+          "description": "Global render order; sections a metric lacks (capabilities ∩ data) are simply not emitted.",
+          "items": { "type": "string" },
+          "minItems": 1
+        },
+        "sections": { "type": "array", "items": { "$ref": "#/$defs/sectionRef" }, "minItems": 1 },
+        "historyLinkEnabled": { "type": "boolean", "default": true }
+      }
+    },
+    "historyScreen": {
+      "type": "object",
+      "required": ["screenId", "tabs", "windows", "defaultWindow"],
+      "additionalProperties": false,
+      "properties": {
+        "screenId": { "const": "S-P4-03" },
+        "tabs": {
+          "type": "object",
+          "description": "Metric pill order per scope; UI folds overflow into the \"More Metrics\" dropdown.",
+          "required": ["SELF"],
+          "additionalProperties": false,
+          "properties": {
+            "SELF": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/metricCode" } },
+            "TEAM": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/metricCode" } }
+          }
+        },
+        "windows": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/historyWindow" },
+          "description": "Comparison windows the ‹ › pager cycles through, in order."
+        },
+        "defaultWindow": { "$ref": "#/$defs/historyWindow" },
+        "maxYearsBack": { "type": "integer", "minimum": 1, "maximum": 4 }
+      }
+    },
+    "customizeConstraints": {
+      "type": "object",
+      "required": ["priority", "focus"],
+      "additionalProperties": false,
+      "properties": {
+        "priority": {
+          "type": "object",
+          "required": ["min", "max", "editable"],
+          "additionalProperties": false,
+          "properties": {
+            "min": { "type": "integer", "minimum": 0 },
+            "max": { "type": "integer", "minimum": 1 },
+            "editable": { "type": "boolean" }
+          }
+        },
+        "focus": {
+          "type": "object",
+          "required": ["min", "max"],
+          "additionalProperties": false,
+          "properties": {
+            "min": { "type": "integer", "minimum": 0 },
+            "max": { "type": "integer", "minimum": 0 }
+          }
+        }
+      }
+    },
+    "customizeScreen": {
+      "type": "object",
+      "required": ["screenId", "scopes"],
+      "additionalProperties": false,
+      "properties": {
+        "screenId": { "const": "S-P4-04" },
+        "scopes": {
+          "type": "object",
+          "required": ["SELF"],
+          "additionalProperties": false,
+          "properties": {
+            "SELF": { "$ref": "#/$defs/customizeConstraints" },
+            "TEAM": { "$ref": "#/$defs/customizeConstraints" }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,6 @@
+import type { NextRequest } from 'next/server';
+import { brochureCall } from '@/lib/contest-admin/domain-client';
+type Context={params:Promise<{contestId:string;versionId:string}>};
+const identity=(request:NextRequest)=>({actorId:request.headers.get('x-contest-actor')??'A1001',tenant:request.headers.get('x-contest-tenant')??'MY'});
+export async function PUT(request:NextRequest,context:Context){const {versionId}=await context.params;const response=await brochureCall(`/contest-versions/${encodeURIComponent(versionId)}/brochure`,identity(request),{method:'PUT',headers:{'content-type':request.headers.get('content-type')??'application/octet-stream','if-match':request.headers.get('if-match')??'','idempotency-key':request.headers.get('idempotency-key')??''},body:Buffer.from(await request.arrayBuffer())});return Response.json(await response.json(),{status:response.status});}
+export async function GET(request:NextRequest,context:Context){const {versionId}=await context.params;const response=await brochureCall(`/contest-versions/${encodeURIComponent(versionId)}/brochure`,identity(request));const headers=new Headers();for(const name of ['content-type','content-length','content-disposition','etag','x-content-type-options']){const value=response.headers.get(name);if(value)headers.set(name,value);}return new Response(response.body,{status:response.status,headers});}

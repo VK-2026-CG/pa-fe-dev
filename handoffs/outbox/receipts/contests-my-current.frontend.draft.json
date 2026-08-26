@@ -1,0 +1,98 @@
+{
+  "schemaVersion": "1.0",
+  "receiptId": "frontend-contests-my-country-isolation-2026-08",
+  "handoffId": "contests-my-country-isolation-2026-08",
+  "consumer": "frontend",
+  "status": "IN_PROGRESS",
+  "specCommit": null,
+  "implementation": {
+    "repository": "PruactionWeb",
+    "commit": null,
+    "dirty": true
+  },
+  "validation": [
+    {
+      "command": "npm test",
+      "status": "PASS",
+      "summary": "138 Playwright tests passed before final implementation commit"
+    }
+  ],
+  "operationCoverage": [
+    {
+      "operationId": "createContest",
+      "status": "IMPLEMENTED",
+      "evidence": "tests/api/contest-admin.spec.ts"
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-CA-01-01",
+      "status": "PASS",
+      "evidence": "tests/api/contest-admin.spec.ts and tests/e2e/contest-admin.spec.ts"
+    }
+  ],
+  "migrations": [
+    {
+      "name": "Frontend migration",
+      "status": "NOT_REQUIRED",
+      "evidence": "No frontend persistent-data migration"
+    }
+  ],
+  "gaps": [
+    "Promote to COMPLETE after the spec and implementation commits are immutable"
+  ],
+  "updatedAt": "2026-08-25T00:00:00.000Z",
+  "designValidation": {
+    "status": "NOT_RUN",
+    "assetValidation": {
+      "assetsRequired": 27,
+      "assetsPresent": 0,
+      "checksumFailures": 0,
+      "unsafeSvgCount": 0,
+      "placeholderCount": 27
+    },
+    "tokenValidation": {
+      "missingTokens": 8,
+      "rawColors": 0,
+      "rawGradients": 0,
+      "rawShadows": 0,
+      "rawFonts": 0
+    },
+    "visualValidation": [
+      {
+        "baselineId": "CA-01.desktop.ready",
+        "status": "NOT_RUN",
+        "evidence": "Spec baseline is not approved"
+      },
+      {
+        "baselineId": "CA-01.mobile.ready",
+        "status": "NOT_RUN",
+        "evidence": "Spec baseline is not approved"
+      },
+      {
+        "baselineId": "CA-01.desktop.loading",
+        "status": "NOT_RUN",
+        "evidence": "Spec baseline is not approved"
+      }
+    ],
+    "responsiveValidation": [
+      {
+        "viewport": "1440x1000",
+        "status": "NOT_RUN",
+        "evidence": "Responsive ruling pending"
+      },
+      {
+        "viewport": "375x812",
+        "status": "NOT_RUN",
+        "evidence": "Responsive ruling pending"
+      }
+    ],
+    "accessibilityValidation": [
+      {
+        "criterion": "WCAG-2.2-AA",
+        "status": "NOT_RUN",
+        "evidence": "Detailed screen implementation not started"
+      }
+    ]
+  }
+}
