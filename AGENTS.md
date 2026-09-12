@@ -83,14 +83,16 @@ Reference documentation (rationale, not rules):
 - SCHEME prefs don't exist yet (OQ-20): SCHEME lenses use catalog defaults;
   Customize edits the STANDARD doc per scope only.
 - **Never claim security posture this repo doesn't have.** Auth is a stub
-  `pa_persona` cookie; CSRF, CSP, rate limiting and IdP are not implemented. See
+  `x-persona` header (client-side `localStorage`, no cookie since ADR 0004);
+  CSRF, CSP, rate limiting and IdP are not implemented. See
   `docs/security/README.md` before writing anything about security.
 
 ## Definition of done for a screen change
 Typecheck green · `npm run test:unit` green (incl. the i18n scan) ·
-`npm run test:api` green · `npm run test:e2e` green · every touched AC has a
+`npm run test:e2e` green · every touched AC has a
 test named after it · `npm run handoff:validate` green · receipt updated · `npm run build` clean · zero console errors in the flows
-you touched (the e2e console watcher asserts this).
+you touched (the e2e console watcher asserts this). BFF contract/entitlement
+changes are verified in `pa-be-dev` (`npm test` there), not here.
 
 ## Testing — Playwright only (no Vitest, no shell smoke)
 Full guide: `docs/testing/playwright.md` · rationale: ADR 0003.
@@ -117,19 +119,20 @@ Rules:
 - `webServer.reuseExistingServer` is **false on purpose**: a stale process on
   4600/3600 must fail loudly rather than serve a different build. If you see
   "port is already used", kill the squatter — don't flip the flag.
-- Playwright owns service orchestration. Never leave `next dev` or the domain
+- Playwright owns service orchestration. Never leave `vite` or the domain
   service running after a task.
 - Browsers: `npx playwright install chromium` (CI: `--with-deps`).
 - `npm test` runs all three projects; the domain service must be built at
-  `../pruaction-insights-service/dist`.
+  `../pa-be-dev/dist`.
 
 ## Routing → CDK layering (multi-LBU)
-Rationale: ADR 0001 · target model: `docs/architecture/frontend-architecture.md`.
+Rationale: ADR 0001, ADR 0004 · target model: `docs/architecture/frontend-architecture.md`.
 
-- `src/app/**/page.tsx` is **routing only**: read route inputs (search params,
-  persona cookie), call `resolveCdk(feature)`, render it. No fetching, no
-  composition, no market branching in a route file.
-- One country per physical deployment: no shared URL, request-selected country/database, or production localhost fallback. `CONTESTS_API_URL` is server-only and required by the Contest client.
+- `src/router.tsx` is **routing only**: read route inputs
+  (`useSearchParams()`/`useParams()`, the client-side persona), call
+  `resolveCdk(feature)`, render it. No fetching, no composition, no market
+  branching in the router.
+- One country per physical deployment: no shared URL, request-selected country/database, or production localhost fallback. `CONTESTS_API_URL`/`INSIGHTS_API_URL` are pa-be-dev's env vars exclusively — this app never reads them (see ADR 0004).
 - `src/config/lbu.ts` is the deployment context: `LBU_CODE` is a **deployment
   constant** (defaults to `my` locally), validated and **fail-closed** on an
   unknown value, and it owns the route/feature manifest.

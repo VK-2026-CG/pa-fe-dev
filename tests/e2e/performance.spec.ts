@@ -1,10 +1,10 @@
 import { expect, test } from '@playwright/test';
-import { personaCookie } from '../support/personas';
+import { setPersona } from '../support/personas';
 import { watchConsole } from '../support/console';
 
 test.describe('Performance dashboard (S-P4-01) on the 375 mobile shell', () => {
   test.beforeEach(async ({ context }) => {
-    await context.addCookies([personaCookie('LEADER_P2')]);
+    await setPersona(context, 'LEADER_P2');
   });
 
   test('renders chrome, priority cards and milestones with no console errors', async ({ page }) => {

@@ -1,5 +1,3 @@
-'use client';
-
 import { useCallback } from 'react';
 import type { ContestCatalogueVM, MetricDefinitionVM, OperandVM, RuleExpressionVM, RuleOperator, ValidationIssueVM } from '@spec/contest-admin-vm';
 import { t } from '@/lib/i18n';

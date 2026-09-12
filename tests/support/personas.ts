@@ -1,5 +1,7 @@
-/** Persona stub cookie (pa_persona) — the same identities the header picker offers. */
-export const PERSONA_COOKIE = 'pa_persona';
+import type { BrowserContext } from '@playwright/test';
+
+/** Client-side persona storage key (see `src/lib/usePersona.tsx`) — the same identities the header dropdown offers. */
+export const PERSONA_STORAGE_KEY = 'pa_persona';
 
 export const PERSONAS = {
   LEADER_P2: 'LEADER_P2',
@@ -11,16 +13,15 @@ export const PERSONAS = {
 
 export type PersonaKey = keyof typeof PERSONAS;
 
-/** Header form for API requests. */
-export function personaHeaders(persona: PersonaKey): Record<string, string> {
-  return { cookie: `${PERSONA_COOKIE}=${PERSONAS[persona]}` };
-}
-
-/** Cookie form for browser contexts. */
-export function personaCookie(persona: PersonaKey, url = 'http://127.0.0.1:3600') {
-  return {
-    name: PERSONA_COOKIE,
-    value: PERSONAS[persona],
-    url,
-  };
+/**
+ * Seed the SPA's persona selection before first navigation. The app is a
+ * client-side SPA now (no `pa_persona` cookie / server-rendered page), so
+ * tests set the same `localStorage` key the persona picker itself writes to,
+ * via a context-level init script that runs before any app code does.
+ */
+export async function setPersona(context: BrowserContext, persona: PersonaKey): Promise<void> {
+  await context.addInitScript(
+    ([key, value]) => window.localStorage.setItem(key, value),
+    [PERSONA_STORAGE_KEY, PERSONAS[persona]] as [string, string],
+  );
 }

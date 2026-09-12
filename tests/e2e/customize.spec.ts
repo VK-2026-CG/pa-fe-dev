@@ -1,15 +1,16 @@
 import { expect, test } from '@playwright/test';
-import { personaCookie } from '../support/personas';
+import { PERSONAS, setPersona } from '../support/personas';
 import { watchConsole } from '../support/console';
+import { bffUrl } from '../support/bff';
 
 /** Mutates saved preferences — keep serial so ordering assertions stay deterministic. */
 test.describe.serial('Customize metrics (S-P4-04)', () => {
   test.beforeAll(async ({ request }) => {
-    await request.put('/api/bff/v1/performance/customize?scope=SELF', { headers: { Cookie: 'pa_persona=AGENT_P4' }, data: { priorityMetricCodes: ['TPC', 'PTPC', 'CASE_COUNT', 'FYP'], focusMetricCodes: ['FYC', 'PERSISTENCY_Y1'] } });
+    await request.put(bffUrl('/api/bff/v1/performance/customize?scope=SELF'), { headers: { 'x-persona': PERSONAS.AGENT_P4 }, data: { priorityMetricCodes: ['TPC', 'PTPC', 'CASE_COUNT', 'FYP'], focusMetricCodes: ['FYC', 'PERSISTENCY_Y1'] } });
   });
 
   test.beforeEach(async ({ context }) => {
-    await context.addCookies([personaCookie('AGENT_P4')]);
+    await setPersona(context, 'AGENT_P4');
   });
 
   test('sheet header shows the title and a Close action', async ({ page }) => {

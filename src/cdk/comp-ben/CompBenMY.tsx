@@ -1,22 +1,22 @@
-'use client';
 /** DRAFT screen (S-P4-06, specVersion 0.9.0) — proposed VMs behind the BFF draft stub (OQ-18). */
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useNavigate } from 'react-router-dom';
 import { t } from '@/lib/i18n';
 import { formatMoney, formatShortDate } from '@/lib/format';
+import { apiFetch } from '@/lib/apiClient';
 
 interface Money { kind: 'MONEY'; amount: string; currency: string }
 interface BonusRow { bonusCode: string; amount: Money; status: 'PAID' | 'PENDING'; paidOn?: string }
 interface CompPayload { draft: boolean; tabs: string[]; staleness?: { asOnDate: string }; rows: BonusRow[]; retirement: unknown[] }
 
 export default function CompBenMY() {
-  const router = useRouter();
+  const navigate = useNavigate();
   const [vm, setVm] = useState<CompPayload | null>(null);
   const [tab, setTab] = useState<'PAID_COMMISSION' | 'RETIREMENT'>('PAID_COMMISSION');
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('/api/bff/v1/compensation?stale=1')
+    apiFetch('/api/bff/v1/compensation?stale=1')
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
       .then(setVm)
       .catch((e: Error) => setError(e.message));
@@ -28,7 +28,7 @@ export default function CompBenMY() {
   return (
     <>
       <div className="appbar">
-        <button className="back" aria-label="Back" onClick={() => router.back()}>←</button>
+        <button className="back" aria-label="Back" onClick={() => navigate(-1)}>←</button>
         <h1>{t('insights.compben.title')}</h1>
       </div>
 

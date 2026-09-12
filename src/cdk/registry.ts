@@ -6,7 +6,6 @@
  * future pages proven identical across multiple supported markets.
  * The pages themselves live in `src/cdk/<feature>/<Feature><LBU|Common>.tsx`.
  */
-import { notFound } from 'next/navigation';
 import { getLbuContext, isFeatureEnabled, type LbuCode } from '@/config/lbu';
 import PerformanceMY from './performance/PerformanceMY';
 import MetricDetailMY from './metric-detail/MetricDetailMY';
@@ -45,12 +44,30 @@ const REGISTRY: Registry = {
 };
 
 /**
- * Resolve a feature's page for this deployment. Disabled in the LBU's route
- * manifest → 404 before render; registered nowhere → a loud configuration error.
+ * Thrown by `resolveCdk` when a feature is disabled for the deployment's LBU.
+ * The route tree's `errorElement` (`src/router.tsx`) catches this and renders
+ * an actual 404 view — this replaces Next's `notFound()`, which had no direct
+ * React Router equivalent.
  */
-export function resolveCdk<F extends CdkFeature>(feature: F, lbu?: LbuCode): CdkPage<F> {
+export class CdkFeatureDisabledError extends Error {
+  constructor(public readonly feature: CdkFeature) {
+    super(`Feature disabled for this deployment: ${feature}`);
+    this.name = 'CdkFeatureDisabledError';
+  }
+}
+
+/**
+ * Resolve a feature's page for this deployment. Disabled in the LBU's route
+ * manifest → throws `CdkFeatureDisabledError` (rendered as 404); registered
+ * nowhere → a loud configuration error.
+ *
+ * `lbu` accepts a raw string (not just `LbuCode`) so callers can forward an
+ * unvalidated env value (e.g. `import.meta.env.VITE_LBU_CODE`) straight
+ * through — `getLbuContext` is what validates/fails closed.
+ */
+export function resolveCdk<F extends CdkFeature>(feature: F, lbu?: string): CdkPage<F> {
   const context = getLbuContext(lbu);
-  if (!isFeatureEnabled(feature, context)) notFound();
+  if (!isFeatureEnabled(feature, context)) throw new CdkFeatureDisabledError(feature);
   const registration: Registration<F> = REGISTRY[feature];
   const page = registration[context.lbu] ?? registration.common;
   if (!page) throw new Error(`No CDK registered for feature=${feature}, lbu=${context.lbu}`);

@@ -1,4 +1,3 @@
-'use client';
 /**
  * Headless primitives — behavior + a11y only. No colors, sizes, or class
  * opinions; every visual hook comes in via className/style/render props.
@@ -47,6 +46,25 @@ export function Carousel({
       {dots?.(api)}
     </div>
   );
+}
+
+/**
+ * useIsDesktop — reads the `--bp-desktop-min` custom property dls.css
+ * defines (the only place breakpoint pixel values may live) so this stays
+ * behavior-only; the styled layer owns the number. SSR/first paint is
+ * `false` (mobile-first); resolves on mount and tracks live resizes.
+ */
+export function useIsDesktop(): boolean {
+  const [isDesktop, setIsDesktop] = useState(false);
+  useEffect(() => {
+    const raw = getComputedStyle(document.documentElement).getPropertyValue('--bp-desktop-min').trim();
+    const mql = window.matchMedia(`(min-width: ${raw || '1024px'})`);
+    const sync = () => setIsDesktop(mql.matches);
+    sync();
+    mql.addEventListener('change', sync);
+    return () => mql.removeEventListener('change', sync);
+  }, []);
+  return isDesktop;
 }
 
 /* ── Collapse: disclosure with a11y wiring (reco panel, accordions) ────── */

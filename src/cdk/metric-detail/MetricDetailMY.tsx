@@ -1,10 +1,9 @@
-'use client';
 import { useCallback, useEffect, useState } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { Link, useNavigate } from 'react-router-dom';
 import { t } from '@/lib/i18n';
 import { href } from '@/lib/nav';
 import { formatDateAsOf } from '@/lib/format';
+import { apiFetch } from '@/lib/apiClient';
 import {
   BarComparison, BreakdownTable, ComparisonCard, GaugeDonut, PendersCard,
   ThresholdArc, VariantValueCard, comparisonLabelKey,
@@ -14,7 +13,7 @@ import { Icon, Tag } from '@/dls-stub';
 import type { MetricDetailVM } from '@spec/performance-vm';
 
 export default function MetricDetailMY({ query }: { query: Record<string, string | undefined> }) {
-  const router = useRouter();
+  const navigate = useNavigate();
   const [vm, setVm] = useState<MetricDetailVM | null>(null);
   const [error, setError] = useState<string | null>(null);
   const metricCode = query.metricCode ?? 'TPC';
@@ -24,7 +23,7 @@ export default function MetricDetailMY({ query }: { query: Record<string, string
     for (const k of ['period', 'businessLine', 'basis', 'scope', 'teamView'] as const) {
       if (query[k]) params.set(k, query[k]!);
     }
-    const res = await fetch(`/api/bff/v1/performance/metrics/${metricCode}?${params}`);
+    const res = await apiFetch(`/api/bff/v1/performance/metrics/${metricCode}?${params}`);
     if (!res.ok) { setError(String(res.status)); return; }
     setError(null);
     setVm(await res.json());
@@ -39,7 +38,7 @@ export default function MetricDetailMY({ query }: { query: Record<string, string
   return (
     <>
       <div className="appbar">
-        <button className="back" aria-label="Back" onClick={() => router.back()}>←</button>
+        <button className="back" aria-label="Back" onClick={() => navigate(-1)}>←</button>
         <h1>{t(`insights.metric.${metricCode}.title`)}</h1>
       </div>
       {/* Context strip — Tag chips h28 + as-of Tag right (Figma 6588:18606) */}
@@ -72,7 +71,7 @@ export default function MetricDetailMY({ query }: { query: Record<string, string
           })}
           {vm.historyNav && (
             <div className="section">
-              <Link className="footer-link" href={href(vm.historyNav)}>
+              <Link className="footer-link" to={href(vm.historyNav)}>
                 <Icon token="sheet.HISTORICAL_DATA" size={20} tone="var(--color-brand)" />
                 <span style={{ flex: 1 }}>{t('insights.history.title')}</span>
                 <Icon token="arrow-right-s" size={20} tone="var(--color-text-muted)" />

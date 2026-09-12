@@ -38,6 +38,15 @@
   --shadow-card: 0 1px 3px rgba(16, 24, 40, 0.08);
   --font-stack: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 
+  /* responsive breakpoints — range boundaries + per-range design canvas width.
+     Mobile 0–767 (design 375) · Tablet 768–1023 (design 1024) · Desktop 1024+ (design 1440).
+     Tokens only for now — no screen consumes the tablet/desktop ranges yet. */
+  --bp-tablet-min: 768px;
+  --bp-desktop-min: 1024px;
+  --design-w-mobile: 375px;
+  --design-w-tablet: 1024px;
+  --design-w-desktop: 1440px;
+
   /* geometry tokens — measured (docs/design/figma-measurements.md) */
   --screen-max: 480px;          /* fluid mobile shell; design base 375 */
   --gutter: 16px;               /* 375 → 343 content */
@@ -105,6 +114,18 @@ svg text { font-family: var(--font-stack); }
 
 /* shell: true mobile — fluid to --screen-max, no desktop chrome */
 .shell { width: 100%; max-width: var(--screen-max); margin: 0 auto; min-height: 100dvh; background: var(--color-bg); padding-bottom: 40px; }
+
+/* Responsive breakpoints (spec: common/ux/tokens/breakpoint.tokens.json).
+   Mobile stays the ≤767 fluid shell above; tablet/desktop widen the shell
+   container to their design canvas width. No per-screen reflow yet — the
+   measured mobile components inside .shell keep their fixed geometry. */
+@media (min-width: 768px) {
+  .shell { max-width: var(--design-w-tablet); }
+}
+@media (min-width: 1024px) {
+  .shell { max-width: var(--design-w-desktop); }
+}
+
 .appbar { display: flex; align-items: center; gap: 10px; height: var(--appbar-h); padding: 0 var(--gutter); background: var(--color-surface); position: sticky; top: 0; z-index: 20; box-shadow: var(--shadow-card); }
 .appbar h1 { font-size: var(--fs-page); line-height: var(--lh-page); margin: 0; flex: 1; min-width: 0; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .appbar .back { border: 0; background: none; font-size: var(--fs-value); line-height: var(--lh-value); cursor: pointer; padding: 6px 8px 6px 0; }
@@ -146,6 +167,25 @@ svg text { font-family: var(--font-stack); }
 .dots { display: flex; justify-content: center; gap: 6px; margin-top: 10px; }
 .dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--color-border); }
 .dots i.on { width: 14px; border-radius: 3px; background: var(--color-brand); }
+
+/* Metric panel (A7, v1.4.0, screenshot-derived) — no-op wrapper on mobile
+   (MetricPanel only renders the header/collapse markup when `isDesktop`,
+   so this is styling-only, not visibility-toggling). At ≥1024px becomes the
+   bordered panel with a title/count/collapse header, and its
+   `.metric-grid`-tagged carousel reflows from horizontal scroll to a
+   2-column grid. Scoped to `.metric-grid` only (not `.carousel-track`
+   generally) so other screens' carousels are untouched. */
+.metric-panel-head { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+.count-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; height: 24px; padding: 0 6px; border-radius: var(--radius-chip); background: var(--tone-muted-bg); color: var(--color-text); font-size: var(--fs-caption); line-height: var(--lh-caption); font-weight: 700; }
+.metric-panel-toggle { display: inline-flex; align-items: center; gap: 8px; border: 0; background: none; padding: 0; cursor: pointer; color: var(--color-text); }
+@media (min-width: 1024px) {
+  .metric-panel { background: var(--color-surface); border-radius: var(--radius-card); box-shadow: var(--shadow-card); padding: 16px; }
+  .carousel-track.metric-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); overflow-x: visible; scroll-snap-type: none; }
+  .carousel-track.metric-grid > * { scroll-snap-align: none; flex: initial; }
+  .carousel-track.metric-grid .mcard,
+  .carousel-track.metric-grid .mcard.simple,
+  .carousel-track.metric-grid .milecard { width: 100%; }
+}
 
 /* Metric card — priority 308×166 / simple 280×80, pad 12, corner arrow 24 */
 .mcard { width: var(--card-prio-w); min-height: var(--card-prio-h); background: var(--color-surface); border-radius: var(--radius-card); box-shadow: var(--shadow-card); padding: var(--card-pad); display: flex; flex-direction: column; color: var(--color-text); }
@@ -200,6 +240,10 @@ svg text { font-family: var(--font-stack); }
 .pager-btn { border: 1px solid var(--color-border); background: var(--color-surface); border-radius: 8px; width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
 .pager-btn:disabled { opacity: 0.35; cursor: default; }
 .period-btn { display: inline-flex; align-items: center; gap: 4px; border: 1px solid var(--color-border); background: var(--color-surface); border-radius: var(--radius-chip); height: var(--pill-h); padding: 0 12px; font-size: var(--fs-caption); line-height: var(--lh-caption); font-weight: 700; cursor: pointer; }
+
+/* Desktop Filter action — replaces period-btn + tabs + toggles at ≥1024px (A7, v1.4.0) */
+.filter-btn { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--color-border); background: var(--color-surface); border-radius: 10px; height: var(--pill-h); padding: 0 14px; font-size: var(--fs-body); line-height: var(--lh-body); font-weight: 700; cursor: pointer; }
+.filter-row { display: flex; gap: 8px; }
 
 /* Scheme toggle row (343×40) + switch */
 .toggle-row { height: 40px; display: flex; align-items: center; justify-content: space-between; }

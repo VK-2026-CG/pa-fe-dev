@@ -1,16 +1,18 @@
-'use client';
-import Link from 'next/link';
+import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import { t } from '@/lib/i18n';
 import { href } from '@/lib/nav';
 import { formatScalar } from '@/lib/format';
 import { PERSONAS, type PersonaId } from '@/lib/persona';
-import { Collapse, clampPct } from '@/headless';
+import { usePersona } from '@/lib/usePersona';
+import { apiFetch } from '@/lib/apiClient';
+import { Collapse, Tabs, clampPct } from '@/headless';
 import {
-  BottomSheet, Icon, IconButton, ProgressBar, RadioSheetList, ScopePill, SheetRow,
+  BottomSheet, Icon, IconButton, ProgressBar, RadioSheetList, ScopePill, SheetRow, ToggleRow,
 } from '@/dls-stub';
 import type {
-  MoreActionVM, PeriodType, QuickLinkVM, RecommendationsPanelVM, Scope, ScopeSwitcherVM,
+  Basis, BusinessLine, DashboardFiltersVM, MoreActionVM, PeriodType, QuickLinkVM,
+  RecommendationsPanelVM, Scope, ScopeSwitcherVM, TeamView,
 } from '@spec/performance-vm';
 
 /* ── w.quick-links (tiles 80×122, icon 62, per Figma 6588:16556) ───────── */
@@ -18,7 +20,7 @@ export function QuickLinkRail({ links }: { links: QuickLinkVM[] }) {
   return (
     <nav className="quick" aria-label="Quick links">
       {links.map((l) => (
-        <Link key={l.id} href={href(l.nav)}>
+        <Link key={l.id} to={href(l.nav)}>
           <span className="ic"><Icon token={`quick.${l.id}`} size={26} tone="var(--color-brand)" /></span>
           <span className="lbl">{t(`insights.quicklink.${l.id}`)}</span>
         </Link>
@@ -52,12 +54,65 @@ export function PeriodSheet({ value, options, meta, onSelect, onClose }: {
   );
 }
 
+/**
+ * Desktop Filter sheet (A7, v1.4.0, screenshot-derived) — combines business
+ * line, period and basis/team-view selection (mobile's separate tabs/period
+ * button/toggle rows) into one sheet. Applies via the same `refetch` params
+ * the mobile controls already use; no new BFF contract.
+ */
+export function FilterSheet({ f, onApply, onClose }: {
+  f: DashboardFiltersVM;
+  onApply: (patch: { period: PeriodType; businessLine: BusinessLine; basis: Basis; teamView?: TeamView }) => void;
+  onClose: () => void;
+}) {
+  const [period, setPeriod] = useState<PeriodType>(f.period);
+  const [businessLine, setBusinessLine] = useState<BusinessLine>(f.businessLine);
+  const [basis, setBasis] = useState<Basis>(f.basis);
+  const [teamView, setTeamView] = useState<TeamView | undefined>(f.teamView);
+  const sub = (p: PeriodType) => {
+    const m = f.periodOptionsMeta?.find((x) => x.period === p);
+    if (!m) return undefined;
+    const d = new Date(`${m.startDate}T00:00:00Z`);
+    const start = `${d.getUTCDate()} ${d.toLocaleString('en', { month: 'short', timeZone: 'UTC' })} ${d.getUTCFullYear()}`;
+    return t('insights.period.range', { start });
+  };
+  return (
+    <BottomSheet title={t('insights.action.FILTER')} onClose={onClose}>
+      <div className="section-label" style={{ marginBottom: 8 }}>{t('insights.dashboard.filter.product')}</div>
+      <Tabs<BusinessLine>
+        value={businessLine} options={f.businessLineOptions} className="segtabs"
+        onChange={setBusinessLine}
+        renderTab={(bl, selected) => (
+          <span className={`seg ${selected ? 'active' : ''}`} style={{ display: 'block' }}>
+            {t(`insights.businessLine.${bl}`)}
+          </span>
+        )}
+      />
+      <div className="section-label" style={{ marginTop: 16, marginBottom: 8 }}>{t('insights.dashboard.filter.time')}</div>
+      <RadioSheetList value={period} options={f.periodOptions} onChange={setPeriod}
+        label={(p) => t(`insights.period.${p}`)} sub={sub} />
+      {f.basisToggleVisible && (
+        <ToggleRow label={t('insights.basis.SCHEME.toggle')} on={basis === 'SCHEME'}
+          onChange={(on) => setBasis(on ? 'SCHEME' : 'STANDARD')} />
+      )}
+      {f.teamViewToggleVisible && (
+        <ToggleRow label={t('insights.teamView.toggle')} on={teamView === 'GROUP'}
+          onChange={(on) => setTeamView(on ? 'GROUP' : 'DIRECT')} />
+      )}
+      <button className="btn-primary" style={{ marginTop: 12 }}
+        onClick={() => { onApply({ period, businessLine, basis, teamView }); onClose(); }}>
+        {t('insights.common.select')}
+      </button>
+    </BottomSheet>
+  );
+}
+
 /* ── More actions — bottom sheet (Figma 6588:16896: rows 52h, lead icons) ─ */
 export function MoreActionsSheet({ actions, onClose }: { actions: MoreActionVM[]; onClose: () => void }) {
   return (
     <BottomSheet title={t('insights.dashboard.metricTracking')} onClose={onClose}>
       {actions.map((a) => (
-        <Link key={a.id} href={href(a.nav)} onClick={onClose} style={{ display: 'block' }}>
+        <Link key={a.id} to={href(a.nav)} onClick={onClose} style={{ display: 'block' }}>
           <SheetRow leadToken={`sheet.${a.id}`} label={t(`insights.action.${a.id}.title`)} />
         </Link>
       ))}
@@ -80,16 +135,17 @@ export function ScopeSwitcher({ vm, onSelect }: { vm: ScopeSwitcherVM; onSelect:
 }
 
 export function PersonaPicker({ current }: { current?: string }) {
+  const { setPersonaId } = usePersona();
   return (
     <span className="persona">
       <select
         aria-label="Dev persona"
         defaultValue={current}
-        onChange={async (e) => {
-          await fetch('/api/dev/persona', {
-            method: 'POST', headers: { 'content-type': 'application/json' },
-            body: JSON.stringify({ persona: e.target.value as PersonaId }),
-          });
+        onChange={(e) => {
+          setPersonaId(e.target.value as PersonaId);
+          // Full reload (not a router navigation): every CDK page loads its
+          // own data once on mount, so a hard reload is the simplest way to
+          // guarantee everything on screen reflects the new persona.
           location.href = '/insights/performance';
         }}
       >
@@ -115,9 +171,9 @@ export function RecoPanel({ vm, expandedInitial = false }: { vm: Recommendations
     const prev = feedback;
     setFeedback(rating); setBusy(true);
     try {
-      const res = await fetch('/api/insights/recommendations/feedback', {
+      const res = await apiFetch(`/api/bff/v1/performance/recommendations/${vm.recommendationId}/feedback`, {
         method: 'POST', headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ recommendationId: vm.recommendationId, rating }),
+        body: JSON.stringify({ rating }),
       });
       if (!res.ok) setFeedback(prev);
     } catch { setFeedback(prev); } finally { setBusy(false); }
@@ -192,11 +248,11 @@ export function RecoPanel({ vm, expandedInitial = false }: { vm: Recommendations
             </span>
           );
           return i.nav
-            ? <Link key={i.code} href={href(i.nav)} className="reco-insight">{body}</Link>
+            ? <Link key={i.code} to={href(i.nav)} className="reco-insight">{body}</Link>
             : <div key={i.code} className="reco-insight">{body}</div>;
         })}
         {vm.cta && (
-          <Link href={href(vm.cta.nav)} className="spread text-semibold" style={{ marginTop: 12 }}>
+          <Link to={href(vm.cta.nav)} className="spread text-semibold" style={{ marginTop: 12 }}>
             <span className="row"><span style={{ width: 8, height: 8, borderRadius: 4, background: 'var(--color-brand)' }} />{t('insights.reco.viewTeamDrilldown')}</span>
             <Icon token="arrow-right-s" size={20} tone="var(--color-text-muted)" />
           </Link>

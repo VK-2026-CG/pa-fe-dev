@@ -1,6 +1,6 @@
 {
   "$schema": "../../screen-config.schema.json",
-  "configVersion": "2.1.0",
+  "configVersion": "2.2.0",
   "country": "MY",
   "module": "performance",
   "screens": {
@@ -84,6 +84,7 @@
             },
             "focusCards": {
               "visible": true,
+              "addEnabled": true,
               "maxCount": 6,
               "widget": "w.metric.card",
               "widgetVariant": "simple"
@@ -209,6 +210,7 @@
             },
             "focusCards": {
               "visible": true,
+              "addEnabled": true,
               "maxCount": 6,
               "widget": "w.metric.card",
               "widgetVariant": "simple"

@@ -26,5 +26,6 @@
   "sheet.HISTORICAL_DATA":       { "figmaNodeId": "6588:16915", "source": "material insights (stand-in for Symbols 'Monitoring')" },
   "activity":                    { "figmaNodeId": "6588:17637", "source": "remixicon pulse-line ('Activity')" },
   "hourglass-2-line":            { "figmaNodeId": "6588:17639", "source": "remixicon hourglass-2-line (layer name verbatim)" },
-  "flag":                        { "figmaNodeId": "6588:16901", "source": "material flag" }
+  "flag":                        { "figmaNodeId": "6588:16901", "source": "material flag" },
+  "filter":                      { "figmaNodeId": null,          "source": "remixicon filter-line (desktop Filter action — screenshot-derived, v1.4.0)" }
 }

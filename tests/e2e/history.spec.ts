@@ -1,10 +1,10 @@
 import { expect, test } from '@playwright/test';
-import { personaCookie } from '../support/personas';
+import { setPersona } from '../support/personas';
 import { watchConsole } from '../support/console';
 
 test.describe('Historical data (S-P4-03)', () => {
   test('3-year window renders year columns and no MoM column (AC-P4-03-02)', async ({ context, page }) => {
-    await context.addCookies([personaCookie('AGENT_P4')]);
+    await setPersona(context, 'AGENT_P4');
     const watch = watchConsole(page);
 
     await page.goto('/insights/history?metricCode=TPC&window=VS_LAST_2_YEARS');
@@ -19,7 +19,7 @@ test.describe('Historical data (S-P4-03)', () => {
   });
 
   test('current-year window shows the MoM column with N/A for January (AC-P4-03-09)', async ({ context, page }) => {
-    await context.addCookies([personaCookie('AGENT_P4')]);
+    await setPersona(context, 'AGENT_P4');
     await page.goto('/insights/history?metricCode=TPC&window=CURRENT_YEAR');
 
     await expect(page.getByRole('columnheader', { name: '2026' })).toBeVisible();
@@ -30,7 +30,7 @@ test.describe('Historical data (S-P4-03)', () => {
   });
 
   test('metric pill switches the series (AC-P4-03-12)', async ({ context, page }) => {
-    await context.addCookies([personaCookie('LEADER_P2')]);
+    await setPersona(context, 'LEADER_P2');
     await page.goto('/insights/history?metricCode=TPC&window=CURRENT_YEAR');
 
     const caseCount = page.getByRole('tab', { name: 'Case Count' });
@@ -40,7 +40,7 @@ test.describe('Historical data (S-P4-03)', () => {
   });
 
   test('window pager walks older/newer and disables at the ends', async ({ context, page }) => {
-    await context.addCookies([personaCookie('AGENT_P4')]);
+    await setPersona(context, 'AGENT_P4');
     await page.goto('/insights/history?metricCode=TPC&window=CURRENT_YEAR');
 
     // Newest window → cannot go newer.

@@ -2,7 +2,7 @@
  * PRUAction — Performance (P4) View Models
  * Contract C3: Next.js BFF → UI (CDK widgets)
  *
- * @version 1.3.0  (business rulings folded in — semantics only; see CHANGES below)
+ * @version 1.4.0  (desktop layout, screenshot-derived — see CHANGES below)
  * @module bff/types/performance-vm
  *
  * ─────────────────────────────────────────────────────────────────────────────
@@ -39,6 +39,15 @@
  *    each option's window start ("MTD · 1 Jul 2026 – Today"). MTD in MY.
  *  - MoM column header follows the metric's `display`
  *    (PCT → "MoM % Change", else "MoM Delta").
+ *
+ * v1.4.0 CHANGES (desktop layout, screenshot-derived — legacy-contract.md A6/A7):
+ *  - `focusMetrics` becomes `{ visible, addEnabled, items }` (was a bare
+ *    array) — BREAKING. `addEnabled` drives a "+" affordance when `items=[]`
+ *    and `visible=true` (was: hide entirely when empty, AC-P4-01-17→26/27).
+ *  - No new fields for the desktop Filter action / summary pills — the BFF
+ *    contract (`filters.*`) is unchanged; only the UI's presentation of the
+ *    existing period/businessLine/basis/teamView filters differs at ≥1024px
+ *    (AC-P4-01-28/29).
  *
  * v1.3.0 CHANGES (rulings 2026-08 — no type changes, semantics only):
  *  - `basis` is an AGENT-SEGMENT lens: SCHEME = Prudential-employed
@@ -276,9 +285,17 @@ export interface PerformanceDashboardVM {
   priorityMetrics: MetricCardVM[];
   /**
    * "Other Focus Metrics (n)" card row (v1.1.0) — selected focus metrics
-   * rendered as simple cards (value + delta, never goal). Empty ⇒ hidden.
+   * rendered as simple cards (value + delta, never goal).
+   * v1.4.0: object shape (was a bare array) — `visible=false` (config
+   * `focusCards.visible`) hides the section entirely; `items=[]` with
+   * `visible=true` renders the header with a "+" affordance when
+   * `addEnabled=true` (AC-P4-01-26/27), never both hidden and empty-visible.
    */
-  focusMetrics: MetricCardVM[];
+  focusMetrics: {
+    visible: boolean;
+    addEnabled: boolean;
+    items: MetricCardVM[];
+  };
   milestones: {
     visible: boolean;
     addEnabled: boolean;                   // "+" affordance

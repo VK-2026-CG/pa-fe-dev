@@ -1,10 +1,10 @@
 import { expect, test } from '@playwright/test';
-import { personaCookie } from '../support/personas';
+import { setPersona } from '../support/personas';
 import { watchConsole } from '../support/console';
 
 test.describe('draft packs render (S-P4-05 / S-P4-06)', () => {
   test.beforeEach(async ({ context }) => {
-    await context.addCookies([personaCookie('AGENT_P4')]);
+    await setPersona(context, 'AGENT_P4');
   });
 
   test('Milestones & Benefits page loads its tabs', async ({ page }) => {
@@ -26,7 +26,7 @@ test.describe('draft packs render (S-P4-05 / S-P4-06)', () => {
 
 test.describe('roadmap routes render the shared Coming-Soon page', () => {
   test.beforeEach(async ({ context }) => {
-    await context.addCookies([personaCookie('LEADER_P2')]);
+    await setPersona(context, 'LEADER_P2');
   });
 
   for (const [path, title] of [
@@ -53,7 +53,7 @@ test.describe('roadmap routes render the shared Coming-Soon page', () => {
 
 test.describe('routing shell', () => {
   test('root redirects to the Performance dashboard', async ({ context, page }) => {
-    await context.addCookies([personaCookie('LEADER_P2')]);
+    await setPersona(context, 'LEADER_P2');
     await page.goto('/');
     await expect(page).toHaveURL(/insights\/performance/);
   });

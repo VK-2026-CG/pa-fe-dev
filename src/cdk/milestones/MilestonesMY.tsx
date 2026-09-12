@@ -1,9 +1,9 @@
-'use client';
 /** DRAFT screen (S-P4-05, specVersion 0.9.0) — proposed VMs behind the BFF draft stub (OQ-17/18). */
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useNavigate } from 'react-router-dom';
 import { t } from '@/lib/i18n';
 import { formatMoney } from '@/lib/format';
+import { apiFetch } from '@/lib/apiClient';
 
 interface Money { kind: 'MONEY'; amount: string; currency: string }
 interface BenefitCard {
@@ -17,14 +17,14 @@ interface BenefitCard {
 interface BenefitsPayload { draft: boolean; tabs: string[]; bonus: BenefitCard[]; contests: unknown[] }
 
 export default function MilestonesMY() {
-  const router = useRouter();
+  const navigate = useNavigate();
   const [vm, setVm] = useState<BenefitsPayload | null>(null);
   const [tab, setTab] = useState<'BONUS' | 'CONTESTS'>('BONUS');
   const [pins, setPins] = useState<Record<number, boolean>>({});
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('/api/bff/v1/benefits')
+    apiFetch('/api/bff/v1/benefits')
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
       .then(setVm)
       .catch((e: Error) => setError(e.message));
@@ -36,7 +36,7 @@ export default function MilestonesMY() {
   return (
     <>
       <div className="appbar">
-        <button className="back" aria-label="Back" onClick={() => router.back()}>←</button>
+        <button className="back" aria-label="Back" onClick={() => navigate(-1)}>←</button>
         <h1>{t('insights.quicklink.MILESTONES')}</h1>
       </div>
 

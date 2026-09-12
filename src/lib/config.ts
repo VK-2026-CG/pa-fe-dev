@@ -4,7 +4,7 @@ import type { PeriodType, BusinessLine, Scope, TeamView } from '@spec/performanc
 export interface QuickLinkCfg { id: string; iconToken: string; nav: { route: string }; order: number; visible: boolean }
 export interface MoreActionCfg { id: string; iconToken: string; nav: { route: string }; order: number }
 export interface CardRowCfg {
-  visible?: boolean; maxCount?: number; widget: string; widgetVariant?: string;
+  visible?: boolean; addEnabled?: boolean; maxCount?: number; widget: string; widgetVariant?: string;
   cardOverrides?: Record<string, { showGoal?: boolean }>;
 }
 export interface DashboardScopeCfg {

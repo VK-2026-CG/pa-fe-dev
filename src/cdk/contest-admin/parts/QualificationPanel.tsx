@@ -1,6 +1,4 @@
-'use client';
-
-import Link from 'next/link';
+import { Link } from 'react-router-dom';
 import type { QualificationConfigurationVM, RuleExpressionVM } from '@spec/contest-admin-vm';
 import { t } from '@/lib/i18n';
 
@@ -18,7 +16,7 @@ export function QualificationPanel({ qualification, ruleBaseHref, onAddRoute }:{
     <section className="ca-route-stack" aria-labelledby="qualification-routes-title">
       <header><div><p>{t('contest.qualification.routesEyebrow')}</p><h3 id="qualification-routes-title">{t('contest.qualification.routes')}</h3></div><button className="ca-secondary" onClick={onAddRoute}>{t('contest.action.addRoute')}</button></header>
       {[...qualification.routes].sort((a,b) => a.order - b.order).map((route,index) => <article key={route.routeId}>
-        <div className="ca-route-index">{index + 1}</div><div><span>{route.audienceCode?t(`contest.audience.${route.audienceCode}`):t('contest.qualification.alternativeRoute')}</span><h4>{route.name??t(route.labelKey)}</h4><p>{t('contest.qualification.nodeSummary',{count:countNodes(route.expression),tiers:route.tierIds.length})}</p><div className="ca-route-policies">{route.selectionPolicy?.mode==='TOP_N'&&<small>{t('contest.routePolicy.topN',{count:route.selectionPolicy.topN??0,metric:route.selectionPolicy.rankByMetricCode??''})}</small>}{route.rewardPolicy&&<small>{t('contest.routePolicy.rewards',{values:route.rewardPolicy.rewardCodes.join(' · ')})}</small>}{route.sourceCitationIds?.length&&<small>{t('contest.routePolicy.sources',{count:route.sourceCitationIds.length})}</small>}</div></div><span className="ca-logic-chip">{t(`contest.logic.${route.expression.type}`)}</span><Link className="ca-secondary" href={`${ruleBaseHref}/${route.routeId}`}>{t('contest.action.editRule')}</Link>
+        <div className="ca-route-index">{index + 1}</div><div><span>{route.audienceCode?t(`contest.audience.${route.audienceCode}`):t('contest.qualification.alternativeRoute')}</span><h4>{route.name??t(route.labelKey)}</h4><p>{t('contest.qualification.nodeSummary',{count:countNodes(route.expression),tiers:route.tierIds.length})}</p><div className="ca-route-policies">{route.selectionPolicy?.mode==='TOP_N'&&<small>{t('contest.routePolicy.topN',{count:route.selectionPolicy.topN??0,metric:route.selectionPolicy.rankByMetricCode??''})}</small>}{route.rewardPolicy&&<small>{t('contest.routePolicy.rewards',{values:route.rewardPolicy.rewardCodes.join(' · ')})}</small>}{route.sourceCitationIds?.length&&<small>{t('contest.routePolicy.sources',{count:route.sourceCitationIds.length})}</small>}</div></div><span className="ca-logic-chip">{t(`contest.logic.${route.expression.type}`)}</span><Link className="ca-secondary" to={`${ruleBaseHref}/${route.routeId}`}>{t('contest.action.editRule')}</Link>
       </article>)}
     </section>
     <section className="ca-tier-matrix" aria-labelledby="tier-matrix-title">

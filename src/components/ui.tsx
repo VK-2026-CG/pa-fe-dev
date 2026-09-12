@@ -1,4 +1,3 @@
-'use client';
 import { useEffect, useState } from 'react';
 import { t } from '@/lib/i18n';
 import { toneFor, formatDelta } from '@/lib/format';

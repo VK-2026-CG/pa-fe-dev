@@ -43,6 +43,8 @@ const MAP = {
   'activity': RX('Health & Medical/pulse-line.svg'),
   'hourglass-2-line': RX('System/hourglass-2-line.svg'),
   'flag': MD('outlined/flag.svg'),
+  // Desktop Filter action (v1.4.0, screenshot-derived — no Figma node id)
+  'filter': RX('System/filter-line.svg'),
 };
 
 mkdirSync('public/icons', { recursive: true });

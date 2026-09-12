@@ -1,0 +1,10 @@
+{
+  "/api/bff/v1/performance/dashboard/route": "app/api/bff/v1/performance/dashboard/route.js",
+  "/api/dev/persona/route": "app/api/dev/persona/route.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/insights/moc/page": "app/insights/moc/page.js",
+  "/api/bff/v1/compensation/route": "app/api/bff/v1/compensation/route.js",
+  "/insights/performance/page": "app/insights/performance/page.js",
+  "/insights/introducer-drilldown/page": "app/insights/introducer-drilldown/page.js",
+  "/insights/comp-ben/page": "app/insights/comp-ben/page.js"
+}

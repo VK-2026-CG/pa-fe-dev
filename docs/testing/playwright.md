@@ -1,35 +1,43 @@
 # Testing (Playwright)
 
-One runner, three projects, configured in [`../../playwright.config.ts`](../../playwright.config.ts).
-Rationale: [ADR 0003](../architecture/decisions/0003-playwright-test-platform.md).
+One runner, three projects (`unit`, `e2e`, `desktop`), configured in
+[`../../playwright.config.ts`](../../playwright.config.ts).
+Rationale: [ADR 0003](../architecture/decisions/0003-playwright-test-platform.md),
+[ADR 0004](../architecture/decisions/0004-vite-spa-and-bff-extraction.md).
 
 | Project | Location | Needs servers | What belongs here |
 |---|---|---|---|
-| `unit` | `tests/unit/` | No | Pure modules: composers, formatters, MoM (D-11), LBU config, CDK registry, i18n key scan |
-| `api` | `tests/api/` | Yes | BFF contract, lens validation, D-14 entitlement guards |
-| `e2e` | `tests/e2e/` | Yes | Browser journeys on the 375-base mobile shell + console-error assertions |
-| — | `tests/support/` | — | Persona cookies/headers, API helpers, console watcher |
+| `unit` | `tests/unit/` | No | Pure modules: formatters, LBU config, CDK registry, i18n key scan, contest-admin rule-explanation |
+| `e2e` | `tests/e2e/` | Yes | Mobile-shell (375) browser journeys + console-error assertions |
+| `desktop` | `tests/e2e/` | Yes | Contest Admin + desktop-shell (1440) browser journeys |
+| — | `tests/support/` | — | Persona `localStorage` seeding, BFF base URL (`bff.ts`), console watcher |
+
+The BFF contract, lens validation, and D-14 entitlement guard tests (formerly
+the `api` project here) now live in `pa-be-dev`'s own Vitest suite — the BFF
+is a separate cross-origin service now, not a same-process Next.js route
+(ADR 0004).
 
 ## Commands
 
 ```bash
 npm run test:unit     # PW_SKIP_WEBSERVER=1 — no browser, no servers
-npm run test:api
-npm run test:e2e
+npm run test:e2e      # e2e + desktop
+npm run test:desktop  # desktop only
 npm test              # all three projects
 npm run test:headed   # watch the browser
 npm run test:ui       # Playwright UI mode
 npm run test:report   # open the last HTML report
 ```
 
-Prerequisites for `api` / `e2e`:
+Prerequisites for `e2e` / `desktop`:
 
 ```bash
 npx playwright install chromium          # CI: --with-deps chromium
-cd ../pruaction-insights-service && npm run build
+cd ../pa-be-dev && npm run build
 ```
 
-Playwright starts the domain service (4600) and the app (3600) itself.
+Playwright starts the domain+BFF service (pa-be-dev, :4600) and this app's
+Vite dev server (:3600) itself.
 
 ## Conventions
 
@@ -60,7 +68,7 @@ lsof -ti tcp:3600 | xargs kill
 ```
 
 Do not flip the flag to `true`. Silently testing against a different build is
-exactly the failure mode this setting prevents. Never leave `next dev` or the
+exactly the failure mode this setting prevents. Never leave `vite` or the
 domain service running after a task.
 
 ## Never

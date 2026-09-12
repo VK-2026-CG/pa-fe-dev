@@ -2,21 +2,19 @@
   "name": "pruaction-app",
   "version": "1.3.0",
   "private": true,
-  "description": "PRUAction Performance module — Next.js UI + BFF (spec repo: pruaction-spec)",
+  "description": "PRUAction Performance module — Vite + React Router SPA (spec repo: pruaction-spec). BFF composition now lives in pa-be-dev.",
   "scripts": {
-    "dev": "next dev -p 3600",
-    "build": "next build",
-    "start": "next start -p 3600",
+    "dev": "vite --port 3600",
+    "build": "vite build",
+    "start": "vite preview --port 3600",
     "test": "playwright test",
     "test:unit": "PW_SKIP_WEBSERVER=1 playwright test --project=unit",
-    "test:api": "playwright test --project=api",
     "test:e2e": "playwright test --project=e2e --project=desktop",
     "test:desktop": "playwright test --project=desktop",
     "test:headed": "playwright test --project=e2e --headed",
     "test:ui": "playwright test --ui",
     "test:report": "playwright show-report",
     "typecheck": "tsc --noEmit",
-    "export:contests": "tsx scripts/export-imported-contests.ts",
     "sync:specs": "bash scripts/sync-specs.sh",
     "handoff:validate": "node scripts/validate-handoffs.mjs",
     "handoff:receipt": "node scripts/create-handoff-receipt.mjs",
@@ -24,9 +22,9 @@
     "assets:validate": "node scripts/validate-spec-assets.mjs"
   },
   "dependencies": {
-    "next": "15.1.3",
     "react": "19.0.0",
-    "react-dom": "19.0.0"
+    "react-dom": "19.0.0",
+    "react-router-dom": "^6.28.1"
   },
   "devDependencies": {
     "@material-design-icons/svg": "^0.14.15",
@@ -34,8 +32,10 @@
     "@types/node": "^22.10.2",
     "@types/react": "^19.0.2",
     "@types/react-dom": "^19.0.2",
+    "@vitejs/plugin-react": "^4.3.4",
     "remixicon": "^4.9.1",
     "tsx": "^4.19.2",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "vite": "^6.0.7"
   }
 }

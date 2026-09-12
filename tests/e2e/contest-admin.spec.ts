@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { watchConsole } from '../support/console';
+import { bffUrl } from '../support/bff';
 import en from '@spec/en.json';
 
 test.describe.serial('Contest Administration desktop — real Contest domain',()=>{
@@ -24,7 +25,7 @@ test.describe.serial('Contest Administration desktop — real Contest domain',()
   });
 
   test('(AC-CA-02, AC-CA-ROUTE-01/02) builder saves domain configuration and persists a nested route',async({page,request})=>{
-    const current=await (await request.get(`/api/bff/v1/contest-admin/contests/${contestId}/versions/${versionId}`)).json();await request.patch(`/api/bff/v1/contest-admin/contests/${contestId}/versions/${versionId}`,{headers:{'If-Match':current.etag},data:{configuration:{basics:{code:'MY_GROWTH_UI',nameKey:'contest.created.new',country:'MY',timezone:'Asia/Kuala_Lumpur',name:'New contest'},audience:{codes:['PERSONAL']},calculation:{metricCode:'FYP',creditRate:'100.00'},rewards:{precedenceCode:'HIGHEST_ONLY'},governance:{frequencyCode:'DAILY'}}}});
+    const current=await (await request.get(bffUrl(`/api/bff/v1/contest-admin/contests/${contestId}/versions/${versionId}`))).json();await request.patch(bffUrl(`/api/bff/v1/contest-admin/contests/${contestId}/versions/${versionId}`),{headers:{'If-Match':current.etag},data:{configuration:{basics:{code:'MY_GROWTH_UI',nameKey:'contest.created.new',country:'MY',timezone:'Asia/Kuala_Lumpur',name:'New contest'},audience:{codes:['PERSONAL']},calculation:{metricCode:'FYP',creditRate:'100.00'},rewards:{precedenceCode:'HIGHEST_ONLY'},governance:{frequencyCode:'DAILY'}}}});
     await page.goto(`${builder}/edit/QUALIFICATION`);await page.getByRole('button',{name:'Add route'}).click();const dialog=page.getByRole('dialog',{name:'Add qualification route'});await dialog.getByLabel('Route name').fill('Personal production gate');await dialog.getByLabel('Route code').fill('PERSONAL_GATE_UI');await dialog.getByLabel('Audience').selectOption('PERSONAL');await dialog.getByLabel('Any condition').check();await dialog.getByLabel('Tier code').fill('SILVER');await dialog.getByLabel('Reward code').fill('STAR_1');await dialog.getByRole('button',{name:'Add route'}).click();
     await expect(page).toHaveURL(/rules\/route_personal_gate_ui/);await expect(page.getByRole('heading',{name:'Rule logic in English'})).toBeVisible();await expect(page.getByRole('region',{name:/ANY/})).toBeVisible();await page.getByRole('button',{name:'Add condition'}).click();const condition=page.locator('.ca-predicate').first();await condition.getByLabel('Metric').selectOption('FYP');await condition.getByLabel('Target value').fill('25000.00');const explanation='First Year Premium / Contribution must be greater than or equal to RM 25,000.';await expect(page.getByText(explanation)).toBeVisible();await page.getByRole('button',{name:'Save rule'}).click();await expect(page.getByText('Rule saved')).toBeVisible();await page.reload();await expect(page.getByLabel('Target value').first()).toHaveValue('25000.00');await expect(page.getByText(explanation)).toBeVisible();
   });

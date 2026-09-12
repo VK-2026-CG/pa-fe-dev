@@ -1,12 +1,14 @@
 # pruaction-app
 
-Next.js 15 implementation of the PRUAction **Performance module** — all P4
-screens (Dashboard S-P4-01, Metric Detail S-P4-02, Historical Data S-P4-03,
-Customize Metrics S-P4-04), the S-P23-01 AI recommendations panel, and the
-two **draft** packs (Milestones & Benefits S-P4-05, Comp & Ben S-P4-06) —
-plus the BFF that composes spec view-models from the Insights domain
-service. Specs live in the separate `pruaction-spec` repo (vendored under
-`vendor/spec/`, v1.3.0).
+Vite + React Router SPA implementing the PRUAction **Performance module** —
+all P4 screens (Dashboard S-P4-01, Metric Detail S-P4-02, Historical Data
+S-P4-03, Customize Metrics S-P4-04), the S-P23-01 AI recommendations panel,
+Contest Administration, and the two **draft** packs (Milestones & Benefits
+S-P4-05, Comp & Ben S-P4-06). The BFF that composes spec view-models from the
+Insights and Contest domain services now lives in the sibling `pa-be-dev`
+repo (see [ADR 0004](docs/architecture/decisions/0004-vite-spa-and-bff-extraction.md));
+this app calls it over HTTP at `/api/bff/v1/...`. Specs live in the separate
+`pruaction-spec` repo (vendored under `vendor/spec/`, v1.3.0).
 
 ## Agent workflow
 
@@ -26,11 +28,11 @@ See `docs/agent-workflows/`.
 
 ## Run it
 ```bash
-# 1) domain service (sibling repo)
-cd ../PruactionBackend && npm install
+# 1) domain service + BFF (sibling repo — pa-be-dev, pruaction-insights-service)
+cd ../pa-be-dev && npm install
 MONGODB_URI='' HOST=127.0.0.1 PORT=4600 npm run dev              # :4600
 
-# 2) this app
+# 2) this app (SPA only — no server-side pieces)
 npm install
 npm run dev                                                      # :3600
 open http://localhost:3600                                       # → /insights/performance
@@ -38,49 +40,46 @@ open http://localhost:3600                                       # → /insights
 Switch personas from the header dropdown: **P2 Leader** (default — scope
 switcher, Direct/Group toggle), **P3 Leader** (Group blocked, 403 by
 design), **P4 Agent**, and the **EMPTY / PROCESSING** demo agents that force
-the designed metric-detail states. `INSIGHTS_API_URL` overrides the service
-URL.
+the designed metric-detail states. The selection lives in `localStorage`
+(`src/lib/usePersona.tsx`) and travels to pa-be-dev as an `x-persona` request
+header on every BFF call (`src/lib/apiClient.ts`) — set `VITE_BFF_URL` if
+pa-be-dev isn't at the default `http://localhost:4600`.
 
-The Performance BFF defaults to `http://localhost:4600/insights/v1`. A
-`BFF-5020` response with `detail: "fetch failed"` means the domain service is
-not reachable; check `http://localhost:4600/healthz` before debugging the
-dashboard route. Use `INSIGHTS_API_URL` only when the service is bound to a
-different host or port.
+A `BFF-5020` response with `detail: "fetch failed"` means pa-be-dev can't
+reach the Insights domain data; check `http://localhost:4600/healthz` before
+debugging the dashboard route. `INSIGHTS_API_URL`/`CONTESTS_API_URL` are
+pa-be-dev's env vars now — this app never reads them.
 
-Contest Administration uses a separate server-only client. `CONTESTS_API_URL` is required by that client and must be the country-specific backend URL; there is no shared production or localhost fallback. Portfolio, contest creation and
-version editing, validation/review/submission, approvals, simulations, historic contests,
-audit reads, and reusable-rule flows call Fastify through the BFF; the browser
-never receives or calls the domain-service URL. Audit export is not exposed
-because Contest API `0.2.0-draft` does not define that operation.
+Contest Administration calls pa-be-dev's BFF routes the same way Performance
+does, carrying `x-contest-actor`/`x-contest-tenant` headers alongside
+`x-persona` (unverified — see ADR 0004). Portfolio, contest creation and
+version editing, validation/review/submission, approvals, simulations,
+historic contests, audit reads, and reusable-rule flows all go through the
+BFF; the browser never calls a domain-service URL directly. Audit export is
+not exposed because Contest API `0.2.0-draft` does not define that operation.
 
-The six reviewed MY 2026 circular definitions are maintained in
-`src/lib/contest-admin/imported-contests.ts`. Regenerate the backend-owned,
-checksum-pinned import file after changing a definition or governed LOV:
-
-```bash
-npm run export:contests
-cd ../PruactionBackend
-npm run db:import:contests -- --dry-run # validates every nested route and LOV
-npm run db:import:contests              # requires MONGODB_URI; idempotent upsert
-```
-
-The importer creates contest drafts for governed review; it does not publish
-them or fabricate agent progress. Agent results remain source-lineage-backed
-outputs of calculation runs.
+The six reviewed MY 2026 circular definitions and the `export:contests`
+tooling that regenerates their checksum-pinned import file now live in
+pa-be-dev (`src/bff/contest-admin/imported-contests.ts`) — this app only
+keeps the pure, client-rendered pieces of Contest Admin config
+(`src/lib/contest-admin/config.ts`, `src/lib/contest-admin/rule-explanation.ts`).
 
 ## Verify
 ```bash
 npm run typecheck
-npm run test:unit    # pure module tests: formatters, composers, contest config, LBU/CDK, i18n scan
-npm run test:api     # BFF contract, Contest-domain integration, and entitlement tests
+npm run test:unit    # pure module tests: formatters, contest config/rule-explanation, LBU/CDK, i18n scan
 npm run test:e2e     # mobile and desktop browser journeys, including console-error checks
-npm test             # all three Playwright projects
+npm test             # both Playwright projects (unit needs no servers; e2e boots pa-be-dev + this app)
 npm run build
 ```
-`test:api` / `test:e2e` need the sibling domain service built
-(`cd ../PruactionBackend && npm run build`) — Playwright boots it and
-the app itself. Browsers: `npx playwright install chromium`. Debug with
-`npm run test:headed`, `npm run test:ui`, `npm run test:report`.
+BFF contract, Contest-domain integration, and entitlement tests now live in
+`pa-be-dev`'s own Vitest suite (`cd ../pa-be-dev && npm test`) — see
+[ADR 0004](docs/architecture/decisions/0004-vite-spa-and-bff-extraction.md).
+
+`test:e2e` needs the sibling domain service built (`cd ../pa-be-dev && npm run
+build`) — Playwright boots it and this app's Vite dev server. Browsers: `npx
+playwright install chromium`. Debug with `npm run test:headed`, `npm run
+test:ui`, `npm run test:report`.
 
 ## Documentation
 
@@ -95,24 +94,28 @@ the app itself. Browsers: `npx playwright install chromium`. Debug with
 | Claude / Copilot entry points | [`CLAUDE.md`](CLAUDE.md) · [`.github/copilot-instructions.md`](.github/copilot-instructions.md) |
 
 ## Layout
-`src/app/insights/*` is the **routing layer only** — each `page.tsx` reads its
-route inputs (search params, persona cookie) and resolves a page from
-`src/cdk`. `src/config/lbu.ts` validates the deployment-scoped `LBU_CODE`
-and owns the per-market route/feature manifest (unknown code → fail closed).
+`src/router.tsx` is the **routing layer only** — a data-driven route table
+(insights features flat, Contest Admin nested with `:contestId`-style params)
+that resolves a page from `src/cdk` and forwards `useSearchParams()`/
+`useParams()` plus the client-side persona. `src/config/lbu.ts` validates the
+deployment-scoped `VITE_LBU_CODE` and owns the per-market route/feature
+manifest (unknown code → fail closed; disabled feature → `resolveCdk` throws,
+caught by the router's `errorElement` as a 404).
 **`src/cdk` is the page layer**: one folder per feature holding the screen
 itself. This repository currently vendors only MY specs, so every registered
 page is named `<Feature>MY.tsx` and registered under `my`; the registry retains
 a `Common` fallback for future pages proven identical across supported LBUs.
-`src/lib` (i18n ·
-string-money formatters · typed config · persona stub · domain client) ·
-`src/lib/compose` (dashboard / metric-detail / history / customize — pure,
-VM-typed) · `src/app/api/bff/v1` (route handlers + entitlement guards + draft
-stubs) · `src/components` (widget library: cards, gauges, bars, breakdown
-table, reco panel, sheets). `src/dls-stub/dls.css` holds the DLS tokens — the
-only file with raw values; `src/app/globals.css` just imports it.
+`src/lib` (i18n · string-money formatters · typed config · persona
+catalogue/context · `apiClient` BFF fetch wrapper) · `src/components` (widget
+library: cards, gauges, bars, breakdown table, reco panel, sheets). The BFF
+route handlers, entitlement guards, and view-model composers now live in
+`pa-be-dev`'s `src/bff/**` — see
+[ADR 0004](docs/architecture/decisions/0004-vite-spa-and-bff-extraction.md).
+`src/dls-stub/dls.css` holds the DLS tokens — the only file with raw values;
+`src/globals.css` just imports it.
 
-Layer order: `app` → `cdk` → `components` → `dls-stub` → `headless`. Adding a
-market = a `config/lbu.ts` entry + its CDKs + spec — no fork of `src/app`,
+Layer order: `router` → `cdk` → `components` → `dls-stub` → `headless`. Adding a
+market = a `config/lbu.ts` entry + its CDKs + spec — no fork of `src/router.tsx`,
 `src/components`, `src/headless` or `src/dls-stub`. Full picture and known gaps:
 [`docs/architecture/README.md`](docs/architecture/README.md).
 

@@ -1,2 +1,0 @@
-import { resolveCdk } from '@/cdk/registry';
-export default async function Page({searchParams}:{searchParams:Promise<Record<string,string|undefined>>}) { const Cdk = resolveCdk('contest-admin'); return <Cdk page="historic-contests" query={await searchParams}/>; }

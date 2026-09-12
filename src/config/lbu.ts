@@ -2,9 +2,20 @@
  * Deployment-scoped market context (docs/architecture/frontend-architecture.md §1).
  *
  * `LBU_CODE` is a deployment constant — never resolved per request. It selects
- * the feature manifest, locale and (later) BFF base URL + DLS theme token set.
- * This app vendors the Malaysia Performance spec, so `my` is the only market
- * that exists today; an unrecognised code fails closed (docs/security/security-standard.md §10).
+ * the feature manifest, locale and (later) DLS theme token set. This app
+ * vendors the Malaysia Performance spec, so `my` is the only market that
+ * exists today; an unrecognised code fails closed (docs/security/security-standard.md §10).
+ *
+ * Client-safe only: this module must never read a server-only env var (only
+ * `VITE_*`-prefixed vars reach the browser bundle at all — Vite's own
+ * enforcement, not just convention). `CONTESTS_API_URL`/`INSIGHTS_API_URL`
+ * belong to pa-be-dev exclusively now that the BFF lives there.
+ *
+ * This module also stays free of `import.meta.env` on purpose: it's imported
+ * directly by `tests/unit/architecture.spec.ts`, which Playwright runs under
+ * plain Node (no Vite transform), where `import.meta` is a syntax error. The
+ * one call site that needs the build-time `VITE_LBU_CODE` override — the
+ * router — reads it and passes it in explicitly (see `src/router.tsx`).
  */
 export const LBU_CODES = ['my'] as const;
 export type LbuCode = (typeof LBU_CODES)[number];
@@ -32,7 +43,6 @@ export interface LbuContext {
   lbu: LbuCode;
   country: string;
   locale: string;
-  contestApiUrl?: string;
   /** Route manifest: a feature absent or false 404s before render. */
   features: Readonly<Record<Feature, boolean>>;
 }
@@ -45,16 +55,16 @@ const CONTEXTS: Readonly<Record<LbuCode, LbuContext>> = Object.freeze({
     lbu: 'my',
     country: 'MY',
     locale: 'en-MY',
-    contestApiUrl: process.env.CONTESTS_API_URL,
     features: Object.freeze(allFeatures()),
   }),
 });
 
 /**
- * Resolve the deployment's market context. Defaults to `my` when `LBU_CODE`
- * is unset (local dev); throws for any configured value we cannot serve.
+ * Resolve the deployment's market context. Defaults to `my` when no code is
+ * given (local dev, and every test); throws for any configured value we
+ * cannot serve.
  */
-export function getLbuContext(lbuCode: string | undefined = process.env.LBU_CODE): LbuContext {
+export function getLbuContext(lbuCode: string | undefined = 'my'): LbuContext {
   const code = (lbuCode ?? 'my').toLowerCase();
   if (!(LBU_CODES as readonly string[]).includes(code)) {
     throw new Error(`Unsupported LBU_CODE: ${code}`);

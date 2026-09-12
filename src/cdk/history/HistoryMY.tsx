@@ -1,14 +1,14 @@
-'use client';
 import { useCallback, useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useNavigate } from 'react-router-dom';
 import { t } from '@/lib/i18n';
 import { formatScalar } from '@/lib/format';
+import { apiFetch } from '@/lib/apiClient';
 import { DeltaBadge } from '@/components/ui';
 import { Icon } from '@/dls-stub';
 import type { HistoryWindow, MetricHistoryVM } from '@spec/performance-vm';
 
 export default function HistoryMY({ query }: { query: Record<string, string | undefined> }) {
-  const router = useRouter();
+  const navigate = useNavigate();
   const [vm, setVm] = useState<MetricHistoryVM | null>(null);
   const [error, setError] = useState<string | null>(null);
   const metricCode = query.metricCode ?? 'TPC';
@@ -19,7 +19,7 @@ export default function HistoryMY({ query }: { query: Record<string, string | un
     for (const k of ['businessLine', 'basis', 'scope', 'teamView'] as const) {
       if (query[k]) params.set(k, query[k]!);
     }
-    const res = await fetch(`/api/bff/v1/performance/metrics/${metricCode}/history?${params}`);
+    const res = await apiFetch(`/api/bff/v1/performance/metrics/${metricCode}/history?${params}`);
     if (!res.ok) { setError(String(res.status)); return; }
     setError(null);
     setVm(await res.json());
@@ -34,7 +34,7 @@ export default function HistoryMY({ query }: { query: Record<string, string | un
     for (const k of ['businessLine', 'basis', 'scope', 'teamView'] as const) {
       if (query[k]) params.set(k, query[k]!);
     }
-    router.push(`/insights/history?${params.toString()}`);
+    navigate(`/insights/history?${params.toString()}`);
   };
 
   if (error) return <div className="section card pad">Error {error}</div>;
@@ -48,7 +48,7 @@ export default function HistoryMY({ query }: { query: Record<string, string | un
   return (
     <>
       <div className="appbar">
-        <button className="back" aria-label="Back" onClick={() => router.back()}>←</button>
+        <button className="back" aria-label="Back" onClick={() => navigate(-1)}>←</button>
         <h1>{t('insights.history.title')}</h1>
       </div>
 

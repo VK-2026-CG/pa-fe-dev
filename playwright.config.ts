@@ -2,15 +2,19 @@ import { defineConfig, devices } from '@playwright/test';
 import path from 'node:path';
 
 /**
- * One runner for three suites:
- *   tests/unit — pure module tests (composers, formatters, config, i18n scan)
- *   tests/api  — BFF contract + entitlement tests (replaces scripts/smoke.sh)
- *   tests/e2e  — browser journeys on the 375-base mobile shell
+ * One runner for two suites:
+ *   tests/unit — pure module tests (formatters, config, i18n scan, CDK registry)
+ *   tests/e2e  — browser journeys on the 375-base mobile shell, against the
+ *                Vite-served SPA calling pa-be-dev directly
+ *
+ * The BFF contract/entitlement tests (formerly tests/api) and the unit specs
+ * for the modules that moved with it now live in pa-be-dev's own Vitest suite
+ * — see docs/architecture/decisions/0004-vite-spa-and-bff-extraction.md.
  *
  * `reuseExistingServer: false` is deliberate: a stale process squatting 4600 or
  * 3600 must fail loudly instead of silently serving a different build.
  */
-const SVC_DIR = process.env.SVC_DIR ?? path.resolve(__dirname, '../PruactionBackend');
+const SVC_DIR = process.env.SVC_DIR ?? path.resolve(__dirname, '../pa-be-dev');
 const APP_PORT = Number(process.env.APP_PORT ?? 3600);
 const SVC_PORT = Number(process.env.SVC_PORT ?? 4600);
 const isCI = !!process.env.CI;
@@ -28,7 +32,7 @@ const webServer = [
     stderr: 'pipe' as const,
   },
   {
-    command: `CONTESTS_API_URL=http://127.0.0.1:${SVC_PORT}/contests/v1 npx next dev -p ${APP_PORT}`,
+    command: `npx vite --port ${APP_PORT}`,
     url: `http://127.0.0.1:${APP_PORT}/insights/performance`,
     reuseExistingServer: false,
     timeout: 120_000,
@@ -57,21 +61,16 @@ export default defineConfig({
       use: {},
     },
     {
-      name: 'api',
-      testDir: './tests/api',
-      use: { ...devices['Desktop Chrome'] },
-    },
-    {
       name: 'e2e',
       testDir: './tests/e2e',
-      testIgnore: '**/contest-*.spec.ts',
+      testIgnore: ['**/contest-*.spec.ts', '**/*-desktop.spec.ts'],
       // 375-base mobile shell (docs/figma-extract.md).
       use: { ...devices['Pixel 7'], isMobile: true, viewport: { width: 375, height: 812 } },
     },
     {
       name: 'desktop',
       testDir: './tests/e2e',
-      testMatch: '**/contest-*.spec.ts',
+      testMatch: ['**/contest-*.spec.ts', '**/*-desktop.spec.ts'],
       use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 1000 } },
     },
   ],

@@ -1,4 +1,3 @@
-'use client';
 /**
  * Customize Metrics (S-P4-04) — white sheet with rounded pill rows.
  * Priority rows are locked + reorderable (drag, or ArrowUp/ArrowDown on the
@@ -7,8 +6,9 @@
  * docs/design/figma-measurements.md.
  */
 import { useCallback, useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useNavigate } from 'react-router-dom';
 import { t } from '@/lib/i18n';
+import { apiFetch } from '@/lib/apiClient';
 import { Toast } from '@/components/ui';
 import {
   CustomizeActions, CustomizeHeader, CustomizeMetricRow, CustomizeSection, CustomizeSurface,
@@ -24,7 +24,7 @@ function metricLabel(item: CustomizeItemVM): string {
 }
 
 export default function CustomizeMetricsMY({ query }: { query: Record<string, string | undefined> }) {
-  const router = useRouter();
+  const navigate = useNavigate();
   const scope = (query.scope === 'TEAM' ? 'TEAM' : 'SELF') as Scope;
   const [vm, setVm] = useState<CustomizeMetricsVM | null>(null);
   const [priority, setPriority] = useState<CustomizeItemVM[]>([]);
@@ -37,7 +37,7 @@ export default function CustomizeMetricsMY({ query }: { query: Record<string, st
   const [overIndex, setOverIndex] = useState<number | null>(null);
 
   const load = useCallback(async () => {
-    const res = await fetch(`/api/bff/v1/performance/customize?scope=${scope}`);
+    const res = await apiFetch(`/api/bff/v1/performance/customize?scope=${scope}`);
     if (!res.ok) { setError(String(res.status)); return; }
     const data: CustomizeMetricsVM = await res.json();
     setVm(data);
@@ -76,19 +76,19 @@ export default function CustomizeMetricsMY({ query }: { query: Record<string, st
       priorityMetricCodes: priority.map((p) => p.metricCode),
       focusMetricCodes: focus.filter((f) => f.selected).map((f) => f.metricCode),
     };
-    const res = await fetch(`/api/bff/v1/performance/customize?scope=${scope}`, {
+    const res = await apiFetch(`/api/bff/v1/performance/customize?scope=${scope}`, {
       method: 'PUT', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body),
     });
     setSaving(false);
     if (res.ok) {
-      router.push('/insights/performance?toast=insights.toast.focusMetricsAdded');
+      navigate('/insights/performance?toast=insights.toast.focusMetricsAdded');
     } else {
       setErrorToast(t('insights.customize.saveFailed'));
     }
   };
 
   /** Close and Cancel both discard — nothing persists without Save. */
-  const dismiss = () => router.back();
+  const dismiss = () => navigate(-1);
 
   return (
     <CustomizeSurface>

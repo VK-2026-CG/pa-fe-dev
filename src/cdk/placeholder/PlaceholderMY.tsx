@@ -1,5 +1,4 @@
-'use client';
-import { useRouter } from 'next/navigation';
+import { useNavigate } from 'react-router-dom';
 import { t } from '@/lib/i18n';
 
 /**
@@ -7,11 +6,11 @@ import { t } from '@/lib/i18n';
  * Common to every LBU; the only per-feature variation is the app-bar title.
  */
 export default function PlaceholderMY({ titleKey }: { titleKey?: string }) {
-  const router = useRouter();
+  const navigate = useNavigate();
   return (
     <>
       <div className="appbar">
-        <button className="back" aria-label="Back" onClick={() => router.back()}>←</button>
+        <button className="back" aria-label="Back" onClick={() => navigate(-1)}>←</button>
         <h1>{titleKey ? t(titleKey) : t('insights.placeholder.title')}</h1>
       </div>
       <div className="section card state">

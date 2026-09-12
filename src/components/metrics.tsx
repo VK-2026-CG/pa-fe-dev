@@ -1,5 +1,4 @@
-'use client';
-import Link from 'next/link';
+import { Link } from 'react-router-dom';
 import { t } from '@/lib/i18n';
 import { href } from '@/lib/nav';
 import { formatScalar, formatDelta, toneFor } from '@/lib/format';
@@ -31,7 +30,7 @@ export function MetricCard({ vm, variant = 'priority' }: { vm: MetricCardVM; var
     ? `/ ${formatScalar(vm.goal.target)}`
     : `/ ${t('insights.goal.notSet')}`;
   return (
-    <Link href={href(vm.nav)} className={`mcard ${variant === 'simple' ? 'simple' : ''}`}>
+    <Link to={href(vm.nav)} className={`mcard ${variant === 'simple' ? 'simple' : ''}`}>
       <div className="head">
         <span>
           <span className="name">{t(`insights.metric.${vm.metricCode}.title`)}</span>
@@ -65,7 +64,7 @@ export function MetricCard({ vm, variant = 'priority' }: { vm: MetricCardVM; var
 /* ── w.milestone.card — 308×238 (Figma 6588:16772) ─────────────────────── */
 export function MilestoneCard({ vm }: { vm: MilestoneCardVM }) {
   return (
-    <Link href={href(vm.nav)} className="milecard">
+    <Link to={href(vm.nav)} className="milecard">
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
         <span>
           <span className="title14">{t(`insights.milestone.program.${vm.programCode}`)}</span>

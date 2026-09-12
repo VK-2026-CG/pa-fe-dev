@@ -1,4 +1,3 @@
-'use client';
 /**
  * DLS STUB primitives — the styled layer over `src/headless`. Swap this
  * folder for the real Prudential DLS; keep the exported names + props.
@@ -6,7 +5,7 @@
  */
 import { useState, type CSSProperties, type ReactNode } from 'react';
 import {
-  Carousel as HCarousel, Checkbox as HCheckbox, Layer, RadioGroup,
+  Carousel as HCarousel, Checkbox as HCheckbox, Collapse, Layer, RadioGroup,
   ReorderHandle as HReorderHandle, Switch as HSwitch, type CarouselApi,
 } from '@/headless';
 
@@ -26,7 +25,6 @@ export function Icon({ token, size = 20, className, style, tone }: {
   }
   return (
     <span aria-hidden className={`icon ${className ?? ''}`} style={{ width: size, height: size, ...style }}>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={src} alt="" width={size} height={size} />
     </span>
   );
@@ -67,11 +65,14 @@ export function ToggleRow({ label, on, onChange }: { label: string; on: boolean;
 }
 
 /* ── CarouselRow: measured snap track + brand dots ─────────────────────── */
-export function CarouselRow({ count, children, showDots = true }: { count: number; children: ReactNode; showDots?: boolean }) {
+export function CarouselRow({ count, children, showDots = true, className, style }: {
+  count: number; children: ReactNode; showDots?: boolean; className?: string; style?: CSSProperties;
+}) {
   return (
     <HCarousel
       count={count}
-      trackClassName="carousel-track"
+      style={style}
+      trackClassName={`carousel-track ${className ?? ''}`}
       dots={showDots && count > 1 ? (api: CarouselApi) => (
         <div className="dots" aria-hidden>
           {Array.from({ length: api.count }, (_, i) => <i key={i} className={i === api.index ? 'on' : ''} />)}
@@ -155,6 +156,48 @@ export function PeriodButton({ label, onClick }: { label: string; onClick: () =>
     <button className="period-btn" onClick={onClick}>
       {label} <Icon token="arrow-down-s" size={16} tone="var(--color-text)" />
     </button>
+  );
+}
+
+/* ── Desktop Filter action (A7, v1.4.0, screenshot-derived) ────────────── */
+export function FilterButton({ label, onClick }: { label: string; onClick: () => void }) {
+  return (
+    <button className="filter-btn" onClick={onClick}>
+      <Icon token="filter" size={16} tone="var(--color-text)" /> {label}
+    </button>
+  );
+}
+
+/**
+ * Metric panel (A7, v1.4.0, screenshot-derived). `isDesktop` gates whether
+ * the title/count/collapse header renders at all — not just CSS visibility
+ * — so mobile never carries a second, hidden-but-present copy of controls
+ * (which broke unique-locator assumptions in a11y/e2e). Below desktop,
+ * `.metric-panel` is a bare wrapper and children always render.
+ */
+export function MetricPanel({ isDesktop, title, count, action, defaultOpen = true, children }: {
+  isDesktop: boolean; title: ReactNode; count: number; action?: ReactNode; defaultOpen?: boolean; children: ReactNode;
+}) {
+  if (!isDesktop) return <div className="metric-panel">{children}</div>;
+  return (
+    <div className="metric-panel">
+      <Collapse defaultOpen={defaultOpen} trigger={({ open, toggle, buttonProps }) => (
+        <div className="metric-panel-head">
+          <button {...buttonProps} className="metric-panel-toggle" onClick={toggle} disabled={Boolean(action)}>
+            <span className="title16">{title}</span>
+            <span className="count-badge">{count}</span>
+          </button>
+          <span style={{ flex: 1 }} />
+          {action ?? (
+            <button className="icon-btn" aria-label={open ? 'Collapse' : 'Expand'} onClick={toggle}>
+              <Icon token={open ? 'arrow-up-s' : 'arrow-down-s'} size={20} tone="var(--color-text)" />
+            </button>
+          )}
+        </div>
+      )}>
+        <div className="metric-panel-body">{children}</div>
+      </Collapse>
+    </div>
   );
 }
 
