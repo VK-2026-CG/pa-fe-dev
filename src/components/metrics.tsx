@@ -25,7 +25,13 @@ function DeltaLine({ delta }: { delta: DeltaVM }) {
 
 /* ── w.metric.card — priority 308×166 · simple 280×80 (carousel slides) ── */
 export function MetricCard({ vm, variant = 'priority' }: { vm: MetricCardVM; variant?: 'priority' | 'simple' }) {
-  const showGoal = variant === 'priority' && vm.showGoal;
+  // A metric with no approved upstream source keeps its title and nav, but has
+  // no value to show — never substitute a zero (VM 1.5.0 / C1 §7.13).
+  const dataState = vm.dataState ?? 'OK';
+  const stateText = dataState === 'PROCESSING'
+    ? t('insights.state.processing.title')
+    : t('insights.state.empty.title');
+  const showGoal = variant === 'priority' && vm.showGoal && dataState === 'OK';
   const goalText = vm.goal?.state === 'SET' && vm.goal.target
     ? `/ ${formatScalar(vm.goal.target)}`
     : `/ ${t('insights.goal.notSet')}`;
@@ -40,7 +46,11 @@ export function MetricCard({ vm, variant = 'priority' }: { vm: MetricCardVM; var
         </span>
         <Icon token="arrow-right-up-line" size={24} tone="var(--color-text)" />
       </div>
-      {variant === 'priority' ? (
+      {dataState !== 'OK' ? (
+        <div className="value-block">
+          <div className="goal-line">{stateText}</div>
+        </div>
+      ) : variant === 'priority' ? (
         <>
           <div className="value-block">
             <div className="value">{formatScalar(vm.value)}</div>

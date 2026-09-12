@@ -25,7 +25,15 @@ export function formatDecimal(value: number, precision = 1): string { return val
 export function formatPp(pp: number): string { return `${pp > 0 ? '+' : ''}${pp}pp`; }
 export function formatPct(pct: number): string { return `${pct > 0 ? '+' : ''}${pct}%`; }
 
-export function formatScalar(v: MetricScalar): string {
+/** Placeholder for a value the pipeline has not supplied — matches the table cells' existing convention. */
+export const NO_VALUE = '-';
+
+/**
+ * Accepts a missing scalar because a metric can now be sourced-but-unpopulated
+ * (`dataState` PROCESSING/EMPTY), rather than throwing on `.kind` at every call site.
+ */
+export function formatScalar(v: MetricScalar | null | undefined): string {
+  if (!v) return NO_VALUE;
   switch (v.kind) {
     case 'MONEY': return formatMoney(v.amount, v.currency);
     case 'COUNT': return formatCount(v.value);
