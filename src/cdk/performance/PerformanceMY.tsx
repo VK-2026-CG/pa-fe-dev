@@ -77,7 +77,6 @@ export default function PerformanceMY({
       return;
     }
     const data: PerformanceDashboardVM = await res.json();
-    console.log(data);
     setError(null);
     setVm(data);
     setLens({
