@@ -15,42 +15,51 @@ test.describe('Performance dashboard (S-P4-01) on the 375 mobile shell', () => {
     await expect(page.getByText('Metric Tracking')).toBeVisible();
     await expect(page.getByRole('navigation', { name: 'Quick links' })).toBeVisible();
 
-    // Priority row header reflects the composed card count (AC-P4-01-06).
-    await expect(page.getByText(/Priority Metrics \(\d+\)/)).toBeVisible();
+    // Priority panel header + count badge reflect the composed card count
+    // (AC-P4-01-06) — the filter chrome is unified across breakpoints (v1.5.6),
+    // so this is the same collapsible panel used on desktop (AC-P4-01-29).
+    const panel = page.locator('.metric-panel').filter({ has: page.getByRole('button', { name: 'Priority Metric' }) });
+    await expect(panel.getByRole('button', { name: 'Priority Metric' }).locator('.count-badge')).toHaveText(/^\d+$/);
     await expect(page.getByText('Priority Milestones')).toBeVisible();
 
     expect(watch.errors, watch.errors.join('\n')).toEqual([]);
     expect(watch.warnings, watch.warnings.join('\n')).toEqual([]);
   });
 
-  test('period sheet opens, selects MTD and refetches (AC-P4-01-23)', async ({ page }) => {
+  test('summary pills reflect the active filters and open the combined Filter sheet (AC-P4-01-28, unified v1.5.6)', async ({ page }) => {
     await page.goto('/insights/performance');
 
-    const periodButton = page.locator('button.period-btn');
-    await expect(periodButton).toContainText('YTD');
-    await periodButton.click();
+    const productPill = page.getByRole('button', { name: /Product/ });
+    const timePill = page.getByRole('button', { name: /Time/ });
+    await expect(productPill).toContainText('Both');
+    await expect(timePill).toContainText('YTD');
 
-    // Sheet title comes from the vendored bundle, never inline copy.
-    await expect(page.getByText('Time Period')).toBeVisible();
+    await productPill.click();
+    const sheet = page.locator('.sheet');
+    await expect(sheet).toBeVisible();
+    await expect(sheet.getByRole('tab', { name: 'Takaful' })).toBeVisible();
+    await expect(sheet.getByRole('radio').filter({ hasText: 'MTD' })).toBeVisible();
 
-    const mtdOption = page.getByRole('radio').filter({ hasText: 'MTD' });
-    await expect(mtdOption).toBeVisible();
-    await mtdOption.click();
-    await page.getByRole('button', { name: 'Select' }).click();
+    await sheet.getByRole('tab', { name: 'Takaful' }).click();
+    await sheet.getByRole('radio').filter({ hasText: 'MTD' }).click();
+    await sheet.getByRole('button', { name: 'Select' }).click();
 
-    await expect(periodButton).toContainText('MTD');
+    await expect(productPill).toContainText('Takaful');
+    await expect(timePill).toContainText('MTD');
   });
 
-  test('business-line tabs switch the lens (Insurance / Takaful)', async ({ page }) => {
+  test('Priority Metric panel shows a count badge and collapses (AC-P4-01-29, unified v1.5.6)', async ({ page }) => {
     await page.goto('/insights/performance');
 
-    const tabs = page.getByRole('tab');
-    await expect(tabs.first()).toHaveAttribute('aria-selected', 'true');
+    const panel = page.locator('.metric-panel').filter({ has: page.getByRole('button', { name: 'Priority Metric' }) });
+    const toggle = panel.getByRole('button', { name: 'Priority Metric' });
+    await expect(toggle).toBeVisible();
+    await expect(toggle.locator('.count-badge')).toHaveText(/^\d+$/);
 
-    const takaful = page.getByRole('tab', { name: 'Takaful' });
-    await takaful.click();
-    await expect(takaful).toHaveAttribute('aria-selected', 'true');
-    await expect(page.getByText(/Priority Metrics \(\d+\)/)).toBeVisible();
+    const collapseBtn = panel.getByRole('button', { name: 'Collapse' });
+    await expect(collapseBtn).toBeVisible();
+    await collapseBtn.click();
+    await expect(panel.getByRole('button', { name: 'Expand' })).toBeVisible();
   });
 
   test('AI recommendations bar ships collapsed and expands on tap (S-P23-01)', async ({ page }) => {
