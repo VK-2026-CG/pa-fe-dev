@@ -6,19 +6,20 @@ test.describe('persona entitlements on the dashboard', () => {
   test('P2 leader sees the scope switcher', async ({ context, page }) => {
     await setPersona(context, 'LEADER_P2');
     await page.goto('/insights/performance');
-    await expect(page.locator('button.scope-pill')).toBeVisible();
+    await expect(page.getByLabel('Scope switcher')).toBeVisible();
   });
 
   test('P3 leader sees the scope switcher but no Group toggle in TEAM (AC-P4-01-16)', async ({ context, page }) => {
     await setPersona(context, 'LEADER_P3');
     await page.goto('/insights/performance');
 
-    const scopePill = page.locator('button.scope-pill');
-    await expect(scopePill).toBeVisible();
-    await scopePill.click();
-    await page.getByRole('menuitem').filter({ hasText: 'Team' }).click();
+    const scopeSwitcher = page.getByLabel('Scope switcher');
+    await expect(scopeSwitcher).toBeVisible();
+    await scopeSwitcher.selectOption('TEAM');
 
-    await expect(page.getByText(/Priority Metrics \(\d+\)/)).toBeVisible();
+    await expect(page.getByRole('button', { name: /Product/ })).toBeVisible();
+    await page.getByRole('button', { name: 'Filter' }).click();
+    await expect(page.locator('.sheet')).toBeVisible();
     await expect(page.getByRole('switch', { name: /Group/i })).toHaveCount(0);
   });
 
@@ -26,7 +27,7 @@ test.describe('persona entitlements on the dashboard', () => {
     await setPersona(context, 'AGENT_P4');
     await page.goto('/insights/performance');
 
-    await expect(page.getByText(/Priority Metrics \(\d+\)/)).toBeVisible();
-    await expect(page.locator('button.scope-pill')).toHaveCount(0);
+    await expect(page.getByRole('button', { name: /Product/ })).toBeVisible();
+    await expect(page.getByLabel('Scope switcher')).toHaveCount(0);
   });
 });

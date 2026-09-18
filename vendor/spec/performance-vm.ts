@@ -76,54 +76,58 @@
 
 /* ────────────────────────────── Primitives ─────────────────────────────── */
 
-export type PeriodType = 'MTD' | 'QTD' | 'YTD';
-export type BusinessLine = 'ALL' | 'INSURANCE' | 'TAKAFUL';
-export type Basis = 'STANDARD' | 'SCHEME';
+export type PeriodType = "MTD" | "QTD" | "YTD";
+export type BusinessLine = "ALL" | "INSURANCE" | "TAKAFUL";
+export type Basis = "STANDARD" | "SCHEME";
 /** Whose numbers: the agent's own or their team's (Agent Leader). */
-export type Scope = 'SELF' | 'TEAM';
+export type Scope = "SELF" | "TEAM";
 /** Team roll-up breadth — the "Group" toggle (only meaningful when scope = TEAM). */
-export type TeamView = 'DIRECT' | 'GROUP';
-export type Variant = 'WITHOUT_REPRICING' | 'WITH_REPRICING';
-export type Sentiment = 'POSITIVE' | 'NEGATIVE' | 'NEUTRAL';
-export type TrendDirection = 'UP' | 'DOWN' | 'FLAT';
+export type TeamView = "DIRECT" | "GROUP";
+export type Variant = "WITHOUT_REPRICING" | "WITH_REPRICING";
+export type Sentiment = "POSITIVE" | "NEGATIVE" | "NEUTRAL";
+export type TrendDirection = "UP" | "DOWN" | "FLAT";
 
 /** ISO 8601 date, e.g. "2026-07-27" */
 export type IsoDate = string;
 
 export interface MoneyValue {
-  kind: 'MONEY';
+  kind: "MONEY";
   /** Decimal string, ≤2 dp — format with DLS formatters, never parseFloat for display. */
   amount: string;
   /** ISO 4217, e.g. "MYR" */
   currency: string;
 }
 export interface CountValue {
-  kind: 'COUNT';
+  kind: "COUNT";
   value: number;
 }
 export interface PercentValue {
-  kind: 'PERCENT';
+  kind: "PERCENT";
   /** 0–100 scale (95 ⇒ 95%). */
   value: number;
 }
 export interface DecimalValue {
-  kind: 'DECIMAL';
+  kind: "DECIMAL";
   /** Unitless ratio, e.g. PRODUCTIVITY 9.7 (cases / active agent). */
   value: number;
   /** Suggested display precision (default 1). */
   precision?: number;
 }
 /** Discriminated union used for every metric value (D-03). */
-export type MetricScalar = MoneyValue | CountValue | PercentValue | DecimalValue;
+export type MetricScalar =
+  | MoneyValue
+  | CountValue
+  | PercentValue
+  | DecimalValue;
 
 export interface DeltaVM {
-  comparisonBasis: 'LAST_YEAR' | 'LAST_MONTH';
+  comparisonBasis: "LAST_YEAR" | "LAST_MONTH";
   direction: TrendDirection;
   /** Drives badge tone; computed by the domain (D-05) — or by the BFF from
    *  catalog `favourability` for month-over-month deltas (D-11). */
   sentiment: Sentiment;
   /** Which field the badge renders — from catalog `changeDisplay` (D-10). */
-  display: 'PCT' | 'PP' | 'ABS';
+  display: "PCT" | "PP" | "ABS";
   /** "+27% vs LY". */
   pct?: number;
   /** "+2pp". */
@@ -133,19 +137,19 @@ export interface DeltaVM {
 }
 
 export interface GoalVM {
-  state: 'SET' | 'NOT_SET';
+  state: "SET" | "NOT_SET";
   target?: MetricScalar;
   /** 0–100+, present only when state = SET. */
   progressPct?: number;
 }
 
 export interface VMeta {
-  screenId: string;               // "S-P4-01" …
-  specVersion: string;            // screen spec version this payload conforms to
-  configVersion: string;          // ui/config/countries/{cc} version applied
-  country: string;                // "MY"
-  asOfDate: IsoDate;              // data watermark → "As of 27 Jul 2026"
-  generatedAt: string;            // ISO date-time
+  screenId: string; // "S-P4-01" …
+  specVersion: string; // screen spec version this payload conforms to
+  configVersion: string; // ui/config/countries/{cc} version applied
+  country: string; // "MY"
+  asOfDate: IsoDate; // data watermark → "As of 27 Jul 2026"
+  generatedAt: string; // ISO date-time
   traceId: string;
   /** True when a sub-source failed and the BFF degraded the payload. */
   partial: boolean;
@@ -155,15 +159,15 @@ export interface VMeta {
 
 /** Navigation is expressed as route tokens resolved by the app shell router. */
 export interface RouteRef {
-  route: string;                        // e.g. "insights/metric-detail"
-  params?: Record<string, string>;      // e.g. { metricCode: "TPC" }
+  route: string; // e.g. "insights/metric-detail"
+  params?: Record<string, string>; // e.g. { metricCode: "TPC" }
 }
 
 /* ─────────────────────── S-P4-01 · Performance Dashboard ────────────────── */
 
 export interface QuickLinkVM {
-  id: string;              // "MILESTONES" | "INTRODUCER_DRILLDOWN" | "COMP_BEN" | "LEADERBOARD" | "VIEW_MOC" …
-  iconToken: string;       // DLS icon token from config
+  id: string; // "MILESTONES" | "INTRODUCER_DRILLDOWN" | "COMP_BEN" | "LEADERBOARD" | "VIEW_MOC" …
+  iconToken: string; // DLS icon token from config
   nav: RouteRef;
   order: number;
   badgeCount?: number;
@@ -179,19 +183,19 @@ export interface RecommendationsEntryVM {
 
 /* Expanded "Performance Recommendations" panel (widget `w.reco.panel`). */
 export interface RecoFlagVM {
-  code: string;                            // i18n: insights.reco.flag.{code}
-  severity: 'INFO' | 'WARNING' | 'CRITICAL';
+  code: string; // i18n: insights.reco.flag.{code}
+  severity: "INFO" | "WARNING" | "CRITICAL";
 }
 export interface RecoHighlightVM {
   metricCode: string;
-  achieved: MetricScalar;                  // "152K TPC secured"
-  goal?: GoalVM;                           // "200K Goal (76%)" + progress bar
+  achieved: MetricScalar; // "152K TPC secured"
+  goal?: GoalVM; // "200K Goal (76%)" + progress bar
   /** Signed % vs expected run-rate → "8% above run-rate". */
   runRateDeltaPct?: number;
 }
 export interface RecoInsightVM {
-  code: string;                            // stable id (analytics/feedback)
-  titleCode: string;                       // i18n: insights.reco.insight.{titleCode}
+  code: string; // stable id (analytics/feedback)
+  titleCode: string; // i18n: insights.reco.insight.{titleCode}
   metricCode?: string;
   trend?: { direction: TrendDirection; sentiment: Sentiment; text: string };
   /** Engine-generated narrative (pre-localised). */
@@ -199,37 +203,37 @@ export interface RecoInsightVM {
   nav?: RouteRef;
 }
 export interface RecommendationsPanelVM {
-  recommendationId: string;                // feedback target
+  recommendationId: string; // feedback target
   flags: RecoFlagVM[];
   highlight?: RecoHighlightVM;
   insights: RecoInsightVM[];
-  cta?: { labelCode: string; nav: RouteRef };  // "View Team Drilldown"
-  generatedAt: string;                     // "Generated on 2026-07-13 at 02:06"
-  feedback?: 'UP' | 'DOWN';                // previously submitted rating
+  cta?: { labelCode: string; nav: RouteRef }; // "View Team Drilldown"
+  generatedAt: string; // "Generated on 2026-07-13 at 02:06"
+  feedback?: "UP" | "DOWN"; // previously submitted rating
 }
 
 export interface DashboardFiltersVM {
   period: PeriodType;
-  periodOptions: PeriodType[];             // from config, e.g. ["QTD","YTD"]
+  periodOptions: PeriodType[]; // from config, e.g. ["QTD","YTD"]
   businessLine: BusinessLine;
-  businessLineOptions: BusinessLine[];     // tab order, e.g. ["ALL","INSURANCE","TAKAFUL"]
+  businessLineOptions: BusinessLine[]; // tab order, e.g. ["ALL","INSURANCE","TAKAFUL"]
   basis: Basis;
-  basisToggleVisible: boolean;             // "Scheme" segment toggle = config ∧ entitlement (OQ-20)
+  basisToggleVisible: boolean; // "Scheme" segment toggle = config ∧ entitlement (OQ-20)
   /**
    * Per-option period windows for the "Time Period" bottom sheet subtitles
    * ("1 Jul 2026 - Today"). BFF-supplied so clients never do fiscal math.
    */
   periodOptionsMeta?: Array<{ period: PeriodType; startDate: IsoDate }>;
   scope: Scope;
-  teamView?: TeamView;                     // present when scope = TEAM
-  teamViewToggleVisible: boolean;          // "Group" toggle = config ∧ leader level P2
+  teamView?: TeamView; // present when scope = TEAM
+  teamViewToggleVisible: boolean; // "Group" toggle = config ∧ leader level P2
 }
 
 /** Header persona switcher (avatar dropdown, top-right). Absent for non-leaders. */
 export interface ScopeSwitcherVM {
   current: Scope;
   options: Array<{
-    scope: Scope;                          // i18n: insights.scope.{SELF|TEAM}
+    scope: Scope; // i18n: insights.scope.{SELF|TEAM}
     /** Secondary lines in the dropdown item (name / unit), pre-resolved. */
     subValues?: string[];
   }>;
@@ -237,8 +241,8 @@ export interface ScopeSwitcherVM {
 
 /** Props contract for widget `w.metric.card` (see widget-contracts.md). */
 export interface MetricCardVM {
-  metricCode: string;                      // i18n: insights.metric.{code}.title
-  valueType: MetricScalar['kind'];
+  metricCode: string; // i18n: insights.metric.{code}.title
+  valueType: MetricScalar["kind"];
   /** Shown as subtitle when present — i18n: insights.variant.{variant}. */
   variant?: Variant;
   /**
@@ -246,7 +250,7 @@ export interface MetricCardVM {
    * upstream source, or batch complete with no data) ⇒ `value` absent and the
    * widget renders a compact state. Defaults to OK when omitted. C1 §7.13.
    */
-  dataState?: MetricDetailVM['dataState'];
+  dataState?: MetricDetailVM["dataState"];
   /** Absent when `dataState !== 'OK'` — never zero-filled or synthesized. */
   value?: MetricScalar;
   /** Per-card data-gap banners, same shape as the detail screen's. */
@@ -255,29 +259,29 @@ export interface MetricCardVM {
   showGoal: boolean;
   goal?: GoalVM;
   delta?: DeltaVM;
-  nav: RouteRef;                           // → S-P4-02 with current filter context
+  nav: RouteRef; // → S-P4-02 with current filter context
 }
 
 /** Props contract for widget `w.milestone.card`. */
 export interface MilestoneMeasureVM {
-  measureCode: string;                     // i18n: insights.measure.{code}
+  measureCode: string; // i18n: insights.measure.{code}
   achieved: MetricScalar;
   target: MetricScalar;
 }
 export interface MilestoneCardVM {
-  programCode: string;                     // i18n: insights.milestone.program.{code}
-  variant: Variant;                        // subtitle, i18n: insights.variant.{variant}
+  programCode: string; // i18n: insights.milestone.program.{code}
+  variant: Variant; // subtitle, i18n: insights.variant.{variant}
   cycleYear: number;
-  currentTierCode: string;                 // i18n: insights.milestone.tier.{code}
+  currentTierCode: string; // i18n: insights.milestone.tier.{code}
   nextTierCode?: string;
   progressPct: number;
   measures: MilestoneMeasureVM[];
-  nav: RouteRef;                           // ↗ milestones detail (P2/P3 surface)
+  nav: RouteRef; // ↗ milestones detail (P2/P3 surface)
 }
 
 /** ⋯ / "More Action" bottom sheet items (widget `w.sheet.more-action`). */
 export interface MoreActionVM {
-  id: 'SET_GOALS' | 'CUSTOMIZE_METRICS' | 'HISTORICAL_DATA' | (string & {});
+  id: "SET_GOALS" | "CUSTOMIZE_METRICS" | "HISTORICAL_DATA" | (string & {});
   iconToken: string;
   nav: RouteRef;
   order: number;
@@ -307,13 +311,13 @@ export interface PerformanceDashboardVM {
   };
   milestones: {
     visible: boolean;
-    addEnabled: boolean;                   // "+" affordance
-    setGoalEnabled: boolean;               // "Set Goal" header action (v1.1.0)
+    addEnabled: boolean; // "+" affordance
+    setGoalEnabled: boolean; // "Set Goal" header action (v1.1.0)
     items: MilestoneCardVM[];
   };
   /** ⋯ overflow sheet actions, config-composed. */
   moreActions: MoreActionVM[];
-  footerLinks: QuickLinkVM[];              // e.g. VIEW_MOC
+  footerLinks: QuickLinkVM[]; // e.g. VIEW_MOC
 }
 
 /* ───────────────────────── S-P4-02 · Metric Detail ──────────────────────── */
@@ -328,55 +332,55 @@ export interface DetailContextVM {
   scope: Scope;
   /** "Direct" / "Group" chip — first chip on team drilldowns (v1.1.0). */
   teamView?: TeamView;
-  businessLine: BusinessLine;              // chip, i18n: insights.businessLine.{code}
-  period: PeriodType;                      // chip
+  businessLine: BusinessLine; // chip, i18n: insights.businessLine.{code}
+  period: PeriodType; // chip
   basis: Basis;
-  asOfDate: IsoDate;                       // "As of …"
+  asOfDate: IsoDate; // "As of …"
 }
 
 /** Donut gauge: collected vs penders (widget `w.metric-detail.gauge`). */
 export interface GaugeSectionVM {
-  type: 'GAUGE';
-  id: string;                              // stable section id, e.g. "gauge.primary"
-  variant?: Variant;                       // heading suffix ("TPC without repricing")
+  type: "GAUGE";
+  id: string; // stable section id, e.g. "gauge.primary"
+  variant?: Variant; // heading suffix ("TPC without repricing")
   collected: MetricScalar;
   penders?: MetricScalar;
 }
 
 /** Threshold gauge for PERCENT metrics (widget `w.metric-detail.threshold-gauge`). */
 export interface ThresholdGaugeSectionVM {
-  type: 'THRESHOLD_GAUGE';
+  type: "THRESHOLD_GAUGE";
   id: string;
   current: PercentValue;
-  threshold: { value: number; comparator: 'GTE' | 'LTE' };
+  threshold: { value: number; comparator: "GTE" | "LTE" };
   /** POSITIVE when threshold met — tints the arc/marker per DLS. */
   sentiment: Sentiment;
 }
 
 /** YoY card (widget `w.metric-detail.comparison`). */
 export interface ComparisonSectionVM {
-  type: 'COMPARISON';
+  type: "COMPARISON";
   id: string;
-  variant?: Variant;                       // card heading suffix when applicable
+  variant?: Variant; // card heading suffix when applicable
   currentYear: number;
   current: MetricScalar;
   priorYear: number;
   prior: MetricScalar;
-  change: DeltaVM;                         // "% Growth" (pct) or "Persistency Change" (pp)
+  change: DeltaVM; // "% Growth" (pct) or "Persistency Change" (pp)
 }
 
 /** Single-value card, e.g. "TPC With Repricing" (widget `w.metric-detail.variant-value`). */
 export interface VariantValueSectionVM {
-  type: 'VARIANT_VALUE';
+  type: "VARIANT_VALUE";
   id: string;
-  variant: Variant;                        // heading, i18n: insights.variant.{variant}
-  periodLabelYear: number;                 // "YTD 2026"
+  variant: Variant; // heading, i18n: insights.variant.{variant}
+  periodLabelYear: number; // "YTD 2026"
   value: MetricScalar;
 }
 
 /** Penders card for count metrics (widget `w.metric-detail.penders`). */
 export interface PendersSectionVM {
-  type: 'PENDERS';
+  type: "PENDERS";
   id: string;
   periodLabelYear: number;
   value: MetricScalar;
@@ -384,16 +388,16 @@ export interface PendersSectionVM {
 
 /** Product breakdown table (widget `w.metric-detail.breakdown-table`). */
 export interface BreakdownRowVM {
-  productCode: string;                     // i18n: insights.product.{code}
+  productCode: string; // i18n: insights.product.{code}
   /** Renders "(10%)" beside the product label when present. */
   weightPct?: number;
   cells: Array<{ businessLine: BusinessLine; value: MetricScalar }>;
 }
 export interface BreakdownSectionVM {
-  type: 'BREAKDOWN';
-  id: string;                              // "breakdown.without-repricing" | "breakdown.with-repricing"
-  variant: Variant;                        // table heading
-  columns: BusinessLine[];                 // column order; i18n per code
+  type: "BREAKDOWN";
+  id: string; // "breakdown.without-repricing" | "breakdown.with-repricing"
+  variant: Variant; // table heading
+  columns: BusinessLine[]; // column order; i18n per code
   rows: BreakdownRowVM[];
   totals: Array<{ businessLine: BusinessLine; value: MetricScalar }>;
 }
@@ -404,13 +408,13 @@ export interface BreakdownSectionVM {
  * (MANPOWER Opening/Closing). Delta chips render per point from `change`.
  */
 export interface BarComparisonSectionVM {
-  type: 'BAR_COMPARISON';
-  id: string;                              // "bars.primary"
-  years: number[];                         // ascending, last = current year
+  type: "BAR_COMPARISON";
+  id: string; // "bars.primary"
+  years: number[]; // ascending, last = current year
   /** Axis unit label, i18n: insights.axis.{unitCode} ("No. of Agents"). */
   axisUnitCode?: string;
   measures: Array<{
-    measureCode?: string;                  // i18n: insights.measure.{code}; absent for single-measure
+    measureCode?: string; // i18n: insights.measure.{code}; absent for single-measure
     points: Array<{ year: number; value: MetricScalar; change?: DeltaVM }>;
   }>;
 }
@@ -426,9 +430,9 @@ export type MetricDetailSectionVM =
 
 /** Dismissible data-quality banner (widget `w.notice.banner`, v1.2.0). */
 export interface NoticeVM {
-  code: string;                            // i18n: insights.notice.{code}
-  severity: 'INFO' | 'WARNING';
-  params?: Record<string, string>;         // i18n interpolation (e.g. productCode)
+  code: string; // i18n: insights.notice.{code}
+  severity: "INFO" | "WARNING";
+  params?: Record<string, string>; // i18n interpolation (e.g. productCode)
 }
 
 export interface MetricDetailVM {
@@ -439,7 +443,7 @@ export interface MetricDetailVM {
    * Temporarily Unavailable" + Refresh). EMPTY ⇒ w.state.empty ("No Data
    * Available"). Non-OK payloads have empty `sections` (v1.2.0).
    */
-  dataState: 'OK' | 'PROCESSING' | 'EMPTY';
+  dataState: "OK" | "PROCESSING" | "EMPTY";
   /** Data-gap banners above the first section (e.g. PRODUCT_DATA_MISSING). */
   notices?: NoticeVM[];
   sections: MetricDetailSectionVM[];
@@ -450,38 +454,43 @@ export interface MetricDetailVM {
 /* ──────────────────────── S-P4-03 · Historical Data ─────────────────────── */
 
 export interface HistoryTabVM {
-  metricCode: string;                      // pill label via i18n
+  metricCode: string; // pill label via i18n
   selected: boolean;
 }
 
 export interface HistoryRowVM {
-  month: number;                           // 1..12 → i18n month short names
+  month: number; // 1..12 → i18n month short names
   /** Aligned with `years`; null ⇒ render "-". */
   values: Array<MetricScalar | null>;
 }
 
 /** History comparison window — drives columns + pager label (v1.1.0). */
-export type HistoryWindow = 'CURRENT_YEAR' | 'VS_LAST_YEAR' | 'VS_LAST_2_YEARS';
+export type HistoryWindow = "CURRENT_YEAR" | "VS_LAST_YEAR" | "VS_LAST_2_YEARS";
 
 export interface MetricHistoryVM {
   meta: VMeta;
-  tabs: HistoryTabVM[];                    // visible pills, from config history.tabs
+  tabs: HistoryTabVM[]; // visible pills, from config history.tabs
   /** Overflow metrics behind the "More Metrics" dropdown when pills exceed width. */
   moreTabs: HistoryTabVM[];
   metricCode: string;
-  valueType: MetricScalar['kind'];
-  context: { businessLine: BusinessLine; basis: Basis; scope: Scope; teamView?: TeamView };
+  valueType: MetricScalar["kind"];
+  context: {
+    businessLine: BusinessLine;
+    basis: Basis;
+    scope: Scope;
+    teamView?: TeamView;
+  };
   comparison: {
-    window: HistoryWindow;                 // i18n: insights.history.window.{code}
-    windowOptions: HistoryWindow[];        // pager cycles these, from config
+    window: HistoryWindow; // i18n: insights.history.window.{code}
+    windowOptions: HistoryWindow[]; // pager cycles these, from config
     anchorYear: number;
-    yearsBack: number;                     // 0 for CURRENT_YEAR
-    canGoOlder: boolean;                   // "<" enabled
-    canGoNewer: boolean;                   // ">" enabled
+    yearsBack: number; // 0 for CURRENT_YEAR
+    canGoOlder: boolean; // "<" enabled
+    canGoNewer: boolean; // ">" enabled
   };
   /** Column order, anchor year first (e.g. [2026, 2025, 2024]). */
   years: number[];
-  rows: HistoryRowVM[];                    // always 12 rows, Jan..Dec
+  rows: HistoryRowVM[]; // always 12 rows, Jan..Dec
   /**
    * Month-over-month deltas for the anchor year — the "MoM Delta" column,
    * present only when window = CURRENT_YEAR. Index 0 (Jan) and months with a
@@ -494,12 +503,12 @@ export interface MetricHistoryVM {
 /* ─────────────────────── S-P4-04 · Customize Metrics ────────────────────── */
 
 export interface CustomizeItemVM {
-  metricCode: string;                      // i18n: insights.metric.{code}.title (+ variant suffix)
-  variant?: Variant;                       // e.g. "TPC without repricing"
+  metricCode: string; // i18n: insights.metric.{code}.title (+ variant suffix)
+  variant?: Variant; // e.g. "TPC without repricing"
   selected: boolean;
   /** Locked ⇒ greyed checked box, not toggleable (MY priority set). */
   locked: boolean;
-  reorderable: boolean;                    // drag handle visible
+  reorderable: boolean; // drag handle visible
   order: number;
 }
 
@@ -520,8 +529,8 @@ export interface CustomizeMetricsVM {
 
 /** PUT /api/bff/v1/performance/customize?scope=… request body. */
 export interface SaveCustomizeRequest {
-  priorityMetricCodes: string[];           // final order
-  focusMetricCodes: string[];              // final order, selected only
+  priorityMetricCodes: string[]; // final order
+  focusMetricCodes: string[]; // final order, selected only
 }
 
 /* ───────────────────────────── Error envelope ───────────────────────────── */

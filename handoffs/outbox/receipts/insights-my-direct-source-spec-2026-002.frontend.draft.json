@@ -1,0 +1,39 @@
+{
+  "schemaVersion": "1.0",
+  "receiptId": "insights-my-direct-source-spec-2026-002.frontend",
+  "handoffId": "insights-my-direct-source-spec-2026-002",
+  "specId": "SPEC-2026-002",
+  "consumer": "frontend",
+  "status": "IN_PROGRESS",
+  "specCommit": null,
+  "implementation": { "repository": "PruactionWeb", "commit": null, "dirty": true },
+  "validation": [
+    { "command": "npm run typecheck", "status": "PASS", "summary": "Strict TypeScript check, including mock-profile and Playwright configs." },
+    { "command": "npm run test:unit", "status": "PASS", "summary": "29 pure-module tests including profile/lens selection, identity isolation and i18n." },
+    { "command": "npm test with APP_PORT=3603 and SVC_PORT=4603", "status": "PASS", "summary": "76 tests against isolated offline fixtures; no replacement of the running development API/UI." },
+    { "command": "npm run test:mock", "status": "PASS", "summary": "6 mobile/desktop tests against imported Mongo source values, including sample switching, reload/detail identity and no console errors." },
+    { "command": "npm run build and production-preview inspection", "status": "PASS", "summary": "Build succeeded; development sample list/selector excluded; group sample identities not bundled." },
+    { "command": "Browser verification on existing port 3600", "status": "PASS", "summary": "Development sample selector visible; production TPC displays RM 48,546.12 instead of ALL/EMPTY." }
+  ],
+  "operationCoverage": [
+    { "operationId": "listAgentMetrics", "status": "UNCHANGED", "evidence": "Existing BFF dashboard call now carries the selected sample identity and matching initial lens; API shape unchanged." },
+    { "operationId": "getMetricDetail", "status": "UNCHANGED", "evidence": "Existing navigation/detail call preserves selected identity and supplied lens; live persistency detail is 88%." }
+  ],
+  "acceptanceCriteria": [
+    { "id": "AC-PA-DIRECT-12", "status": "PASS", "evidence": "tests/unit/performance-mock.spec.ts and tests/mock/performance-samples.spec.ts production scenario." },
+    { "id": "AC-PA-DIRECT-13", "status": "PASS", "evidence": "Configured MAPA identity/lens tests and mobile/desktop manpower 12 assertions." },
+    { "id": "AC-PA-DIRECT-14", "status": "PASS", "evidence": "Persistency profile and live Y1 detail 88% assertions." },
+    { "id": "AC-PA-DIRECT-15", "status": "PASS", "evidence": "Stored profile ID, safe fallback and Contest isolation unit tests plus reload/detail browser checks." },
+    { "id": "AC-PA-DIRECT-16", "status": "PASS", "evidence": "Unconfigured defaults/header unit test and full offline regression suite." },
+    { "id": "AC-PA-DIRECT-17", "status": "PASS", "evidence": "Development-only config gate, production bundle scan and preview selector-absence check." }
+  ],
+  "migrations": [
+    { "name": "Database changes", "status": "NOT_REQUIRED", "evidence": "Frontend wiring only; no new data values or database writes." }
+  ],
+  "gaps": [
+    "No immutable READY handoff or committed clean frontend implementation exists; this is the requester-approved development follow-up.",
+    "Production authentication, business mappings and existing UX approval gaps are not resolved by a mock selector.",
+    "Backend/source acceptance IDs AC-PA-DIRECT-01 through AC-PA-DIRECT-11 remain covered by the separate backend work; this receipt records browser ACs 12 through 17."
+  ],
+  "updatedAt": "2026-09-18T19:30:00Z"
+}

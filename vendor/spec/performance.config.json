@@ -11,7 +11,7 @@
         "SELF": {
           "features": {
             "basisToggle": {
-              "visible": true
+              "visible": false
             },
             "recommendations": {
               "enabled": true,

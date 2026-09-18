@@ -52,6 +52,7 @@
   --gutter: 16px;               /* 375 → 343 content */
   --appbar-h: 56px;             /* Sheet Part / Header 375×56 */
   --tile-w: 80px;  --tile-h: 122px;  --tile-gap: 7.67px;
+  --tile-gap-tablet-desktop: 64px; /* space.quicklink.gap, AC-P4-01-41, >=768px */
   --tile-icon: 62px;
   --card-pad: 12px;
   --card-prio-w: 308px; --card-prio-h: 166px;
@@ -160,6 +161,11 @@ svg text { font-family: var(--font-stack); }
 .quick .ic { width: var(--tile-icon); height: var(--tile-icon); margin-top: 12px; border-radius: var(--radius-tile); background: var(--color-surface); box-shadow: var(--shadow-card); display: flex; align-items: center; justify-content: center; color: var(--color-brand); }
 .quick .lbl { width: 100%; margin-top: 4px; font-size: var(--fs-caption); line-height: var(--lh-caption); text-align: center; font-weight: 600; overflow-wrap: break-word; }
 
+/* Tablet/desktop: fixed gap between tiles, left-aligned (AC-P4-01-41, space.quicklink.gap) */
+@media (min-width: 768px) {
+  .quick { justify-content: flex-start; gap: var(--tile-gap-tablet-desktop); }
+}
+
 /* Carousels: snap track sized to measured card widths; one card + peek */
 .carousel-track { display: flex; gap: var(--card-gap); overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; margin: 0; padding: 0; }
 .carousel-track::-webkit-scrollbar { display: none; }
@@ -254,6 +260,11 @@ svg text { font-family: var(--font-stack); }
 
 /* Scope switcher pill 108×38 (Figma 6588:16960) */
 .scope-pill { min-width: var(--scope-pill-w); height: var(--scope-pill-h); border-radius: var(--radius-chip); border: 1px solid var(--color-border); background: var(--color-surface); display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-weight: 700; font-size: var(--fs-caption); line-height: var(--lh-caption); cursor: pointer; }
+
+/* Recommendations overlay (v1.5.5, R3 moved to a sticky bottom bar — same
+   sticky-bottom pattern as .cust-actions, not a new fixed-position idiom).
+   Sits above section content; expands upward without pushing the page. */
+.reco-overlay { position: sticky; z-index: 30; bottom: 0; margin: 24px calc(var(--gutter) * -1) 0; padding: 8px var(--gutter) calc(8px + env(safe-area-inset-bottom)); background: var(--color-bg); }
 
 /* Recommendations (collapsed 44h bar; expanded panel) */
 .reco-bar { height: var(--reco-bar-h); width: 100%; display: flex; align-items: center; gap: 8px; padding: 0 16px; border: 0; cursor: pointer; border-radius: var(--radius-card); background: linear-gradient(90deg, var(--reco-grad-a), var(--reco-grad-b)); color: #fff; font-size: var(--fs-body); font-weight: 700; }

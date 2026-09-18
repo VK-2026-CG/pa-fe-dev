@@ -1,6 +1,8 @@
 import path from 'node:path';
+import { readFileSync } from 'node:fs';
 import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
+import { developmentSamplesEnabled, parsePerformanceSamples } from './src/lib/performanceMock';
 
 /**
  * Plain Vite + React SPA (see docs/architecture/decisions/0004-vite-spa-and-bff-extraction.md).
@@ -8,8 +10,12 @@ import react from '@vitejs/plugin-react';
  * vendored spec bundle: several client-rendered CDK/parts files (types, pure
  * VM-shaped config, rule-explanation helpers) import from it directly.
  */
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ mode, command }) => {
   const env = loadEnv(mode, process.cwd(), 'VITE_');
+  const sampleFile = env.VITE_PERFORMANCE_MOCK_SAMPLES_FILE;
+  const samples = developmentSamplesEnabled(command, mode) && sampleFile
+    ? parsePerformanceSamples(JSON.parse(readFileSync(path.resolve(sampleFile), 'utf8')))
+    : [];
   return {
     plugins: [react()],
     resolve: {
@@ -29,6 +35,9 @@ export default defineConfig(({ mode }) => {
        * bare identifier (guarded with `typeof`) parses fine in both worlds.
        */
       __BFF_URL__: JSON.stringify(env.VITE_BFF_URL ?? ''),
+      __PERFORMANCE_AGENT_ID__: JSON.stringify(env.VITE_PERFORMANCE_AGENT_ID ?? ''),
+      __PERFORMANCE_TENANT__: JSON.stringify(env.VITE_PERFORMANCE_TENANT ?? 'MY'),
+      __PERFORMANCE_SAMPLES__: JSON.stringify(samples),
     },
   };
 });

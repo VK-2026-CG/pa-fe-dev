@@ -45,6 +45,44 @@ the designed metric-detail states. The selection lives in `localStorage`
 header on every BFF call (`src/lib/apiClient.ts`) — set `VITE_BFF_URL` if
 pa-be-dev isn't at the default `http://localhost:4600`.
 
+When pa-be-dev uses `INSIGHTS_DATA_SOURCE=performance`, configure this SPA with
+an agent from the backend's `INSIGHTS_MOCK_AGENTS_FILE` allowlist. These values
+are a development mock identity, not credentials:
+
+```dotenv
+VITE_PERFORMANCE_AGENT_ID=1000096
+VITE_PERFORMANCE_TENANT=MY
+```
+
+Restart Vite after changing either value. Performance BFF requests will then
+carry `x-agent-id` and `x-tenant`. Direct navigation to port 4600 cannot supply
+those headers and is expected to return 401.
+
+### Browse the imported source samples
+
+The reported "No Data Available" dashboard was caused by requesting ALL while
+the imported mock profile supports INSURANCE. A configured fixed identity now
+starts the dashboard with SELF/INSURANCE/STANDARD/YTD rather than ALL.
+
+For explicit switching between the supplied production, MAPA and persistency
+agents, set `VITE_PERFORMANCE_MOCK_SAMPLES_FILE` to a local JSON array of
+`{ id, kind, agentId }` profiles (`kind`: PRODUCTION, MAPA or PERSISTENCY).
+The configured file is ignored under `data/performance-mocks/`; raw source data
+is never copied into the frontend. Restart Vite after changing configuration.
+
+The **Development data sample** selector appears in the dashboard header in the
+development server only. Production starts SELF/INSURANCE/YTD; MAPA/persistency
+start TEAM/GROUP/INSURANCE/YTD. Selection survives reload and detail navigation.
+Profiles select different agents; missing metrics stay unavailable. No backend
+authorization, ALL semantics or metric values are changed by the browser.
+Contest requests never carry the selected Performance identity.
+
+`npm run test:mock` runs mobile/desktop browser tests against the running Mongo
+API on port 4600, using a separately owned Vite process on port 3602. Standard
+browser tests run against isolated offline fixtures with mock settings disabled;
+`APP_PORT`/`SVC_PORT` can use spare ports without replacing running dev servers.
+Production builds exclude the development sample list/selector configuration.
+
 A `BFF-5020` response with `detail: "fetch failed"` means pa-be-dev can't
 reach the Insights domain data; check `http://localhost:4600/healthz` before
 debugging the dashboard route. `INSIGHTS_API_URL`/`CONTESTS_API_URL` are

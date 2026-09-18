@@ -1,9 +1,9 @@
 {
   "_readme": "Token → glyph provenance. `figmaNodeId` points into od7f65KVKBKaettyAhNU2Z (P2/P3 uplifted DLS section) so `Figma:download_assets` can replace each file with the DLS export verbatim. Current files are the exact open-source glyphs the design layers name (Remix Icon / Material classic).",
-  "quick.MILESTONES":            { "figmaNodeId": "6588:16560", "source": "remixicon medal-line" },
-  "quick.INTRODUCER_DRILLDOWN":  { "figmaNodeId": "6588:16564", "source": "remixicon group-line" },
-  "quick.COMP_BEN":              { "figmaNodeId": "6588:16568", "source": "remixicon trophy-fill (layer name verbatim)" },
-  "quick.LEADERBOARD":           { "figmaNodeId": "6588:16575", "source": "remixicon bar-chart-grouped-line" },
+  "quick.MILESTONES":            { "figmaNodeId": null, "source": "DLS_APPROVED final asset provided by requester (Milestone.svg); see pruaction-spec README D-16" },
+  "quick.INTRODUCER_DRILLDOWN":  { "figmaNodeId": null, "source": "DLS_APPROVED final asset provided by requester (Introducer.svg); see pruaction-spec README D-16" },
+  "quick.COMP_BEN":              { "figmaNodeId": null, "source": "DLS_APPROVED final asset provided by requester (Subtract.svg); see pruaction-spec README D-16" },
+  "quick.LEADERBOARD":           { "figmaNodeId": null, "source": "DLS_APPROVED final asset provided by requester (Union.svg); see pruaction-spec README D-16" },
   "quick.TEAM_DRILLDOWN":        { "figmaNodeId": null,          "source": "remixicon team-line" },
   "quick.VIEW_MOC":              { "figmaNodeId": null,          "source": "remixicon trophy-line" },
   "arrow-right-up-line":         { "figmaNodeId": "6588:17652", "source": "remixicon arrow-right-up-line (layer name verbatim)" },

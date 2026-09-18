@@ -1,4 +1,4 @@
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig, devices, type PlaywrightTestConfig } from '@playwright/test';
 import path from 'node:path';
 
 /**
@@ -22,9 +22,11 @@ const isCI = !!process.env.CI;
 /** tests/unit are pure module tests — they need no servers (PW_SKIP_WEBSERVER=1). */
 const skipWebServer = process.env.PW_SKIP_WEBSERVER === '1';
 
-const webServer = [
+const webServer: PlaywrightTestConfig['webServer'] = [
   {
-    command: `MONGODB_URI='' PORT=${SVC_PORT} node ${JSON.stringify(`${SVC_DIR}/dist/src/server.js`)}`,
+    command: `"${process.execPath}" "${path.join(SVC_DIR, 'dist/src/server.js')}"`,
+    cwd: SVC_DIR,
+    env: { MONGODB_URI: '', INSIGHTS_DATA_SOURCE: 'memory', NODE_ENV: 'test', HOST: '127.0.0.1', PORT: String(SVC_PORT) },
     url: `http://127.0.0.1:${SVC_PORT}/healthz`,
     reuseExistingServer: false,
     timeout: 60_000,
@@ -32,7 +34,9 @@ const webServer = [
     stderr: 'pipe' as const,
   },
   {
-    command: `npx vite --port ${APP_PORT}`,
+    command: `"${process.execPath}" "${path.resolve(__dirname, 'node_modules/vite/bin/vite.js')}" --host 127.0.0.1 --port ${APP_PORT} --strictPort`,
+    cwd: __dirname,
+    env: { VITE_BFF_URL: `http://127.0.0.1:${SVC_PORT}`, VITE_PERFORMANCE_AGENT_ID: '', VITE_PERFORMANCE_MOCK_SAMPLES_FILE: '' },
     url: `http://127.0.0.1:${APP_PORT}/insights/performance`,
     reuseExistingServer: false,
     timeout: 120_000,

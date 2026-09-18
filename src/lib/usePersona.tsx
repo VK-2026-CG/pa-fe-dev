@@ -1,9 +1,9 @@
 /**
  * Client-side persona identity (replaces the pre-migration `pa_persona`
  * cookie + `src/app/api/dev/persona` route). The selection now lives in
- * `localStorage` and travels to pa-be-dev as the `x-persona` request header
- * (see `@/lib/apiClient`) — same unverified trust level as the cookie it
- * replaces, just a different transport now that the BFF is cross-origin.
+ * `localStorage` and travels to pa-be-dev as the `x-persona` request header in
+ * offline fixture mode (see `@/lib/apiClient`). Performance Mongo mode uses
+ * its separately configured development agent identity.
  */
 import {
   createContext, useContext, useMemo, useState, type ReactNode,
