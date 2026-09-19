@@ -60,17 +60,9 @@
             }
           ],
           "metricTracking": {
-            "periodOptions": [
-              "MTD",
-              "QTD",
-              "YTD"
-            ],
+            "periodOptions": ["MTD", "QTD", "YTD"],
             "defaultPeriod": "QTD",
-            "businessLineTabs": [
-              "ALL",
-              "INSURANCE",
-              "TAKAFUL"
-            ],
+            "businessLineTabs": ["ALL", "INSURANCE", "TAKAFUL"],
             "defaultBusinessLine": "ALL",
             "priorityCards": {
               "maxCount": 4,
@@ -91,13 +83,10 @@
             }
           },
           "milestones": {
-            "visible": true,
+            "visible": false,
             "addEnabled": true,
             "setGoalEnabled": true,
-            "programs": [
-              "MDRT_SERIES",
-              "STAR_CLUB"
-            ],
+            "programs": ["MDRT_SERIES", "STAR_CLUB"],
             "widget": "w.milestone.card",
             "widgetVariant": "three-measure"
           },
@@ -186,17 +175,9 @@
             }
           ],
           "metricTracking": {
-            "periodOptions": [
-              "MTD",
-              "QTD",
-              "YTD"
-            ],
+            "periodOptions": ["MTD", "QTD", "YTD"],
             "defaultPeriod": "YTD",
-            "businessLineTabs": [
-              "ALL",
-              "INSURANCE",
-              "TAKAFUL"
-            ],
+            "businessLineTabs": ["ALL", "INSURANCE", "TAKAFUL"],
             "defaultBusinessLine": "ALL",
             "priorityCards": {
               "maxCount": 9,
@@ -217,13 +198,10 @@
             }
           },
           "milestones": {
-            "visible": true,
+            "visible": false,
             "addEnabled": true,
             "setGoalEnabled": true,
-            "programs": [
-              "MDRT_SERIES",
-              "STAR_CLUB"
-            ],
+            "programs": ["MDRT_SERIES", "STAR_CLUB"],
             "widget": "w.milestone.card",
             "widgetVariant": "three-measure"
           },
@@ -253,7 +231,17 @@
               "order": 3
             }
           ],
-          "footerLinks": []
+          "footerLinks": [
+            {
+              "id": "VIEW_MOC",
+              "iconToken": "icon.insights.moc",
+              "nav": {
+                "route": "insights/moc"
+              },
+              "order": 1,
+              "visible": true
+            }
+          ]
         }
       }
     },
@@ -332,12 +320,7 @@
     "history": {
       "screenId": "S-P4-03",
       "tabs": {
-        "SELF": [
-          "TPC",
-          "CASE_COUNT",
-          "FYP",
-          "FYC"
-        ],
+        "SELF": ["TPC", "CASE_COUNT", "FYP", "FYC"],
         "TEAM": [
           "TPC",
           "CASE_COUNT",
@@ -350,11 +333,7 @@
           "NEW_RECRUIT_CONTRACTED"
         ]
       },
-      "windows": [
-        "CURRENT_YEAR",
-        "VS_LAST_YEAR",
-        "VS_LAST_2_YEARS"
-      ],
+      "windows": ["CURRENT_YEAR", "VS_LAST_YEAR", "VS_LAST_2_YEARS"],
       "defaultWindow": "VS_LAST_2_YEARS",
       "maxYearsBack": 4
     },

@@ -15,7 +15,8 @@ test.describe('persona entitlements on the dashboard', () => {
 
     const scopeSwitcher = page.getByLabel('Scope switcher');
     await expect(scopeSwitcher).toBeVisible();
-    await scopeSwitcher.selectOption('TEAM');
+    await scopeSwitcher.click();
+    await page.getByRole('menuitem', { name: 'Team' }).click();
 
     await expect(page.getByRole('button', { name: /Product/ })).toBeVisible();
     await page.getByRole('button', { name: 'Filter' }).click();
@@ -29,5 +30,19 @@ test.describe('persona entitlements on the dashboard', () => {
 
     await expect(page.getByRole('button', { name: /Product/ })).toBeVisible();
     await expect(page.getByLabel('Scope switcher')).toHaveCount(0);
+  });
+
+  test('scope switcher shows the icon only below breakpoint.tablet (AC-P4-01-42)', async ({ context, page }) => {
+    await setPersona(context, 'LEADER_P2');
+    await page.goto('/insights/performance');
+
+    const scopeSwitcher = page.getByLabel('Scope switcher');
+    await expect(scopeSwitcher).toBeVisible();
+    // 375px viewport (this project's shell) is below breakpoint.tablet (768px):
+    // the label stays out of the visual layout; the control is still functional.
+    await expect(page.locator('.scope-pill-label')).not.toBeVisible();
+    await scopeSwitcher.click();
+    await page.getByRole('menuitem', { name: 'Team' }).click();
+    await expect(page.getByRole('button', { name: /Product/ })).toBeVisible();
   });
 });

@@ -12,6 +12,7 @@ import {
   RadioGroup,
   ReorderHandle as HReorderHandle,
   Switch as HSwitch,
+  useEscapeKey,
   type CarouselApi,
 } from "@/headless";
 
@@ -254,7 +255,10 @@ export function RadioSheetList<T extends string>({
   );
 }
 
-/* ── Menu popover (anchored) ───────────────────────────────────────────── */
+/* ── Menu popover (anchored to a `position: relative` ancestor) ─────────
+   Not built on `Layer`: `.menu` is `position: absolute` against that
+   ancestor, so it must stay a DOM sibling of the backdrop rather than
+   nested inside Layer's own (fixed) backdrop element. */
 export function MenuPopover({
   onClose,
   children,
@@ -262,6 +266,7 @@ export function MenuPopover({
   onClose: () => void;
   children: ReactNode;
 }) {
+  useEscapeKey(onClose);
   return (
     <>
       <div
@@ -316,8 +321,9 @@ export function FilterButton({
   onClick: () => void;
 }) {
   return (
-    <button className="filter-btn" onClick={onClick}>
-      <Icon token="filter" size={16} tone="var(--color-text)" /> {label}
+    <button className="filter-btn" aria-label={label} onClick={onClick}>
+      <Icon token="filter" size={16} tone="var(--color-text)" />
+      <span className="filter-btn-label">{label}</span>
     </button>
   );
 }
@@ -515,13 +521,23 @@ export function CustomizeActions({ children }: { children: ReactNode }) {
   return <div className="cust-actions">{children}</div>;
 }
 
-/* ── Scope pill (108×38) with menu ─────────────────────────────────────── */
+/**
+ * Scope pill (Figma 6588:16960, 108×38) with menu. `icon` prefixes the
+ * label. The label span (`.scope-pill-label`) stays in the DOM at every
+ * breakpoint — `dls.css` collapses it visually below `breakpoint.tablet`
+ * (icon-only) and shows it from `breakpoint.tablet` up, per AC-P4-01-42;
+ * `aria-label` keeps the button's accessible name breakpoint-independent.
+ */
 export function ScopePill({
+  icon,
   label,
+  ariaLabel,
   options,
   onSelect,
 }: {
+  icon?: string;
   label: string;
+  ariaLabel?: string;
   options: Array<{ key: string; label: string; selected: boolean }>;
   onSelect: (key: string) => void;
 }) {
@@ -532,9 +548,12 @@ export function ScopePill({
         className="scope-pill"
         aria-haspopup="menu"
         aria-expanded={open}
+        aria-label={ariaLabel}
         onClick={() => setOpen((o) => !o)}
       >
-        {label} <Icon token="arrow-down-s" size={16} tone="var(--color-text)" />
+        {icon && <Icon token={icon} size={20} tone="var(--color-text)" />}
+        <span className="scope-pill-label">{label}</span>
+        <Icon token="arrow-down-s" size={16} tone="var(--color-text)" />
       </button>
       {open && (
         <MenuPopover onClose={() => setOpen(false)}>

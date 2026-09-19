@@ -45,6 +45,9 @@ const MAP = {
   'flag': MD('outlined/flag.svg'),
   // Desktop Filter action (v1.4.0, screenshot-derived — no Figma node id)
   'filter': RX('System/filter-line.svg'),
+  // Scope switcher trigger icon (S-P4-01 v1.5.9, AC-P4-01-42) — unapproved
+  // placeholder pending a Figma-exported avatar asset (README OQ-24).
+  'scope-avatar': RX('User & Faces/user-line.svg'),
 };
 
 mkdirSync('public/icons', { recursive: true });

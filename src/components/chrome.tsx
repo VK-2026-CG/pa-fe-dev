@@ -13,6 +13,7 @@ import {
   IconButton,
   ProgressBar,
   RadioSheetList,
+  ScopePill,
   SheetRow,
   ToggleRow,
 } from "@/dls-stub";
@@ -168,7 +169,12 @@ export function MoreActionsSheet({
 /* ── Scheme / Group toggle row is styled by dls-stub ToggleRow ─────────── */
 export { ToggleRow } from "@/dls-stub";
 
-/* ── Scope switcher (v1.5.4, native select styled like PersonaPicker) ───── */
+/* ── Scope switcher (v1.5.9, AC-P4-01-42): icon + responsive label pill ──
+   Reuses the DLS `ScopePill` primitive (Figma 6588:16960) rather than the
+   v1.5.4 native <select>: icon + chevron always render, the label is
+   visually hidden below breakpoint.tablet (<768px, same token as the R1
+   rail's AC-P4-01-41) and shown at breakpoint.tablet/desktop (≥768px). The
+   accessible name is fixed at "Scope switcher" regardless of breakpoint. */
 export function ScopeSwitcher({
   vm,
   onSelect,
@@ -177,19 +183,17 @@ export function ScopeSwitcher({
   onSelect: (s: Scope) => void;
 }) {
   return (
-    <span className="persona">
-      <select
-        aria-label="Scope switcher"
-        value={vm.current}
-        onChange={(e) => onSelect(e.target.value as Scope)}
-      >
-        {vm.options.map((o) => (
-          <option key={o.scope} value={o.scope}>
-            {t(`insights.scope.${o.scope}`)}
-          </option>
-        ))}
-      </select>
-    </span>
+    <ScopePill
+      icon="scope-avatar"
+      ariaLabel="Scope switcher"
+      label={t(`insights.scope.${vm.current}`)}
+      options={vm.options.map((o) => ({
+        key: o.scope,
+        label: t(`insights.scope.${o.scope}`),
+        selected: o.scope === vm.current,
+      }))}
+      onSelect={(key) => onSelect(key as Scope)}
+    />
   );
 }
 

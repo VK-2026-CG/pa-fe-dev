@@ -1,6 +1,6 @@
-import { expect, test } from '@playwright/test';
-import { setPersona } from '../support/personas';
-import { watchConsole } from '../support/console';
+import { expect, test } from "@playwright/test";
+import { setPersona } from "../support/personas";
+import { watchConsole } from "../support/console";
 
 /**
  * Desktop viewport parity (A7 chrome, unified across breakpoints since
@@ -9,37 +9,107 @@ import { watchConsole } from '../support/console';
  * at 1440×1000). This file only checks the unification actually holds at
  * this viewport; the interaction coverage itself lives in performance.spec.ts.
  */
-test.describe('Performance dashboard (S-P4-01) at desktop viewport (≥1024px)', () => {
+test.describe("Performance dashboard (S-P4-01) at desktop viewport (≥1024px)", () => {
   test.beforeEach(async ({ context }) => {
-    await setPersona(context, 'LEADER_P2');
+    await setPersona(context, "LEADER_P2");
   });
 
-  test('renders the same unified chrome as mobile, no console errors', async ({ page }) => {
+  test("renders the same unified chrome as mobile, no console errors", async ({
+    page,
+  }) => {
     const watch = watchConsole(page);
-    await page.goto('/insights/performance');
+    await page.goto("/insights/performance");
 
-    await expect(page.getByRole('heading', { name: 'Performance' })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Filter' })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Performance" }),
+    ).toBeVisible();
+    const filterButton = page.getByRole("button", { name: "Filter" });
+    await expect(filterButton).toBeVisible();
+    await expect(filterButton.locator(".filter-btn-label")).toBeVisible();
 
     // Exactly one "More actions" trigger — no duplicate hidden copy at either breakpoint.
-    await expect(page.getByRole('button', { name: 'More actions' })).toHaveCount(1);
+    await expect(
+      page.getByRole("button", { name: "More actions" }),
+    ).toHaveCount(1);
 
-    expect(watch.errors, watch.errors.join('\n')).toEqual([]);
-    expect(watch.warnings, watch.warnings.join('\n')).toEqual([]);
+    expect(watch.errors, watch.errors.join("\n")).toEqual([]);
+    expect(watch.warnings, watch.warnings.join("\n")).toEqual([]);
   });
 
-  test('Other Focus Metric header stays visible even when empty, with a "+" add affordance (AC-P4-01-26/27)', async ({ page }) => {
-    await page.goto('/insights/performance');
+  test("scope switcher shows icon + label at breakpoint.tablet/desktop (AC-P4-01-42)", async ({
+    page,
+  }) => {
+    await page.goto("/insights/performance");
 
-    const panel = page.locator('.metric-panel').filter({ has: page.getByRole('button', { name: 'Other Focus Metric' }) });
-    const toggle = panel.getByRole('button', { name: 'Other Focus Metric' });
+    const scopeSwitcher = page.getByLabel("Scope switcher");
+    await expect(scopeSwitcher).toBeVisible();
+    await expect(page.locator(".scope-pill-label")).toBeVisible();
+    await expect(page.locator(".scope-pill-label")).toHaveText("Self");
+  });
+
+  test('Other Focus Metric header stays visible even when empty, with a "+" add affordance (AC-P4-01-26/27)', async ({
+    page,
+  }) => {
+    await page.goto("/insights/performance");
+
+    const panel = page.locator(".metric-panel").filter({
+      has: page.getByRole("button", { name: "Other Focus Metric" }),
+    });
+    const toggle = panel.getByRole("button", { name: "Other Focus Metric" });
     await expect(toggle).toBeVisible();
-    const count = await toggle.locator('.count-badge').innerText();
+    const count = await toggle.locator(".count-badge").innerText();
 
-    if (count === '0') {
-      await expect(panel.getByRole('link', { name: 'Add focus metric' })).toBeVisible();
+    if (count === "0") {
+      await expect(
+        panel.getByRole("link", { name: "Add focus metric" }),
+      ).toBeVisible();
     } else {
-      await expect(panel.getByRole('button', { name: 'Collapse' })).toBeVisible();
+      await expect(
+        panel.getByRole("button", { name: "Collapse" }),
+      ).toBeVisible();
+      // Other Focus Metrics keeps its own carousel-track class, independent of
+      // the Priority Metrics-only layout change (AC-P4-01-43 / AC-P4-01-47).
+      await expect(panel.locator(".carousel-track.focus-grid")).toBeVisible();
+      await expect(panel.locator(".carousel-track.priority-grid")).toHaveCount(
+        0,
+      );
+    }
+  });
+
+  test("Priority Metric cards keep the 2-column grid at breakpoint.desktop, unchanged (AC-P4-01-43)", async ({
+    page,
+  }) => {
+    await page.goto("/insights/performance");
+
+    const track = page.locator(".carousel-track.priority-grid");
+    await expect(track).toBeVisible();
+    await expect(track).toHaveCSS("display", "grid");
+
+    const cards = track.locator(".mcard");
+    const count = await cards.count();
+    if (count >= 2) {
+      const first = await cards.nth(0).boundingBox();
+      const second = await cards.nth(1).boundingBox();
+      // Second card sits beside the first (same row), not below it.
+      expect(second && first && Math.abs(second.y - first!.y)).toBeLessThan(5);
+    }
+  });
+
+  test("priority card face has no goal row/progress bar or nav icon at breakpoint.desktop (AC-P4-01-44)", async ({
+    page,
+  }) => {
+    await page.goto("/insights/performance");
+
+    for (const title of ["TPC", "PTPC"]) {
+      const card = page
+        .locator(".carousel-track.priority-grid .mcard")
+        .filter({ hasText: title })
+        .first();
+      await expect(card).toBeVisible();
+      await expect(card.locator(".variant")).toContainText("(");
+      await expect(card.locator(".goal-line")).toHaveCount(0);
+      await expect(card.locator(".progress")).toHaveCount(0);
+      await expect(card.locator(".icon")).toHaveCount(0);
     }
   });
 });

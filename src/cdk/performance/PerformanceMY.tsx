@@ -8,7 +8,11 @@ import { Link } from "react-router-dom";
 import { t } from "@/lib/i18n";
 import { href } from "@/lib/nav";
 import { apiFetch } from "@/lib/apiClient";
-import { initialPerformanceLens, PERFORMANCE_SAMPLES, type PerformanceLens } from "@/lib/performanceMock";
+import {
+  initialPerformanceLens,
+  PERFORMANCE_SAMPLES,
+  type PerformanceLens,
+} from "@/lib/performanceMock";
 import { PerformanceSamplePicker } from "./parts/PerformanceSamplePicker";
 import { MetricCard, MilestoneCard } from "@/components/metrics";
 import {
@@ -20,14 +24,7 @@ import {
   ScopeSwitcher,
 } from "@/components/chrome";
 import { Toast } from "@/components/ui";
-import {
-  CarouselRow,
-  FilterButton,
-  Icon,
-  IconButton,
-  MetricPanel,
-} from "@/dls-stub";
-import { useIsDesktop } from "@/headless";
+import { CarouselRow, FilterButton, Icon, MetricPanel } from "@/dls-stub";
 import type { CdkPageProps } from "@/cdk/types";
 import type { PerformanceDashboardVM } from "@spec/performance-vm";
 
@@ -47,7 +44,6 @@ export default function PerformanceMY({
     initialToast ? t(initialToast) : undefined,
   );
   const loadSeq = useRef(0);
-  const isDesktop = useIsDesktop();
 
   const load = useCallback(async (l: LensState) => {
     const seq = ++loadSeq.current;
@@ -93,7 +89,13 @@ export default function PerformanceMY({
     void load(next);
   };
 
-  if (error) return <><PerformanceSamplePicker /><div className="section card pad">Error {error}</div></>;
+  if (error)
+    return (
+      <>
+        <PerformanceSamplePicker />
+        <div className="section card pad">Error {error}</div>
+      </>
+    );
   if (!vm) return <div className="section muted">Loading…</div>;
 
   const f = vm.filters;
@@ -112,10 +114,16 @@ export default function PerformanceMY({
         <Link className="contest-admin-link" to="/contest-admin/contests">
           {t("insights.nav.contestAdmin")}
         </Link>
-        {PERFORMANCE_SAMPLES.length ? <PerformanceSamplePicker /> : <PersonaPicker current={persona} />}
+        {PERFORMANCE_SAMPLES.length ? (
+          <PerformanceSamplePicker />
+        ) : (
+          <PersonaPicker current={persona} />
+        )}
       </div>
 
-      {PERFORMANCE_SAMPLES.length > 0 && <div className="section muted">{t("insights.dev.sample.notice")}</div>}
+      {PERFORMANCE_SAMPLES.length > 0 && (
+        <div className="section muted">{t("insights.dev.sample.notice")}</div>
+      )}
 
       <div
         style={{
@@ -127,11 +135,10 @@ export default function PerformanceMY({
       >
         <h1>Performance</h1>
         {vm.scopeSwitcher && (
-            <ScopeSwitcher
-              vm={vm.scopeSwitcher}
-              onSelect={(scope) => refetch({ scope })}
-            />
-         
+          <ScopeSwitcher
+            vm={vm.scopeSwitcher}
+            onSelect={(scope) => refetch({ scope })}
+          />
         )}
       </div>
 
@@ -153,32 +160,47 @@ export default function PerformanceMY({
             label={t("insights.action.FILTER")}
             onClick={() => setFilterOpen(true)}
           />
-          <IconButton
-            token="more-horiz"
-            label="More actions"
+          <button
+            type="button"
+            className="more-actions-btn"
+            aria-label="More actions"
             onClick={() => setMoreOpen(true)}
-          />
+          >
+            <Icon token="more-vert" size={16} tone="var(--color-text)" />
+          </button>
         </span>
       </div>
+      {/* Product/Time read-only summary pills (AC-P4-01-38) — static labels,
+          not controls, and intentionally rendered with their own dedicated
+          class so the History screen's pills remain unchanged. */}
       <div className="section">
         <div className="filter-row">
-          <button className="pill" onClick={() => setFilterOpen(true)}>
+          <span
+            className="filter-pill"
+            aria-label={`${t("insights.dashboard.filter.product")}: ${t(`insights.businessLine.${f.businessLine}`)}`}
+          >
             <span className="muted">
               {t("insights.dashboard.filter.product")}
             </span>{" "}
             {t(`insights.businessLine.${f.businessLine}`)}
-          </button>
-          <button className="pill" onClick={() => setFilterOpen(true)}>
-            <span className="muted">
-              {t("insights.dashboard.filter.time")}
-            </span>{" "}
+          </span>
+          <span
+            className="filter-pill"
+            aria-label={`${t("insights.dashboard.filter.time")}: ${t(`insights.period.${f.period}`)}`}
+          >
+            <span className="muted">{t("insights.dashboard.filter.time")}</span>{" "}
             {t(`insights.period.${f.period}`)}
-          </button>
+          </span>
         </div>
       </div>
 
-      {/* PRIORITY METRICS — carousel of 308×166 cards (6588:17629), grid at ≥1024px inside a panel (A7).
-          Collapsible panel header (title + count) now renders at every breakpoint (v1.5.6). */}
+      {/* PRIORITY METRICS — static single-column list below breakpoint.desktop
+          (<1024px, mobile and tablet alike), 2-column grid at ≥1024px inside
+          a panel (AC-P4-01-43, v1.5.10, amends A7). No horizontal scroll or
+          pagination dots at any breakpoint. Other Focus Metrics below now
+          matches this layout too (AC-P4-01-47, v1.5.12), via its own
+          independent `.focus-grid` class. Collapsible panel header
+          (title + count) renders at every breakpoint (v1.5.6). */}
       <div className="section">
         <MetricPanel
           isDesktop={true}
@@ -187,8 +209,8 @@ export default function PerformanceMY({
         >
           <CarouselRow
             count={vm.priorityMetrics.length}
-            className="metric-grid"
-            showDots={!isDesktop}
+            className="priority-grid"
+            showDots={false}
           >
             {vm.priorityMetrics.map((c) => (
               <MetricCard key={c.metricCode} vm={c} variant="priority" />
@@ -197,8 +219,11 @@ export default function PerformanceMY({
         </MetricPanel>
       </div>
 
-      {/* OTHER FOCUS — carousel of 280×80 simple cards. Header stays visible even when empty
-          (AC-P4-01-26/27, v1.4.0): shows a "+" add affordance instead of hiding the section.
+      {/* OTHER FOCUS — 280×80 simple cards; static single-column list below
+          breakpoint.desktop, 2-column grid at ≥1024px (AC-P4-01-47, v1.5.12,
+          matches Priority Metrics' AC-P4-01-43 via its own `.focus-grid`
+          class). Header stays visible even when empty (AC-P4-01-26/27,
+          v1.4.0): shows a "+" add affordance instead of hiding the section.
           Collapsible panel header now renders at every breakpoint (v1.5.6). */}
       {vm.focusMetrics.visible && (
         <>
@@ -224,7 +249,7 @@ export default function PerformanceMY({
                 <CarouselRow
                   count={vm.focusMetrics.items.length}
                   showDots={false}
-                  className="metric-grid"
+                  className="focus-grid"
                   style={{ marginTop: 8 }}
                 >
                   {vm.focusMetrics.items.map((c) => (

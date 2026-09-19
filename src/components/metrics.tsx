@@ -23,7 +23,15 @@ function DeltaLine({ delta }: { delta: DeltaVM }) {
   );
 }
 
-/* ── w.metric.card — priority 308×166 · simple 280×80 (carousel slides) ── */
+/**
+ * w.metric.card — priority (`compact` in spec) 308×166 · simple 280×80
+ * (carousel slides). Since v1.5.11/AC-P4-01-44, the `priority` face never
+ * renders goal target/progress (regardless of `goal.state`) and has no nav
+ * icon, converging its OK-state markup with the `simple` face's
+ * value+delta-on-one-row layout; only the inline "(variant)" subtitle still
+ * differs between the two. Goal target/progress remain valid VM fields,
+ * still rendered on the Metric Detail (S-P4-02) screen.
+ */
 export function MetricCard({ vm, variant = 'priority' }: { vm: MetricCardVM; variant?: 'priority' | 'simple' }) {
   // A metric with no approved upstream source keeps its title and nav, but has
   // no value to show — never substitute a zero (VM 1.5.0 / C1 §7.13).
@@ -31,36 +39,21 @@ export function MetricCard({ vm, variant = 'priority' }: { vm: MetricCardVM; var
   const stateText = dataState === 'PROCESSING'
     ? t('insights.state.processing.title')
     : t('insights.state.empty.title');
-  const showGoal = variant === 'priority' && vm.showGoal && dataState === 'OK';
-  const goalText = vm.goal?.state === 'SET' && vm.goal.target
-    ? `/ ${formatScalar(vm.goal.target)}`
-    : `/ ${t('insights.goal.notSet')}`;
   return (
     <Link to={href(vm.nav)} className={`mcard ${variant === 'simple' ? 'simple' : ''}`}>
       <div className="head">
         <span>
           <span className="name">{t(`insights.metric.${vm.metricCode}.title`)}</span>
           {variant === 'priority' && vm.variant && (
-            <span className="variant" style={{ display: 'block' }}>{t(`insights.variant.${vm.variant}`)}</span>
+            <span className="variant"> ({t(`insights.variant.${vm.variant}`)})</span>
           )}
         </span>
-        <Icon token="arrow-right-up-line" size={24} tone="var(--color-text)" />
+        {variant === 'simple' && <Icon token="arrow-right-up-line" size={24} tone="var(--color-text)" />}
       </div>
       {dataState !== 'OK' ? (
         <div className="value-block">
           <div className="goal-line">{stateText}</div>
         </div>
-      ) : variant === 'priority' ? (
-        <>
-          <div className="value-block">
-            <div className="value">{formatScalar(vm.value)}</div>
-            {showGoal && <div className="goal-line">{goalText}</div>}
-          </div>
-          <div className="foot">
-            {vm.delta && <DeltaLine delta={vm.delta} />}
-            {showGoal && vm.goal?.state === 'SET' && <ProgressBar pct={clampPct(vm.goal.progressPct)} />}
-          </div>
-        </>
       ) : (
         <div className="spread foot" style={{ alignItems: 'flex-end' }}>
           <span className="value">{formatScalar(vm.value)}</span>

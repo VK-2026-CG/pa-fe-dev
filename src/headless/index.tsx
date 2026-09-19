@@ -193,6 +193,15 @@ export function ReorderHandle({
   );
 }
 
+/** Escape-to-dismiss for any overlay (sheets, menus) — the one place the key listener lives. */
+export function useEscapeKey(onClose: () => void): void {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [onClose]);
+}
+
 /* ── Layer (backdrop + Escape/outside dismiss) → sheets & menus ────────── */
 export function Layer({
   onClose, backdropClassName, children, align = 'end',
@@ -200,11 +209,7 @@ export function Layer({
   onClose: () => void; backdropClassName?: string; children: ReactNode;
   align?: 'end' | 'none';
 }) {
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [onClose]);
+  useEscapeKey(onClose);
   return (
     <div className={backdropClassName} onClick={onClose}
       style={align === 'end' ? { display: 'flex', alignItems: 'flex-end', justifyContent: 'center' } : undefined}>
