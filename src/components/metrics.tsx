@@ -102,14 +102,27 @@ export function MilestoneCard({ vm }: { vm: MilestoneCardVM }) {
 }
 
 /* ── w.metric-detail.gauge — card w/ 270×220 donut + legend (6588:18612) ─ */
-export function GaugeDonut({ s, metricCode }: { s: GaugeSectionVM; metricCode: string }) {
+function GaugeCardBody({ s, metricCode, valueOnly = false }: { s: GaugeSectionVM; metricCode: string; valueOnly?: boolean }) {
   const R = 90; const C = 2 * Math.PI * R; const SWEEP = 0.75;
+  // AC-P4-02-24: heading is the variant alone when one is present.
+  const heading = s.variant
+    ? t(`insights.variant.${s.variant}`)
+    : t(`insights.metric.${metricCode}.title`);
+  // AC-P4-02-23: value-only face — no donut, no penders legend.
+  if (valueOnly) {
+    return (
+      <>
+        <div className="title16">{heading}</div>
+        <div className="gauge-value-only">
+          <span className="k muted">{t('insights.gauge.collected')}</span>
+          <span className="v">{formatScalar(s.collected)}</span>
+        </div>
+      </>
+    );
+  }
   return (
-    <div className="card pad">
-      <div className="title16">
-        {t(`insights.metric.${metricCode}.title`)}
-        {s.variant ? ` ${t(`insights.variant.${s.variant}`).toLowerCase()}` : ''}
-      </div>
+    <>
+      <div className="title16">{heading}</div>
       <div style={{ display: 'flex', justifyContent: 'center' }}>
         <svg width="270" height="210" viewBox="0 0 270 210" role="img" aria-label={formatScalar(s.collected)}>
           <g transform="rotate(135 135 108)">
@@ -132,6 +145,13 @@ export function GaugeDonut({ s, metricCode }: { s: GaugeSectionVM; metricCode: s
           </span>
         )}
       </div>
+    </>
+  );
+}
+export function GaugeDonut({ s, metricCode }: { s: GaugeSectionVM; metricCode: string }) {
+  return (
+    <div className="card pad">
+      <GaugeCardBody s={s} metricCode={metricCode} />
     </div>
   );
 }
@@ -228,45 +248,118 @@ export function BarComparison({ s, metricCode }: { s: BarComparisonSectionVM; me
 }
 
 /* ── w.metric-detail.comparison — YoY card (rows 38h, growth Tag) ──────── */
-export function ComparisonCard({ s, metricCode, labelKey }: { s: ComparisonSectionVM; metricCode: string; labelKey: string }) {
+/**
+ * AC-P4-02-24/25: rows render the bare year with a muted "Collected"
+ * subtitle (no "YTD " prefix — the period lives in the Time pill), and the
+ * change renders as a toned delta line under the current-year value instead
+ * of a separate labelled "% Growth" row. `showHeading` is false inside the
+ * combined card, where the card heading already names the variant.
+ */
+function ComparisonCardBody({
+  s, metricCode, labelKey, deltaLine = false, showHeading = true, period,
+}: { s: ComparisonSectionVM; metricCode: string; labelKey: string; deltaLine?: boolean; showHeading?: boolean; period?: string }) {
+  const yearLabel = (y: number) => (deltaLine ? String(y) : `YTD ${y}`);
   return (
-    <div className="card pad">
-      <div className="title14">
-        {t(`insights.metric.${metricCode}.title`)}
-        {s.variant ? ` ${t(`insights.variant.${s.variant}`)}` : ''}
-      </div>
-      <div className="yoy-row" style={{ marginTop: 8 }}>
+    <>
+      {showHeading ? (
+        <div className="title14">
+          {t(`insights.metric.${metricCode}.title`)}
+          {s.variant ? ` ${t(`insights.variant.${s.variant}`)}` : ''}
+        </div>
+      ) : (
+        // AC-P4-02-28: "{period} Comparison" heads the comparison half; the
+        // card heading above it already names the variant.
+        period && (
+          <div className="title14">
+            {t('insights.detail.comparisonTitle', { period: t(`insights.period.${period}`) })}
+          </div>
+        )
+      )}
+      <div className={`yoy-row${deltaLine ? ' yoy-row-tall' : ''}`} style={{ marginTop: 8 }}>
         <span>
-          <span className="k">{`YTD ${s.currentYear}`}</span>
+          <span className="k">{yearLabel(s.currentYear)}</span>
           <span className="sub" style={{ display: 'block' }}>{t('insights.comparison.collected')}</span>
         </span>
-        <span className="v">{formatScalar(s.current)}</span>
+        {deltaLine ? (
+          <span className="yoy-value">
+            <span className="v">{formatScalar(s.current)}</span>
+            <DeltaLine delta={s.change} />
+          </span>
+        ) : (
+          <span className="v">{formatScalar(s.current)}</span>
+        )}
       </div>
       <hr className="hairline" />
       <div className="yoy-row">
         <span>
-          <span className="k">{`YTD ${s.priorYear}`}</span>
+          <span className="k">{yearLabel(s.priorYear)}</span>
           <span className="sub" style={{ display: 'block' }}>{t('insights.comparison.collected')}</span>
         </span>
         <span className="v text-semibold">{formatScalar(s.prior)}</span>
       </div>
-      <hr className="hairline" />
-      <div className="yoy-row" style={{ height: 36 }}>
-        <span className="k">{t(labelKey)}</span>
-        <DeltaBadge delta={s.change} />
+      {/* AC-P4-02-25 replaces this labelled row with the delta line above, but
+          only for the TPC/PTPC combined card — AC-P4-02-13/-03 still require
+          it for PP/ABS metrics (persistency, manpower, productivity, …). */}
+      {!deltaLine && (
+        <>
+          <hr className="hairline" />
+          <div className="yoy-row" style={{ height: 36 }}>
+            <span className="k">{t(labelKey)}</span>
+            <DeltaBadge delta={s.change} />
+          </div>
+        </>
+      )}
+    </>
+  );
+}
+export function ComparisonCard({ s, metricCode, labelKey }: { s: ComparisonSectionVM; metricCode: string; labelKey: string }) {
+  return (
+    <div className="card pad">
+      <ComparisonCardBody s={s} metricCode={metricCode} labelKey={labelKey} />
+    </div>
+  );
+}
+
+/**
+ * w.metric-detail.gauge + w.metric-detail.comparison combined card
+ * (MetricDetail_S-P4-02 v1.3.0, AC-P4-02-21, TPC/PTPC only). One bordered
+ * card instead of two: stacked with a horizontal divider below
+ * breakpoint.desktop, two columns with a vertical divider at
+ * breakpoint.desktop and above (`.gauge-comparison` in dls.css).
+ *
+ * v1.4.0 adds the bare-year rows + delta line (AC-P4-02-24/25); v1.5.0 makes
+ * the value-only gauge face apply at every breakpoint (AC-P4-02-23 amended,
+ * desktop evidence) and adds the "{period} Comparison" heading
+ * (AC-P4-02-28).
+ */
+export function GaugeComparisonCard({
+  gauge, comparison, metricCode, labelKey, period,
+}: { gauge: GaugeSectionVM; comparison: ComparisonSectionVM; metricCode: string; labelKey: string; period?: string }) {
+  return (
+    <div className="card pad gauge-comparison">
+      <div className="gc-gauge">
+        <GaugeCardBody s={gauge} metricCode={metricCode} valueOnly />
+      </div>
+      <div className="gc-divider" />
+      <div className="gc-comparison">
+        <ComparisonCardBody
+          s={comparison} metricCode={metricCode} labelKey={labelKey}
+          deltaLine showHeading={false} period={period}
+        />
       </div>
     </div>
   );
 }
 
 /* ── Variant value / penders — single-row YoY cards (6588:18661) ───────── */
-export function VariantValueCard({ s, metricCode }: { s: VariantValueSectionVM; metricCode: string }) {
+export function VariantValueCard({ s }: { s: VariantValueSectionVM }) {
   return (
     <div className="card pad">
-      <div className="title14">{t(`insights.metric.${metricCode}.title`)} {t(`insights.variant.${s.variant}`)}</div>
+      {/* AC-P4-02-24: variant-only heading, bare year. */}
+      <div className="title14">{t(`insights.variant.${s.variant}`)}</div>
       <div className="yoy-row" style={{ marginTop: 8 }}>
         <span>
-          <span className="k">{`YTD ${s.periodLabelYear}`}</span>
+          <span className="k">{s.periodLabelYear}</span>
           <span className="sub" style={{ display: 'block' }}>{t('insights.comparison.collected')}</span>
         </span>
         <span className="v">{formatScalar(s.value)}</span>
@@ -287,41 +380,43 @@ export function PendersCard({ s }: { s: PendersSectionVM }) {
 }
 
 /* ── w.metric-detail.breakdown-table — header 40h / rows 48h / 177+116 ─── */
-export function BreakdownTable({ s, metricCode }: { s: BreakdownSectionVM; metricCode: string }) {
+export function BreakdownTable({ s }: { s: BreakdownSectionVM }) {
   return (
-    <div>
+    <div className="card pad">
+      {/* AC-P4-02-30: card heading is the variant alone, matching the
+          variant-only convention already used for variant.with-repricing
+          (AC-P4-02-24). The shared "Breakdown by Product" heading lives once
+          above the card(s), in MetricDetailMY. */}
       <div className="title14" style={{ marginBottom: 8 }}>
-        {t('insights.detail.breakdownByProduct', { metric: `${t(`insights.metric.${metricCode}.title`)} ${t(`insights.variant.${s.variant}`).toLowerCase()}` })}
+        {t(`insights.variant.${s.variant}`)}
       </div>
-      <div className="card pad">
-        <div className="scroll-x">
-          <table className="table">
-            <thead>
-              <tr>
-                <th className="colfirst">{t('insights.detail.product')}</th>
-                {s.columns.map((c) => <th key={c} className="num colval">{t(`insights.businessLine.${c}`)}</th>)}
-              </tr>
-            </thead>
-            <tbody>
-              {s.rows.map((r) => (
-                <tr key={r.productCode}>
-                  <td className="colfirst">{t(`insights.product.${r.productCode}`)}{r.weightPct !== undefined ? ` (${r.weightPct}%)` : ''}</td>
-                  {s.columns.map((c) => {
-                    const cell = r.cells.find((x) => x.businessLine === c);
-                    return <td key={c} className="num colval">{cell ? formatScalar(cell.value) : '-'}</td>;
-                  })}
-                </tr>
-              ))}
-              <tr>
-                <td className="colfirst total">{t('insights.detail.total')}</td>
+      <div className="scroll-x">
+        <table className="table">
+          <thead>
+            <tr>
+              <th className="colfirst">{t('insights.detail.product')}</th>
+              {s.columns.map((c) => <th key={c} className="num colval">{t(`insights.businessLine.${c}`)}</th>)}
+            </tr>
+          </thead>
+          <tbody>
+            {s.rows.map((r) => (
+              <tr key={r.productCode}>
+                <td className="colfirst">{t(`insights.product.${r.productCode}`)}{r.weightPct !== undefined ? ` (${r.weightPct}%)` : ''}</td>
                 {s.columns.map((c) => {
-                  const tot = s.totals.find((x) => x.businessLine === c);
-                  return <td key={c} className="num colval total">{tot ? formatScalar(tot.value) : '-'}</td>;
+                  const cell = r.cells.find((x) => x.businessLine === c);
+                  return <td key={c} className="num colval">{cell ? formatScalar(cell.value) : '-'}</td>;
                 })}
               </tr>
-            </tbody>
-          </table>
-        </div>
+            ))}
+            <tr>
+              <td className="colfirst total">{t('insights.detail.total')}</td>
+              {s.columns.map((c) => {
+                const tot = s.totals.find((x) => x.businessLine === c);
+                return <td key={c} className="num colval total">{tot ? formatScalar(tot.value) : '-'}</td>;
+              })}
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   );

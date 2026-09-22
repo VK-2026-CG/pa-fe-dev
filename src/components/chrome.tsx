@@ -31,6 +31,24 @@ import type {
   TeamView,
 } from "@spec/performance-vm";
 
+/**
+ * w.detail.context-pill — read-only pill pairing a muted label with its
+ * value ("Product Both", "Time YTD"). Shared by the S-P4-01 dashboard
+ * (AC-P4-01-38/48/51) and S-P4-02's header region (AC-P4-02-22); promoted
+ * out of PerformanceMY when the second consumer appeared. Static label, not
+ * a control.
+ */
+export function ContextPill({ labelKey, value }: { labelKey: string; value: string }) {
+  return (
+    <span className="filter-pill" aria-label={`${t(labelKey)}: ${value}`}>
+      <span className="muted" style={{ marginRight: 4 }}>
+        {t(labelKey)}
+      </span>
+      {value}
+    </span>
+  );
+}
+
 /* ── w.quick-links (tiles 80×122, icon 62, per Figma 6588:16556) ───────── */
 export function QuickLinkRail({ links }: { links: QuickLinkVM[] }) {
   return (

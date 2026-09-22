@@ -80,6 +80,7 @@
       "additionalProperties": false,
       "properties": {
         "visible": { "type": "boolean", "default": true },
+        "addEnabled": { "type": "boolean", "description": "\"+\" affordance shown when the row is empty (v2.2.0, focusCards only)." },
         "maxCount": { "type": "integer", "minimum": 1, "maximum": 12 },
         "widget": { "const": "w.metric.card" },
         "widgetVariant": { "type": "string" },

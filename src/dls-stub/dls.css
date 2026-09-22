@@ -1186,6 +1186,123 @@ svg text {
   font-weight: 800;
 }
 
+/* S-P4-02 header region (AC-P4-02-22): the back row carries the as-of date
+   on the right, and the metric title renders as a page title in the body
+   below the bar instead of inside the bar. */
+.detail-appbar .detail-asof {
+  margin-left: auto;
+  font-size: var(--fs-caption);
+  line-height: var(--lh-caption);
+}
+.page-title {
+  font-size: var(--fs-page);
+  line-height: var(--lh-page);
+  font-weight: 800;
+  margin: 0;
+}
+.back .back-label {
+  margin-left: 6px;
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  font-weight: 600;
+}
+
+/* AC-P4-02-27: variant.with-repricing + penders.primary share a row at
+   breakpoint.desktop; stacked below it. Same 1024px breakpoint as .shell. */
+.section-pair {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+@media (min-width: 1024px) {
+  .section-pair {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Value-only gauge face below breakpoint.desktop (AC-P4-02-23): muted
+   "Collected" label above the value, no donut, no penders legend. */
+.gauge-value-only {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 8px;
+}
+.gauge-value-only .k {
+  font-size: var(--fs-caption);
+  line-height: var(--lh-caption);
+}
+.gauge-value-only .v {
+  font-size: var(--fs-title);
+  line-height: var(--lh-title);
+  font-weight: 800;
+}
+
+/* Comparison delta line under the current-year value (AC-P4-02-25),
+   replacing the separate labelled growth row for the combined card. */
+.yoy-value {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+.yoy-row-tall {
+  height: auto;
+  min-height: var(--row-yoy-h);
+  padding: 8px 0;
+  align-items: flex-start;
+}
+
+/* w.metric-detail.gauge + w.metric-detail.comparison combined card
+   (MetricDetail_S-P4-02 v1.3.0, AC-P4-02-21, TPC/PTPC only). Stacked with a
+   horizontal divider below breakpoint.desktop; two columns with a vertical
+   divider at breakpoint.desktop (>=1024px) and above — same breakpoint as
+   .shell above, per common/ux/tokens/breakpoint.tokens.json. */
+.gauge-comparison {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.gauge-comparison .gc-divider {
+  height: 1px;
+  background: var(--color-border);
+}
+@media (min-width: 1024px) {
+  .gauge-comparison {
+    flex-direction: row;
+    align-items: stretch;
+    gap: 24px;
+    height: 336px; /* direct-instruction value, not measured/Figma — same convention as AC-P4-01-46 */
+  }
+  .gauge-comparison .gc-gauge,
+  .gauge-comparison .gc-comparison {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  /* Comparison content (heading + rows) centers as a block, vertically only. */
+  .gauge-comparison .gc-comparison {
+    justify-content: center;
+  }
+  /* Gauge heading stays top-left where it was; only the value fills and
+     centers within the remaining space below it. */
+  .gauge-comparison .gc-gauge .gauge-value-only {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  .gauge-comparison .gc-divider {
+    width: 1px;
+    height: auto;
+    align-self: stretch;
+  }
+}
+
 /* Notices, states, toast */
 .notice {
   border-radius: 10px;

@@ -16,6 +16,7 @@ import {
 import { PerformanceSamplePicker } from "./parts/PerformanceSamplePicker";
 import { MetricCard, MilestoneCard } from "@/components/metrics";
 import {
+  ContextPill,
   FilterSheet,
   MoreActionsControl,
   PersonaPicker,
@@ -183,24 +184,14 @@ export default function PerformanceMY({
           class so the History screen's pills remain unchanged. */}
       <div className="section">
         <div className="filter-row">
-          <span
-            className="filter-pill"
-            aria-label={`${t("insights.dashboard.filter.product")}: ${t(`insights.businessLine.${f.businessLine}`)}`}
-          >
-            <span className="muted" style={{ marginRight: 4 }}>
-              {t("insights.dashboard.filter.product")}
-            </span>
-            {t(`insights.businessLine.${f.businessLine}`)}
-          </span>
-          <span
-            className="filter-pill"
-            aria-label={`${t("insights.dashboard.filter.time")}: ${t(`insights.period.${f.period}`)}`}
-          >
-            <span className="muted" style={{ marginRight: 4 }}>
-              {t("insights.dashboard.filter.time")}
-            </span>
-            {t(`insights.period.${f.period}`)}
-          </span>
+          <ContextPill
+            labelKey="insights.dashboard.filter.product"
+            value={t(`insights.businessLine.${f.businessLine}`)}
+          />
+          <ContextPill
+            labelKey="insights.dashboard.filter.time"
+            value={t(`insights.period.${f.period}`)}
+          />
         </div>
       </div>
 
