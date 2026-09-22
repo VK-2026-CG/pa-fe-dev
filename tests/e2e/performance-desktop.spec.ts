@@ -36,6 +36,31 @@ test.describe("Performance dashboard (S-P4-01) at desktop viewport (≥1024px)",
     expect(watch.warnings, watch.warnings.join("\n")).toEqual([]);
   });
 
+  test("Filter & Selection renders as a right-anchored side drawer at ≥768px (AC-P4-01-72)", async ({
+    page,
+  }) => {
+    await page.goto("/insights/performance");
+
+    await page.getByRole("button", { name: "Filter" }).click();
+    const sheet = page.locator(".sheet");
+    await expect(sheet).toBeVisible();
+    await expect(sheet).toHaveAttribute("aria-label", "Filter & Selection");
+    const box = await sheet.boundingBox();
+    const viewport = page.viewportSize()!;
+    expect(box!.x + box!.width).toBeCloseTo(viewport.width, 0);
+    expect(box!.width).toBeLessThanOrEqual(420);
+    expect(box!.height).toBeCloseTo(viewport.height, 0);
+
+    // Dashboard behind the drawer stays mounted and visible (non-navigating).
+    await expect(
+      page.getByRole("heading", { name: "Performance" }),
+    ).toBeVisible();
+
+    await sheet.getByRole("radio").filter({ hasText: "Takaful" }).click();
+    await sheet.getByRole("button", { name: "Apply" }).click();
+    await expect(sheet).toHaveCount(0);
+  });
+
   test("scope switcher shows icon + label at breakpoint.tablet/desktop (AC-P4-01-42)", async ({
     page,
   }) => {

@@ -87,12 +87,14 @@ export default function PerformanceMY({
 
   const refetch = (patch: Partial<LensState>) => {
     const next = { ...lens, ...patch };
-    if (patch.scope) {
-      // scope switch resets segment + teamView to defaults (AC-P4-01-14/15)
+    if (patch.scope && patch.scope !== lens.scope) {
+      // Reset on a real scope change, but retain the View sheet's explicit
+      // Direct/Group choice in the same request (AC-P4-01-67).
       next.basis = "STANDARD";
-      next.teamView = patch.scope === "TEAM" ? "DIRECT" : undefined;
+      next.teamView = patch.scope === "TEAM" ? (patch.teamView ?? "DIRECT") : undefined;
       next.period = undefined; // pick up the scope's config default
     }
+    if (next.scope === "SELF") next.teamView = undefined;
     setVm(null);
     setLens(next);
     void load(next);
@@ -142,11 +144,24 @@ export default function PerformanceMY({
         }}
         className="section"
       >
-        <h1>Performance</h1>
+        <h1>
+          Performance{" "}
+          {f.scope === "TEAM" && f.teamView && (
+            <span
+              className="caption muted"
+              style={{ fontWeight: 400, marginLeft: 6 }}
+            >
+              {t("insights.dashboard.teamViewSuffix", {
+                view: t(`insights.teamView.${f.teamView}`),
+              })}
+            </span>
+          )}
+        </h1>
         {vm.scopeSwitcher && (
           <ScopeSwitcher
             vm={vm.scopeSwitcher}
-            onSelect={(scope) => refetch({ scope })}
+            teamView={f.teamView}
+            onSelect={(scope, teamView) => refetch({ scope, ...(teamView ? { teamView } : {}) })}
           />
         )}
       </div>

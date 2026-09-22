@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { t } from "@/lib/i18n";
 import { href } from "@/lib/nav";
 import { formatScalar } from "@/lib/format";
@@ -13,6 +13,7 @@ import {
   IconButton,
   MenuPopover,
   ProgressBar,
+  RadioDropdown,
   RadioSheetList,
   ScopePill,
   SheetRow,
@@ -79,7 +80,13 @@ export function FilterSheet({
   const [teamView, setTeamView] = useState<TeamView | undefined>(f.teamView);
   const showMoreOptions = f.basisToggleVisible || f.teamViewToggleVisible;
   return (
-    <BottomSheet title={t("insights.filter.title")} onClose={onClose}>
+    <BottomSheet
+      className="filter-sheet"
+      backdropClassName="filter-sheet-backdrop"
+      align="none"
+      title={t("insights.filter.title")}
+      onClose={onClose}
+    >
       <div className="filter-card">
         <div className="section-label">
           {t("insights.filter.sectionProduct")}
@@ -217,31 +224,142 @@ export function MoreActionsControl({
 /* ── Scheme / Group toggle row is styled by dls-stub ToggleRow ─────────── */
 export { ToggleRow } from "@/dls-stub";
 
-/* ── Scope switcher (v1.5.9, AC-P4-01-42): icon + responsive label pill ──
-   Reuses the DLS `ScopePill` primitive (Figma 6588:16960) rather than the
-   v1.5.4 native <select>: icon + chevron always render, the label is
-   visually hidden below breakpoint.tablet (<768px, same token as the R1
-   rail's AC-P4-01-41) and shown at breakpoint.tablet/desktop (≥768px). The
-   accessible name is fixed at "Scope switcher" regardless of breakpoint. */
+/* ── Scope switcher (S-P4-01): mobile View sheet, desktop/tablet pill ─────
+   Mobile keeps the icon + chevron trigger but stages Self/Team selection in a
+   bottom sheet until Apply. Tablet/desktop retain the anchored ScopePill menu.
+   The accessible name is fixed at "Scope switcher" at every breakpoint. */
 export function ScopeSwitcher({
   vm,
+  teamView,
   onSelect,
 }: {
   vm: ScopeSwitcherVM;
-  onSelect: (s: Scope) => void;
+  teamView?: TeamView;
+  onSelect: (s: Scope, teamView?: TeamView) => void;
 }) {
+  const isTabletUp = useIsTabletUp();
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [stagedScope, setStagedScope] = useState<Scope>(vm.current);
+  const [stagedTeamView, setStagedTeamView] = useState<TeamView>(teamView ?? "DIRECT");
+  const [teamMenuOpen, setTeamMenuOpen] = useState(false);
+  const teamViewOptions = vm.teamViewOptions ?? [];
+  const showTeamView = stagedScope === "TEAM" && teamViewOptions.length > 1;
+
+  useEffect(() => {
+    setStagedScope(vm.current);
+    setStagedTeamView(teamView ?? "DIRECT");
+    setTeamMenuOpen(false);
+    setMobileOpen(false);
+  }, [vm.current, teamView, isTabletUp]);
+
+  const close = () => {
+    setTeamMenuOpen(false);
+    setMobileOpen(false);
+  };
+
+  const options = vm.options.map((o) => ({
+    key: o.scope,
+    label: t(`insights.scope.${o.scope}`),
+    selected: o.scope === vm.current,
+  }));
+
+  if (isTabletUp) {
+    return (
+      <ScopePill
+        icon="scope-avatar"
+        ariaLabel="Scope switcher"
+        label={t(`insights.scope.${vm.current}`)}
+        options={options}
+        onSelect={(key) => onSelect(key as Scope)}
+      />
+    );
+  }
+
   return (
-    <ScopePill
-      icon="scope-avatar"
-      ariaLabel="Scope switcher"
-      label={t(`insights.scope.${vm.current}`)}
-      options={vm.options.map((o) => ({
-        key: o.scope,
-        label: t(`insights.scope.${o.scope}`),
-        selected: o.scope === vm.current,
-      }))}
-      onSelect={(key) => onSelect(key as Scope)}
-    />
+    <>
+      <button
+        className="scope-pill"
+        aria-haspopup="dialog"
+        aria-expanded={mobileOpen}
+        aria-label="Scope switcher"
+        onClick={() => {
+          setStagedScope(vm.current);
+          setStagedTeamView(teamView ?? "DIRECT");
+          setTeamMenuOpen(false);
+          setMobileOpen(true);
+        }}
+      >
+        <Icon token="scope-avatar" size={20} tone="var(--color-text)" />
+        <Icon token="arrow-down-s" size={16} tone="var(--color-text)" />
+      </button>
+      {mobileOpen && (
+        <BottomSheet
+          className={`scope-sheet ${teamMenuOpen ? "team-menu-open" : ""}`}
+          backdropClassName="scope-sheet-backdrop"
+          closeIconTone="var(--view-muted)"
+          title={t("insights.scope.sheetTitle")}
+          onClose={close}
+        >
+          <div className="scope-sheet-options">
+            <RadioSheetList
+              value={stagedScope}
+              options={vm.options.map((o) => o.scope)}
+              onChange={(scope) => {
+                if (scope !== stagedScope) setStagedTeamView("DIRECT");
+                setStagedScope(scope);
+                setTeamMenuOpen(false);
+              }}
+              label={(scope) => t(`insights.scope.${scope}`)}
+            />
+            {showTeamView && (
+              <RadioDropdown
+                value={stagedTeamView}
+                options={teamViewOptions}
+                label={(value) => t(`insights.teamView.${value}`)}
+                ariaLabel={t("insights.teamView.label")}
+                onChange={setStagedTeamView}
+                open={teamMenuOpen}
+                onOpenChange={setTeamMenuOpen}
+              />
+            )}
+            {stagedScope === "TEAM" && !showTeamView && (
+              <RadioDropdown
+                value="DIRECT"
+                options={["DIRECT"]}
+                label={(value) => t(`insights.teamView.${value}`)}
+                ariaLabel={t("insights.teamView.label")}
+                onChange={() => {}}
+                open={false}
+                onOpenChange={() => {}}
+                disabled
+              />
+            )}
+          </div>
+          <div className="scope-sheet-actions">
+            <button
+              className="scope-sheet-cancel"
+              onClick={close}
+            >
+              {t("insights.common.cancel")}
+            </button>
+            <button
+              className="scope-sheet-apply"
+              onClick={() => {
+                const nextTeamView = stagedScope === "TEAM"
+                  ? (showTeamView ? stagedTeamView : (vm.current === "TEAM" ? teamView ?? "DIRECT" : "DIRECT"))
+                  : undefined;
+                close();
+                if (stagedScope !== vm.current || nextTeamView !== teamView) {
+                  onSelect(stagedScope, nextTeamView);
+                }
+              }}
+            >
+              {t("insights.common.apply")}
+            </button>
+          </div>
+        </BottomSheet>
+      )}
+    </>
   );
 }
 
