@@ -275,16 +275,19 @@ export function ScopeSwitcher({
     setMobileOpen(false);
   };
 
+  const scopeIcon = (scope: Scope) => (scope === "SELF" ? "scope-self" : "scope-team");
+
   const options = vm.options.map((o) => ({
     key: o.scope,
     label: t(`insights.scope.${o.scope}`),
     selected: o.scope === vm.current,
+    icon: scopeIcon(o.scope),
   }));
 
   if (isTabletUp) {
     return (
       <ScopePill
-        icon="scope-avatar"
+        icon={scopeIcon(vm.current)}
         ariaLabel="Scope switcher"
         label={t(`insights.scope.${vm.current}`)}
         options={options}
@@ -307,7 +310,7 @@ export function ScopeSwitcher({
           setMobileOpen(true);
         }}
       >
-        <Icon token="scope-avatar" size={20} tone="var(--color-text)" />
+        <Icon token={scopeIcon(vm.current)} size={20} tone="var(--color-text)" />
         <Icon token="arrow-down-s" size={16} tone="var(--color-text)" />
       </button>
       {mobileOpen && (

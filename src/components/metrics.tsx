@@ -14,11 +14,11 @@ export function DeltaBadge({ delta }: { delta: DeltaVM }) {
 }
 
 /** "+27% vs last year" line (Figma 6588:17659: toned delta + muted suffix). */
-function DeltaLine({ delta }: { delta: DeltaVM }) {
+function DeltaLine({ delta, full }: { delta: DeltaVM; full?: boolean }) {
   return (
     <span className="delta-line">
       <span className={`d ${toneFor(delta.sentiment)}`}>{formatDelta(delta)}</span>
-      <span className="muted">{t('insights.delta.vsLY')}</span>
+      <span className="muted">{t(full ? 'insights.delta.vsLastYear' : 'insights.delta.vsLY')}</span>
     </span>
   );
 }
@@ -56,7 +56,7 @@ export function MetricCard({ vm, variant = 'priority' }: { vm: MetricCardVM; var
       ) : (
         <div className="spread foot" style={{ alignItems: 'flex-end' }}>
           <span className="value">{formatScalar(vm.value, vm.valueDisplay === 'COMPACT')}</span>
-          {vm.delta && <DeltaLine delta={vm.delta} />}
+          {vm.delta && <DeltaLine delta={vm.delta} full />}
         </div>
       )}
     </Link>

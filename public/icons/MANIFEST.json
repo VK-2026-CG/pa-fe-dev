@@ -29,5 +29,7 @@
   "flag":                        { "figmaNodeId": "6588:16901", "source": "material flag" },
   "filter":                      { "figmaNodeId": null,          "source": "remixicon filter-line (desktop Filter action — screenshot-derived, v1.4.0)" },
   "more-vert":                   { "figmaNodeId": null,          "source": "material more_vert (S-P4-01 v1.5.13 vertical overflow asset)" },
-  "scope-avatar":                { "figmaNodeId": null,          "source": "remixicon user-line — UNAPPROVED placeholder pending UX/Figma export, pruaction-spec README OQ-24 (S-P4-01 v1.5.9, AC-P4-01-42)" }
+  "scope-avatar":                { "figmaNodeId": null,          "source": "remixicon user-line — UNAPPROVED placeholder pending UX/Figma export, pruaction-spec README OQ-24 (S-P4-01 v1.5.9, AC-P4-01-42)" },
+  "scope-self":                  { "figmaNodeId": null,          "source": "DLS_APPROVED final asset provided by requester (Self.svg); resolves OQ-24 for the Self scope option" },
+  "scope-team":                  { "figmaNodeId": null,          "source": "DLS_APPROVED final asset provided by requester (Team.svg); resolves OQ-24 for the Team scope option" }
 }

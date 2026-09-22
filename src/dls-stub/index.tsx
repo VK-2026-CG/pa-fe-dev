@@ -697,7 +697,7 @@ export function ScopePill({
   icon?: string;
   label: string;
   ariaLabel?: string;
-  options: Array<{ key: string; label: string; selected: boolean }>;
+  options: Array<{ key: string; label: string; selected: boolean; icon?: string }>;
   onSelect: (key: string) => void;
 }) {
   const [open, setOpen] = useState(false);
@@ -727,7 +727,12 @@ export function ScopePill({
                 onSelect(o.key);
               }}
             >
-              <span className="lbl" style={{ marginLeft: 0 }}>
+              {o.icon && (
+                <span className="lead">
+                  <Icon token={o.icon} size={20} tone="var(--color-text)" />
+                </span>
+              )}
+              <span className="lbl" style={o.icon ? undefined : { marginLeft: 0 }}>
                 {o.label}
               </span>
               {o.selected ? <span aria-hidden>✓</span> : <span />}
