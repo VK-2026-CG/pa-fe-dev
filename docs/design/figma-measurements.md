@@ -71,6 +71,16 @@ from that dump (node ids cited). Nothing here is invented.
   (Month / 2026 / MoM). Footer `Icon button` 48×48 bottom-right.
 
 ## Sheets & menus
+
+### S-P4-01 mobile View sheet (v1.5.18 requester PNG)
+
+Screenshot-derived, not measured Figma metadata: 750px source interpreted at
+2x on a 375px canvas. Inset 8px, radius 16px, header 72px; option card has
+16px gutters, 46px radio rows, 17px leading radios. P2 Team selector is 48px
+high with 8px radius; its floating Direct/Group panel has 44px option rows,
+16px radius and shadow. Footer buttons are 48px high with 8px gap. The open
+menu reserves space above the footer; short viewports scroll the sheet.
+Values are scoped to `.scope-sheet`; other sheets and desktop remain unchanged.
 - Bottom sheet: header 375×56; option rows 343×**52** — leading icon 20,
   label 14/20 at x36, trailing `arrow-right-s` 20, 1px hairline.
 - More-Action rows: Flag / Cached / Monitoring leading icons (see manifest).

@@ -20,6 +20,9 @@ test.describe("Performance dashboard (S-P4-01) on the 375 mobile shell", () => {
     await expect(
       page.getByRole("navigation", { name: "Quick links" }),
     ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Introducer Drilldown" }),
+    ).toHaveCount(0);
 
     const panel = page
       .locator(".metric-panel")
@@ -38,7 +41,12 @@ test.describe("Performance dashboard (S-P4-01) on the 375 mobile shell", () => {
     await expect(page.getByRole("link", { name: "View MOC" })).toBeVisible();
 
     await page.getByLabel("Scope switcher").click();
-    await page.getByRole("menuitem", { name: "Team" }).click();
+    await page.locator(".sheet").getByRole("radio", { name: "Team" }).click();
+    await page.locator(".sheet").getByRole("button", { name: "Apply" }).click();
+    await expect(page.getByRole("link", { name: "Team Drilldown" })).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Introducer Drilldown" }),
+    ).toHaveCount(0);
     await expect(page.getByText("Priority Milestones")).toHaveCount(0);
     await expect(page.getByRole("link", { name: "Set Goal" })).toHaveCount(0);
     await expect(page.getByRole("link", { name: "Add milestone" })).toHaveCount(
@@ -76,7 +84,8 @@ test.describe("Performance dashboard (S-P4-01) on the 375 mobile shell", () => {
     ).toBeVisible();
 
     await page.getByLabel("Scope switcher").click();
-    await page.getByRole("menuitem", { name: "Team" }).click();
+    await page.locator(".sheet").getByRole("radio", { name: "Team" }).click();
+    await page.locator(".sheet").getByRole("button", { name: "Apply" }).click();
     await expect(page.getByText("Priority Milestones")).toBeVisible();
     await expect(page.getByRole("link", { name: "Set Goal" })).toBeVisible();
     await expect(
@@ -122,6 +131,17 @@ test.describe("Performance dashboard (S-P4-01) on the 375 mobile shell", () => {
     const sheet = page.locator(".sheet");
     await expect(sheet).toBeVisible();
     await expect(sheet).toHaveAttribute("aria-label", "Filter & Selection");
+    // Below 768px, stays a full-width bottom sheet (AC-P4-01-71), unchanged.
+    // Compared against the actual layout viewport, not page.viewportSize():
+    // this page has a pre-existing ~16px horizontal overflow (unrelated to
+    // this sheet — the same gap shows up on the untouched More-actions
+    // sheet), so the layout viewport is wider than the requested 375px.
+    const box = await sheet.boundingBox();
+    const layoutWidth = await page.evaluate(() => document.documentElement.scrollWidth);
+    const innerHeight = await page.evaluate(() => window.innerHeight);
+    expect(box!.x).toBe(0);
+    expect(box!.width).toBeCloseTo(layoutWidth, 0);
+    expect(box!.y + box!.height).toBeCloseTo(innerHeight, 0);
     await expect(
       sheet.getByRole("radio").filter({ hasText: "Takaful" }),
     ).toBeVisible();

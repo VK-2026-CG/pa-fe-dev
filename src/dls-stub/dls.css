@@ -181,6 +181,16 @@ svg text {
     max-width: var(--design-w-desktop);
   }
 }
+/* Screens without their own tablet/desktop treatment yet (e.g. S-P4-05,
+   manifest blocker "Responsive/state visual baselines are incomplete") opt
+   back into the fluid mobile width at every breakpoint via this marker on
+   their root element — otherwise their mobile-measured cards/tabs inherit
+   .shell's width bump above and stretch edge-to-edge, unreadable. Higher
+   specificity than the plain .shell media rules above wins regardless of
+   source order. */
+.shell:has(.mobile-only-shell) {
+  max-width: var(--screen-max);
+}
 
 .appbar {
   display: flex;
@@ -505,6 +515,7 @@ svg text {
 .mcard {
   width: var(--card-prio-w);
   background: var(--color-surface);
+  border: 1px solid #e4e4e7; /* direct-instruction value, distinct from --color-border */
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-card);
   padding: var(--card-pad);
@@ -836,6 +847,8 @@ svg text {
     width: var(--pill-h);
     min-width: var(--pill-h);
     padding: 0;
+    /* AC-P4-01-49: mobile-only icon tint, direct-instruction value. */
+    --filter-icon-color: #ed1b2d;
   }
   .filter-btn-label {
     display: none;
@@ -1063,6 +1076,190 @@ svg text {
 }
 .filter-card .toggle-row {
   padding: 0 16px;
+}
+
+/* Filter & Selection: bottom sheet <768px, right side drawer >=768px
+   (S-P4-01 v1.5.19, AC-P4-01-71/72) — same responsive split as
+   .cust-surface (Customize Metrics), `align="none"` hands geometry to CSS. */
+.filter-sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-height: 92vh;
+  overflow-y: auto;
+}
+@media (min-width: 768px) {
+  .filter-sheet {
+    left: auto;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: min(420px, 100vw);
+    max-height: none;
+    height: 100vh;
+    margin: 0;
+    border-radius: 0;
+    border-left: 1px solid var(--color-border);
+  }
+  .filter-sheet .sheet-head {
+    height: 72px;
+  }
+}
+
+/* S-P4-01 mobile View sheet — requester PNG, 750px interpreted at 2x.
+   These scoped screenshot-derived tokens leave other sheets/menus unchanged. */
+.scope-sheet-backdrop {
+  right: auto;
+  bottom: auto;
+  width: 100vw;
+  height: 100dvh;
+}
+.scope-sheet {
+  --view-brand: #f4122c;
+  --view-text: #1d1d20;
+  --view-border: #d1d1d6;
+  --view-muted: #74747e;
+  width: calc(100% - 16px);
+  border-radius: 16px;
+  margin-bottom: max(8px, env(safe-area-inset-bottom));
+  padding-bottom: 0;
+  max-height: calc(100dvh - 16px - env(safe-area-inset-bottom));
+  overflow-y: auto;
+  color: var(--view-text);
+}
+.scope-sheet .sheet-head {
+  height: 72px;
+  padding: 0 24px;
+}
+.scope-sheet .sheet-head .title16 {
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 600;
+}
+.scope-sheet .sheet-head .icon-btn {
+  color: var(--view-muted);
+}
+.scope-sheet .sheet-body {
+  padding: 0 16px;
+}
+.scope-sheet-options {
+  margin-top: 16px;
+  padding: 14px 0 16px;
+  border: 1px solid var(--view-border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-card);
+}
+.scope-sheet-options .sheet-row {
+  height: 46px;
+  padding: 0 28px;
+  border-bottom: 0;
+  flex-direction: row-reverse;
+  gap: 10px;
+  color: inherit;
+}
+.scope-sheet-options .sheet-row .lbl {
+  margin-left: 0;
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 400;
+}
+.scope-sheet .radio {
+  width: 17px;
+  height: 17px;
+  border: 1.5px solid var(--view-muted);
+  background: var(--color-surface);
+}
+.scope-sheet .radio.on {
+  border: 5px solid var(--view-brand);
+}
+.scope-sheet-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 8px;
+  margin: 14px -16px 0;
+  padding: 16px;
+  background: #fcfcfc;
+}
+.scope-sheet-actions button {
+  height: 48px;
+  border-radius: 8px;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.scope-sheet-cancel {
+  border: 1px solid var(--view-border);
+  background: var(--color-surface);
+  color: var(--view-text);
+}
+.scope-sheet-apply {
+  border: 1px solid var(--view-brand);
+  background: var(--view-brand);
+  color: #fff;
+}
+.scope-sheet.team-menu-open .scope-sheet-actions {
+  margin-top: 112px;
+}
+.radio-dropdown {
+  position: relative;
+  margin: 0 12px 0 28px;
+}
+.radio-dropdown-trigger {
+  width: 100%;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+  border: 2px solid var(--view-muted, var(--color-text-muted));
+  border-radius: 8px;
+  background: #f5f5f5;
+  color: inherit;
+  font-size: 15px;
+  line-height: 22px;
+  cursor: pointer;
+}
+.radio-dropdown-trigger .icon {
+  color: var(--view-muted, var(--color-text-muted));
+}
+.radio-dropdown-trigger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.radio-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  width: calc(100% + 14px);
+  z-index: 1;
+  padding: 8px 0;
+  border-radius: 16px;
+  background: var(--color-surface);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+.radio-dropdown-option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0 22px;
+  font-size: 15px;
+  line-height: 22px;
+  cursor: pointer;
+}
+.radio-dropdown-option input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+.radio-dropdown-option:has(input:focus-visible) {
+  outline: 2px solid var(--color-text-muted);
+  outline-offset: -3px;
+  border-radius: 8px;
 }
 
 /* Menus */

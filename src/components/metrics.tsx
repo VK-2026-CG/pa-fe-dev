@@ -48,7 +48,6 @@ export function MetricCard({ vm, variant = 'priority' }: { vm: MetricCardVM; var
             <span className="variant"> ({t(`insights.variant.${vm.variant}`)})</span>
           )}
         </span>
-        {variant === 'simple' && <Icon token="arrow-right-up-line" size={24} tone="var(--color-text)" />}
       </div>
       {dataState !== 'OK' ? (
         <div className="value-block">

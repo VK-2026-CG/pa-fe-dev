@@ -15,6 +15,14 @@ test.describe('draft packs render (S-P4-05 / S-P4-06)', () => {
     expect(watch.errors, watch.errors.join('\n')).toEqual([]);
   });
 
+  test('Milestones stays at its fluid mobile width at tablet/desktop instead of stretching (AC-P4-05-06)', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    await page.goto('/insights/milestones');
+    const shell = page.locator('.shell');
+    const box = await shell.boundingBox();
+    expect(box!.width).toBeLessThanOrEqual(480);
+  });
+
   test('Comp & Ben page shows the stale-data banner (AC-P4-06-04)', async ({ page }) => {
     const watch = watchConsole(page);
     await page.goto('/insights/comp-ben');

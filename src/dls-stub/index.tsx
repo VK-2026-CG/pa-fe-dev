@@ -3,7 +3,7 @@
  * folder for the real Prudential DLS; keep the exported names + props.
  * Geometry per docs/design/figma-measurements.md; icons per public/icons/MANIFEST.json.
  */
-import { useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import {
   Carousel as HCarousel,
   Checkbox as HCheckbox,
@@ -161,15 +161,26 @@ export function BottomSheet({
   title,
   onClose,
   children,
+  className,
+  backdropClassName,
+  closeIconTone,
+  align,
 }: {
   title: ReactNode;
   onClose: () => void;
   children: ReactNode;
+  className?: string;
+  backdropClassName?: string;
+  closeIconTone?: string;
+  /** 'none' hands geometry entirely to CSS (see .cust-surface) — used by
+   * sheets that become a side drawer at tablet/desktop instead of staying
+   * bottom-anchored. Defaults to 'end' (Layer's flex bottom-sheet centering). */
+  align?: 'end' | 'none';
 }) {
   return (
-    <Layer onClose={onClose} backdropClassName="sheet-backdrop">
+    <Layer onClose={onClose} backdropClassName={`sheet-backdrop ${backdropClassName ?? ""}`.trim()} align={align}>
       <div
-        className="sheet"
+        className={`sheet ${className ?? ""}`.trim()}
         role="dialog"
         aria-modal="true"
         aria-label={typeof title === "string" ? title : undefined}
@@ -177,7 +188,7 @@ export function BottomSheet({
         <div className="sheet-head">
           <span className="title16">{title}</span>
           <button className="icon-btn" aria-label="Close" onClick={onClose}>
-            <Icon token="close" size={20} />
+            <Icon token="close" size={20} tone={closeIconTone} />
           </button>
         </div>
         <div className="sheet-body">{children}</div>
@@ -284,6 +295,114 @@ export function MenuPopover({
   );
 }
 
+/** Radio dropdown inside a sheet. Uses the parent sheet's focus trap, not a
+ * second modal layer. Escape closes this menu before reaching the sheet. */
+export function RadioDropdown<T extends string>({
+  value,
+  options,
+  label,
+  ariaLabel,
+  onChange,
+  open,
+  onOpenChange,
+  disabled,
+}: {
+  value: T;
+  options: T[];
+  label: (option: T) => string;
+  ariaLabel: string;
+  onChange: (value: T) => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  /** No other value is selectable (e.g. P3, Team-scope Direct-only); renders
+   * the same trigger, greyed out, with no menu and no open/close behavior. */
+  disabled?: boolean;
+}) {
+  const id = useId();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!open || disabled) return;
+    containerRef.current?.querySelector<HTMLInputElement>('input:checked')?.focus({ preventScroll: true });
+    const onPointerDown = (event: PointerEvent) => {
+      if (event.target instanceof Node && !containerRef.current?.contains(event.target)) {
+        onOpenChange(false);
+      }
+    };
+    document.addEventListener('pointerdown', onPointerDown);
+    return () => document.removeEventListener('pointerdown', onPointerDown);
+  }, [open, onOpenChange]);
+
+  const close = () => {
+    onOpenChange(false);
+    triggerRef.current?.focus({ preventScroll: true });
+  };
+
+  return (
+    <div
+      ref={containerRef}
+      className="radio-dropdown"
+      onBlur={() => {
+        // Label activation can temporarily move focus outside before the
+        // browser focuses/checks its radio. Check after activation completes.
+        requestAnimationFrame(() => {
+          const container = containerRef.current;
+          if (container && !container.contains(document.activeElement)) onOpenChange(false);
+        });
+      }}
+      onKeyDown={(event) => {
+        if (!disabled && open && event.key === 'Escape') {
+          event.preventDefault();
+          event.stopPropagation();
+          close();
+        }
+      }}
+    >
+      <button
+        ref={triggerRef}
+        type="button"
+        className="radio-dropdown-trigger"
+        disabled={disabled}
+        aria-label={`${ariaLabel}: ${label(value)}`}
+        aria-expanded={disabled ? undefined : open}
+        aria-controls={!disabled && open ? id : undefined}
+        onClick={disabled ? undefined : () => onOpenChange(!open)}
+        onKeyDown={disabled ? undefined : (event) => {
+          if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+            event.preventDefault();
+            onOpenChange(true);
+          }
+        }}
+      >
+        <span>{label(value)}</span>
+        <Icon token="arrow-down-s" tone="var(--view-muted, var(--color-text-muted))" />
+      </button>
+      {!disabled && open && (
+        <div id={id} className="radio-dropdown-menu" role="radiogroup" aria-label={ariaLabel}>
+          {options.map((option) => (
+            <label key={option} className="radio-dropdown-option">
+              <input
+                type="radio"
+                name={id}
+                value={option}
+                checked={option === value}
+                onChange={() => {
+                  onChange(option);
+                  close();
+                }}
+                onClick={() => { if (option === value) close(); }}
+              />
+              <span className={`radio ${option === value ? 'on' : ''}`} aria-hidden="true" />
+              <span>{label(option)}</span>
+            </label>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ── Small buttons ─────────────────────────────────────────────────────── */
 export function IconButton({
   token,
@@ -326,7 +445,7 @@ export function FilterButton({
 }) {
   return (
     <button className="filter-btn" aria-label={label} onClick={onClick}>
-      <Icon token="filter" size={16} tone="var(--color-text)" />
+      <Icon token="filter" size={16} tone="var(--filter-icon-color, var(--color-text))" />
       <span className="filter-btn-label">{label}</span>
     </button>
   );

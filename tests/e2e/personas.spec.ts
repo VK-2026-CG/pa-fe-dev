@@ -16,7 +16,8 @@ test.describe('persona entitlements on the dashboard', () => {
     const scopeSwitcher = page.getByLabel('Scope switcher');
     await expect(scopeSwitcher).toBeVisible();
     await scopeSwitcher.click();
-    await page.getByRole('menuitem', { name: 'Team' }).click();
+    await page.locator('.sheet').getByRole('radio', { name: 'Team' }).click();
+    await page.locator('.sheet').getByRole('button', { name: 'Apply' }).click();
 
     await expect(page.getByRole('button', { name: /Product/ })).toBeVisible();
     await page.getByRole('button', { name: 'Filter' }).click();
@@ -39,10 +40,55 @@ test.describe('persona entitlements on the dashboard', () => {
     const scopeSwitcher = page.getByLabel('Scope switcher');
     await expect(scopeSwitcher).toBeVisible();
     // 375px viewport (this project's shell) is below breakpoint.tablet (768px):
-    // the label stays out of the visual layout; the control is still functional.
+    // the label stays out of the visual layout; the control opens the mobile
+    // view bottom sheet.
     await expect(page.locator('.scope-pill-label')).not.toBeVisible();
     await scopeSwitcher.click();
-    await page.getByRole('menuitem', { name: 'Team' }).click();
+    const sheet = page.getByRole('dialog', { name: 'View' });
+    await expect(sheet).toBeVisible();
+    await expect(sheet.getByRole('radio', { name: 'Self' })).toBeVisible();
+    await expect(sheet.getByRole('radio', { name: 'Team' })).toBeVisible();
+    await sheet.getByRole('radio', { name: 'Team' }).click();
+    await sheet.getByRole('button', { name: 'Apply' }).click();
     await expect(page.getByRole('button', { name: /Product/ })).toBeVisible();
+  });
+
+  test('mobile view sheet stages changes until Apply and Cancel discards them', async ({ context, page }) => {
+    await setPersona(context, 'LEADER_P2');
+    await page.goto('/insights/performance');
+
+    await page.getByLabel('Scope switcher').click();
+    const sheet = page.locator('.sheet');
+    await sheet.getByRole('radio', { name: 'Team' }).click();
+    await expect(sheet.getByRole('radio', { name: 'Team' })).toHaveAttribute('aria-checked', 'true');
+    await sheet.getByRole('button', { name: 'Cancel' }).click();
+    await expect(page.locator('.sheet')).toHaveCount(0);
+
+    await page.getByLabel('Scope switcher').click();
+    await expect(page.locator('.sheet').getByRole('radio', { name: 'Self' })).toHaveAttribute('aria-checked', 'true');
+  });
+
+  test('Performance heading appends a teamView suffix for TEAM, data-driven not persona-driven (AC-P4-01-75)', async ({ context, page }) => {
+    await setPersona(context, 'LEADER_P2');
+    await page.goto('/insights/performance');
+    await expect(page.getByRole('heading', { name: 'Performance', exact: true })).toBeVisible();
+
+    await page.getByLabel('Scope switcher').click();
+    await page.locator('.sheet').getByRole('radio', { name: 'Team', exact: true }).click();
+    await page.locator('.sheet').getByRole('button', { name: 'Apply' }).click();
+    await expect(page.getByRole('heading', { name: 'Performance (Direct View)', exact: true })).toBeVisible();
+
+    await page.getByLabel('Scope switcher').click();
+    await page.locator('.sheet').getByRole('button', { name: 'Team view: Direct' }).click();
+    await page.locator('.sheet').getByRole('radiogroup', { name: 'Team view' }).getByText('Group', { exact: true }).click();
+    await page.locator('.sheet').getByRole('button', { name: 'Apply' }).click();
+    await expect(page.getByRole('heading', { name: 'Performance (Group View)', exact: true })).toBeVisible();
+
+    await setPersona(context, 'LEADER_P3');
+    await page.goto('/insights/performance');
+    await page.getByLabel('Scope switcher').click();
+    await page.locator('.sheet').getByRole('radio', { name: 'Team', exact: true }).click();
+    await page.locator('.sheet').getByRole('button', { name: 'Apply' }).click();
+    await expect(page.getByRole('heading', { name: 'Performance (Direct View)', exact: true })).toBeVisible();
   });
 });
