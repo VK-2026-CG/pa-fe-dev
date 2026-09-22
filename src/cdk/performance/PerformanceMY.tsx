@@ -114,7 +114,7 @@ export default function PerformanceMY({
   return (
     <>
       {toast && <Toast message={toast} onDone={() => setToast(undefined)} />}
-      <div
+      {/* <div
         style={{
           display: "flex",
           alignItems: "center",
@@ -135,7 +135,7 @@ export default function PerformanceMY({
 
       {PERFORMANCE_SAMPLES.length > 0 && (
         <div className="section muted">{t("insights.dev.sample.notice")}</div>
-      )}
+      )} */}
 
       <div
         style={{
