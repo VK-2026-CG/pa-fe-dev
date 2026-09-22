@@ -121,14 +121,17 @@ test.describe("Performance dashboard (S-P4-01) on the 375 mobile shell", () => {
     await filterButton.click();
     const sheet = page.locator(".sheet");
     await expect(sheet).toBeVisible();
-    await expect(sheet.getByRole("tab", { name: "Takaful" })).toBeVisible();
+    await expect(sheet).toHaveAttribute("aria-label", "Filter & Selection");
+    await expect(
+      sheet.getByRole("radio").filter({ hasText: "Takaful" }),
+    ).toBeVisible();
     await expect(
       sheet.getByRole("radio").filter({ hasText: "MTD" }),
     ).toBeVisible();
 
-    await sheet.getByRole("tab", { name: "Takaful" }).click();
+    await sheet.getByRole("radio").filter({ hasText: "Takaful" }).click();
     await sheet.getByRole("radio").filter({ hasText: "MTD" }).click();
-    await sheet.getByRole("button", { name: "Select" }).click();
+    await sheet.getByRole("button", { name: "Apply" }).click();
 
     await expect(productPill).toContainText("Takaful");
     await expect(timePill).toContainText("MTD");

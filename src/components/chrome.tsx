@@ -6,11 +6,12 @@ import { formatScalar } from "@/lib/format";
 import { PERSONAS, type PersonaId } from "@/lib/persona";
 import { usePersona } from "@/lib/usePersona";
 import { apiFetch } from "@/lib/apiClient";
-import { Collapse, Tabs, clampPct } from "@/headless";
+import { Collapse, clampPct, useIsTabletUp } from "@/headless";
 import {
   BottomSheet,
   Icon,
   IconButton,
+  MenuPopover,
   ProgressBar,
   RadioSheetList,
   ScopePill,
@@ -47,10 +48,14 @@ export function QuickLinkRail({ links }: { links: QuickLinkVM[] }) {
 }
 
 /**
- * Desktop Filter sheet (A7, v1.4.0, screenshot-derived) — combines business
- * line, period and basis/team-view selection (mobile's separate tabs/period
- * button/toggle rows) into one sheet. Applies via the same `refetch` params
- * the mobile controls already use; no new BFF contract.
+ * Combined Filter sheet ("Filter & Selection", v1.5.14, AC-P4-01-54/55/56/57)
+ * — grouped-radio redesign of the A7/v1.4.0 combined sheet: Product and Time
+ * Period each render as their own bordered card of radio rows (business line
+ * no longer a segmented control, period no longer shows a date-range
+ * subtitle); Scheme/Group render as a third card only when visible. All
+ * selections stage locally and commit together on a single Apply tap — no
+ * refetch until then. Applies via the same `refetch` params the mobile
+ * controls already used; no new BFF contract.
  */
 export function FilterSheet({
   f,
@@ -72,97 +77,140 @@ export function FilterSheet({
   );
   const [basis, setBasis] = useState<Basis>(f.basis);
   const [teamView, setTeamView] = useState<TeamView | undefined>(f.teamView);
-  const sub = (p: PeriodType) => {
-    const m = f.periodOptionsMeta?.find((x) => x.period === p);
-    if (!m) return undefined;
-    const d = new Date(`${m.startDate}T00:00:00Z`);
-    const start = `${d.getUTCDate()} ${d.toLocaleString("en", { month: "short", timeZone: "UTC" })} ${d.getUTCFullYear()}`;
-    return t("insights.period.range", { start });
-  };
+  const showMoreOptions = f.basisToggleVisible || f.teamViewToggleVisible;
   return (
-    <BottomSheet title={t("insights.action.FILTER")} onClose={onClose}>
-      <div className="section-label" style={{ marginBottom: 8 }}>
-        {t("insights.dashboard.filter.product")}
-      </div>
-      <Tabs<BusinessLine>
-        value={businessLine}
-        options={f.businessLineOptions}
-        className="segtabs"
-        onChange={setBusinessLine}
-        renderTab={(bl, selected) => (
-          <span
-            className={`seg ${selected ? "active" : ""}`}
-            style={{ display: "block" }}
-          >
-            {t(`insights.businessLine.${bl}`)}
-          </span>
-        )}
-      />
-      <div className="section-label" style={{ marginTop: 16, marginBottom: 8 }}>
-        {t("insights.dashboard.filter.time")}
-      </div>
-      <RadioSheetList
-        value={period}
-        options={f.periodOptions}
-        onChange={setPeriod}
-        label={(p) => t(`insights.period.${p}`)}
-        sub={sub}
-      />
-      {f.basisToggleVisible && (
-        <ToggleRow
-          label={t("insights.basis.SCHEME.toggle")}
-          on={basis === "SCHEME"}
-          onChange={(on) => setBasis(on ? "SCHEME" : "STANDARD")}
+    <BottomSheet title={t("insights.filter.title")} onClose={onClose}>
+      <div className="filter-card">
+        <div className="section-label">
+          {t("insights.filter.sectionProduct")}
+        </div>
+        <RadioSheetList
+          value={businessLine}
+          options={f.businessLineOptions}
+          onChange={setBusinessLine}
+          label={(bl) => t(`insights.businessLine.${bl}`)}
         />
-      )}
-      {f.teamViewToggleVisible && (
-        <ToggleRow
-          label={t("insights.teamView.toggle")}
-          on={teamView === "GROUP"}
-          onChange={(on) => setTeamView(on ? "GROUP" : "DIRECT")}
+      </div>
+      <div className="filter-card">
+        <div className="section-label">{t("insights.period.sheetTitle")}</div>
+        <RadioSheetList
+          value={period}
+          options={f.periodOptions}
+          onChange={setPeriod}
+          label={(p) => t(`insights.period.${p}`)}
         />
-      )}
+      </div>
+      {/* {showMoreOptions && (
+        <div className="filter-card">
+          {f.basisToggleVisible && (
+            <ToggleRow
+              label={t("insights.basis.SCHEME.toggle")}
+              on={basis === "SCHEME"}
+              onChange={(on) => setBasis(on ? "SCHEME" : "STANDARD")}
+            />
+          )}
+          {f.teamViewToggleVisible && (
+            <ToggleRow
+              label={t("insights.teamView.toggle")}
+              on={teamView === "GROUP"}
+              onChange={(on) => setTeamView(on ? "GROUP" : "DIRECT")}
+            />
+          )}
+        </div>
+      )} */}
       <button
         className="btn-primary"
-        style={{ marginTop: 12 }}
+        style={{ marginTop: 4 }}
         onClick={() => {
           onApply({ period, businessLine, basis, teamView });
           onClose();
         }}
       >
-        {t("insights.common.select")}
+        {t("insights.common.apply")}
       </button>
     </BottomSheet>
   );
 }
 
-/* ── More actions — bottom sheet (Figma 6588:16896: rows 52h, lead icons) ─ */
-export function MoreActionsSheet({
+/**
+ * More actions trigger + chrome (Figma 6588:16896: rows 52h, lead icons).
+ * Below `breakpoint.tablet` (<768px): full-width `BottomSheet`, X close,
+ * dimmed backdrop — unchanged. At `breakpoint.tablet`/`breakpoint.desktop`
+ * (S-P4-01 v1.5.16, `AC-P4-01-59`–`62`): an anchored `MenuPopover` under the
+ * trigger, no dimmed backdrop, no X — dismisses via outside click/Escape/row
+ * selection, reusing the same anchored-menu primitive as the header scope
+ * switcher (`ScopePill`). Row content/order is identical either way.
+ *
+ * `interceptActionIds` lets a caller intercept specific rows (S-P4-01
+ * v1.5.15, AC-P4-01-58): at breakpoint.tablet/desktop, "Customize Metrics"
+ * opens in place over the still-mounted dashboard instead of navigating —
+ * every other row keeps its normal `<Link>` navigation.
+ */
+export function MoreActionsControl({
   actions,
-  onClose,
+  interceptActionIds,
+  onIntercept,
 }: {
   actions: MoreActionVM[];
-  onClose: () => void;
+  interceptActionIds?: Set<string>;
+  onIntercept?: (action: MoreActionVM) => void;
 }) {
+  const [open, setOpen] = useState(false);
+  const isTabletUp = useIsTabletUp();
+  const close = () => setOpen(false);
+
+  const rows = actions.map((a) =>
+    interceptActionIds?.has(a.id) ? (
+      // `SheetRow` is itself a <button> — no wrapping element, unlike
+      // the <Link>-wrapped rows below, to avoid a nested-button DOM.
+      <SheetRow
+        key={a.id}
+        leadToken={`sheet.${a.id}`}
+        label={t(`insights.action.${a.id}.title`)}
+        onClick={() => {
+          onIntercept?.(a);
+          close();
+        }}
+      />
+    ) : (
+      <Link
+        key={a.id}
+        to={href(a.nav)}
+        onClick={close}
+        style={{ display: "block" }}
+      >
+        <SheetRow
+          leadToken={`sheet.${a.id}`}
+          label={t(`insights.action.${a.id}.title`)}
+        />
+      </Link>
+    ),
+  );
+
   return (
-    <BottomSheet
-      title={t("insights.dashboard.metricTracking")}
-      onClose={onClose}
-    >
-      {actions.map((a) => (
-        <Link
-          key={a.id}
-          to={href(a.nav)}
-          onClick={onClose}
-          style={{ display: "block" }}
-        >
-          <SheetRow
-            leadToken={`sheet.${a.id}`}
-            label={t(`insights.action.${a.id}.title`)}
-          />
-        </Link>
-      ))}
-    </BottomSheet>
+    <span style={{ position: "relative", flex: "0 0 auto" }}>
+      <button
+        type="button"
+        className="more-actions-btn"
+        aria-label="More actions"
+        aria-haspopup="menu"
+        aria-expanded={open}
+        onClick={() => setOpen((o) => !o)}
+      >
+        <Icon token="more-vert" size={16} tone="var(--color-text)" />
+      </button>
+      {open &&
+        (isTabletUp ? (
+          <MenuPopover onClose={close}>{rows}</MenuPopover>
+        ) : (
+          <BottomSheet
+            title={t("insights.dashboard.metricTracking")}
+            onClose={close}
+          >
+            {rows}
+          </BottomSheet>
+        ))}
+    </span>
   );
 }
 

@@ -26,7 +26,7 @@ declare const __PERFORMANCE_AGENT_ID__: string | undefined;
 declare const __PERFORMANCE_TENANT__: string | undefined;
 const BFF_BASE_URL: string =
   (typeof __BFF_URL__ !== "undefined" && __BFF_URL__) ||
-  "http://localhost:4600";
+  "";
 const CONTEST_ADMIN_PREFIX = "/api/bff/v1/contest-admin";
 const PERFORMANCE_PREFIX = "/api/bff/v1/performance";
 const PERFORMANCE_AGENT_ID =

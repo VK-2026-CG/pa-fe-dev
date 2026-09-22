@@ -18,6 +18,29 @@ export function formatMoney(amount: string, currency: string): string {
   return `${neg ? '-' : ''}${prefix} ${group(i)}${frac ? `.${frac}` : ''}`.replace(`${prefix}  `, `${prefix} `);
 }
 export function formatCount(value: number): string { return group(String(Math.trunc(value))); }
+
+/**
+ * Compact abbreviation for MONEY/COUNT card values (S-P4-01 v1.5.9,
+ * `MetricCardVM.valueDisplay='COMPACT'`, widget-contracts.md §2): below 1,000
+ * renders the plain integer; 1,000+ → "{n}K"; 1,000,000+ → "{n}M". One
+ * decimal place, half-up rounding, trailing ".0" dropped. No currency prefix.
+ */
+function formatCompactNumber(value: number): string {
+  const neg = value < 0;
+  const abs = Math.abs(value);
+  const round1 = (n: number) => (Math.round(n * 10) / 10).toString().replace(/\.0$/, '');
+  const compact = abs >= 1_000_000
+    ? `${round1(abs / 1_000_000)}M`
+    : abs >= 1_000
+      ? `${round1(abs / 1_000)}K`
+      : group(String(Math.trunc(abs)));
+  return `${neg ? '-' : ''}${compact}`;
+}
+
+/** "100000.00" → "980K" (compact mode) — string parsed once, no currency prefix. */
+export function formatMoneyCompact(amount: string): string {
+  return formatCompactNumber(Number(amount));
+}
 export function formatPercent(value: number): string {
   return `${Number.isInteger(value) ? value : value.toFixed(2).replace(/0+$/, '').replace(/\.$/, '')}%`;
 }
@@ -32,11 +55,11 @@ export const NO_VALUE = '-';
  * Accepts a missing scalar because a metric can now be sourced-but-unpopulated
  * (`dataState` PROCESSING/EMPTY), rather than throwing on `.kind` at every call site.
  */
-export function formatScalar(v: MetricScalar | null | undefined): string {
+export function formatScalar(v: MetricScalar | null | undefined, compact = false): string {
   if (!v) return NO_VALUE;
   switch (v.kind) {
-    case 'MONEY': return formatMoney(v.amount, v.currency);
-    case 'COUNT': return formatCount(v.value);
+    case 'MONEY': return compact ? formatMoneyCompact(v.amount) : formatMoney(v.amount, v.currency);
+    case 'COUNT': return compact ? formatCompactNumber(v.value) : formatCount(v.value);
     case 'PERCENT': return formatPercent(v.value);
     case 'DECIMAL': return formatDecimal(v.value, v.precision ?? 1);
   }

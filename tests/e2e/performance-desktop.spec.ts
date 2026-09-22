@@ -112,4 +112,64 @@ test.describe("Performance dashboard (S-P4-01) at desktop viewport (≥1024px)",
       await expect(card.locator(".icon")).toHaveCount(0);
     }
   });
+
+  test('"More actions" opens an anchored popover, not the mobile sheet, with no dimmed backdrop (AC-P4-01-59/60)', async ({
+    page,
+  }) => {
+    const watch = watchConsole(page);
+    await page.goto("/insights/performance");
+
+    const moreActions = page.getByRole("button", { name: "More actions" });
+    await moreActions.click();
+
+    const menu = page.locator(".menu");
+    await expect(menu).toBeVisible();
+    await expect(menu).toHaveAttribute("role", "menu");
+    // The mobile bottom-sheet chrome must not render at this breakpoint.
+    await expect(page.locator(".sheet")).toHaveCount(0);
+    await expect(page.locator(".sheet-backdrop")).toHaveCount(0);
+
+    // Anchored directly under the trigger, not full-width/bottom-pinned.
+    const triggerBox = await moreActions.boundingBox();
+    const menuBox = await menu.boundingBox();
+    expect(triggerBox).not.toBeNull();
+    expect(menuBox).not.toBeNull();
+    expect(menuBox!.width).toBeLessThan(400);
+    expect(menuBox!.y).toBeGreaterThan(triggerBox!.y);
+
+    // No visible X close control on this variant (AC-P4-01-60).
+    await expect(menu.getByRole("button", { name: "Close" })).toHaveCount(0);
+
+    // "Set Goals" still navigates (<Link>); "Customize Metrics" is
+    // intercepted to open in place (a <button>, AC-P4-01-58).
+    await expect(
+      menu.getByRole("link", { name: "Set Goals" }),
+    ).toBeVisible();
+    await expect(
+      menu.getByRole("button", { name: "Customize Metrics" }),
+    ).toBeVisible();
+    await expect(
+      menu.getByRole("link", { name: "Historical Data" }),
+    ).toBeVisible();
+
+    expect(watch.errors, watch.errors.join("\n")).toEqual([]);
+    expect(watch.warnings, watch.warnings.join("\n")).toEqual([]);
+  });
+
+  test('"More actions" popover dismisses via outside click and Escape (AC-P4-01-60)', async ({
+    page,
+  }) => {
+    await page.goto("/insights/performance");
+    const moreActions = page.getByRole("button", { name: "More actions" });
+
+    await moreActions.click();
+    await expect(page.locator(".menu")).toBeVisible();
+    await page.mouse.click(20, 20);
+    await expect(page.locator(".menu")).toHaveCount(0);
+
+    await moreActions.click();
+    await expect(page.locator(".menu")).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(page.locator(".menu")).toHaveCount(0);
+  });
 });

@@ -56,7 +56,7 @@ export function MetricCard({ vm, variant = 'priority' }: { vm: MetricCardVM; var
         </div>
       ) : (
         <div className="spread foot" style={{ alignItems: 'flex-end' }}>
-          <span className="value">{formatScalar(vm.value)}</span>
+          <span className="value">{formatScalar(vm.value, vm.valueDisplay === 'COMPACT')}</span>
           {vm.delta && <DeltaLine delta={vm.delta} />}
         </div>
       )}

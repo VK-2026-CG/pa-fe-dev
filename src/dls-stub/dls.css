@@ -1044,6 +1044,27 @@ svg text {
   );
 }
 
+/* Filter & Selection sheet cards (v1.5.14, AC-P4-01-55/57) */
+.filter-card {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+.filter-card .section-label {
+  padding: 12px 16px 4px;
+}
+.filter-card [role="radio"] .sheet-row {
+  padding: 0 16px;
+  border-bottom: 1px solid var(--color-border);
+}
+.filter-card [role="radio"]:last-child .sheet-row {
+  border-bottom: 0;
+}
+.filter-card .toggle-row {
+  padding: 0 16px;
+}
+
 /* Menus */
 .menu {
   position: absolute;
@@ -1228,19 +1249,67 @@ svg text {
   color: var(--tone-danger);
 }
 
-/* Customize Metrics (S-P4-04) — white sheet, rounded pill rows.
+/* Customize Metrics (S-P4-04) — responsive overlay chrome (v1.4.0,
+   AC-P4-04-11..31): bottom sheet <768px, right side sheet ≥768px.
    ⚠ Geometry/colors screenshot-derived; swap with the DLS pack. */
+.cust-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 20, 30, 0.45);
+  z-index: 40;
+}
+/*
+ * No open/close transition is applied — matches every other sheet in this
+ * app (Filter, More actions), which also render instantly with no CSS
+ * animation. `prefers-reduced-motion` therefore has nothing to override
+ * here by construction, which still satisfies AC-P4-04-30's intent (no
+ * animated motion plays for a reduced-motion viewer); it's simpler than
+ * animating and reverses cleanly since there's no keyframe to remove later.
+ */
 .cust-surface {
   background: var(--color-surface);
-  min-height: 100dvh;
-  padding: 0 var(--cust-gutter) calc(var(--cust-row-h) + 48px);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-height: 92vh;
+  border-radius: 16px 16px 0 0;
+}
+/* Cancel hidden below tablet — mobile action area is Save-only (AC-P4-04-13). */
+.cust-actions .btn-outline {
+  display: none;
+}
+/* Header divider (AC-P4-04-20 desktop; harmless hairline at every breakpoint). */
+.cust-head {
+  border-bottom: 1px solid var(--color-border);
+}
+.cust-scroll {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 0 var(--cust-gutter);
+}
+/* Locked priority checkbox: grey fill, not brand red (AC-P4-04-24). */
+.cust-box.locked.on {
+  background: var(--color-check-border);
+  border-color: var(--color-check-border);
+}
+/* Selected, unlocked focus row: stronger dark-neutral border, distinct
+   from the red checkbox fill (AC-P4-04-25, corrected against production
+   reference — the border reads near-black, not brand red). */
+.cust-row.selected {
+  border-color: var(--color-text);
+  border-width: 1.5px;
 }
 .cust-head {
   height: var(--cust-head-h);
+  padding: 0 var(--cust-gutter);
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  flex: 0 0 auto;
 }
 .cust-head h1 {
   margin: 0;
@@ -1267,6 +1336,13 @@ svg text {
 
 .cust-section {
   padding-top: var(--cust-section-gap);
+}
+.cust-section-head.shaded {
+  /* Full-bleed shaded band, Priority Metrics only (AC-P4-04-32) — bleeds
+     past .cust-scroll's gutter padding, rows underneath stay white. */
+  margin: 0 calc(var(--cust-gutter) * -1);
+  padding: 12px var(--cust-gutter);
+  background: var(--color-bg);
 }
 .cust-section h2 {
   margin: 0;
@@ -1372,11 +1448,12 @@ svg text {
   display: block;
 }
 
-/* Sticky action bar keeps Save explicit (contract PUT, AC-P4-04-03). */
+/* Fixed action bar (flex sibling of .cust-scroll, always visible — not
+   part of the scrolling region) keeps Save explicit (contract PUT,
+   AC-P4-04-03), pinned to the sheet's bottom edge at every breakpoint
+   (AC-P4-04-13/17/26). */
 .cust-actions {
-  position: sticky;
-  bottom: 0;
-  margin: 24px calc(var(--cust-gutter) * -1) 0;
+  flex: 0 0 auto;
   padding: 12px var(--cust-gutter) calc(12px + env(safe-area-inset-bottom));
   background: var(--color-surface);
   box-shadow: 0 -1px 3px rgba(16, 24, 40, 0.06);
@@ -1391,11 +1468,46 @@ svg text {
   margin-top: 0;
   border-radius: 14px;
 }
+.cust-actions .btn-primary:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
 .cust-warn {
   padding-top: 12px;
   color: var(--tone-danger);
   font-size: var(--fs-caption);
   line-height: var(--lh-caption);
+}
+
+/* Tablet/desktop side-sheet overrides (AC-P4-04-16/17/19/20/23/26). Placed
+   after every base `.cust-*` rule above so these — same specificity, later
+   source order — actually win the cascade at >=768px. */
+@media (min-width: 768px) {
+  .cust-surface {
+    left: auto;
+    top: 0;
+    bottom: 0;
+    width: min(420px, 100vw);
+    max-height: none;
+    height: 100vh;
+    border-radius: 0;
+    border-left: 1px solid var(--color-border);
+  }
+  .cust-head {
+    height: 72px;
+  }
+  .cust-row {
+    border-radius: 8px;
+    box-shadow: none;
+  }
+  .cust-actions {
+    justify-content: flex-end;
+  }
+  .cust-actions .btn-outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
 }
 
 /* Customize rows (legacy sheet-style list, still used elsewhere) */

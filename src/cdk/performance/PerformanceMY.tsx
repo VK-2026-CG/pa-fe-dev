@@ -17,7 +17,7 @@ import { PerformanceSamplePicker } from "./parts/PerformanceSamplePicker";
 import { MetricCard, MilestoneCard } from "@/components/metrics";
 import {
   FilterSheet,
-  MoreActionsSheet,
+  MoreActionsControl,
   PersonaPicker,
   QuickLinkRail,
   RecoPanel,
@@ -25,8 +25,14 @@ import {
 } from "@/components/chrome";
 import { Toast } from "@/components/ui";
 import { CarouselRow, FilterButton, Icon, MetricPanel } from "@/dls-stub";
+import { useIsTabletUp } from "@/headless";
+import CustomizeMetricsMY from "@/cdk/customize-metrics/CustomizeMetricsMY";
 import type { CdkPageProps } from "@/cdk/types";
 import type { PerformanceDashboardVM } from "@spec/performance-vm";
+
+/** Rows intercepted at breakpoint.tablet/desktop to open in place instead of
+ * navigating (S-P4-01 v1.5.15, AC-P4-01-58). */
+const CUSTOMIZE_METRICS_ACTION_ID = new Set(["CUSTOMIZE_METRICS"]);
 
 type LensState = PerformanceLens;
 
@@ -38,12 +44,15 @@ export default function PerformanceMY({
   const [lens, setLens] = useState<LensState>(() => initialPerformanceLens());
   const [vm, setVm] = useState<PerformanceDashboardVM | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [moreOpen, setMoreOpen] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
+  const [customizeOpen, setCustomizeOpen] = useState(false);
   const [toast, setToast] = useState<string | undefined>(
     initialToast ? t(initialToast) : undefined,
   );
   const loadSeq = useRef(0);
+  /** breakpoint.tablet/desktop opens Customize Metrics in place; mobile still
+   * navigates to the standalone route (S-P4-04 v1.5.0, AC-P4-04-33/37). */
+  const isTabletUp = useIsTabletUp();
 
   const load = useCallback(async (l: LensState) => {
     const seq = ++loadSeq.current;
@@ -160,14 +169,13 @@ export default function PerformanceMY({
             label={t("insights.action.FILTER")}
             onClick={() => setFilterOpen(true)}
           />
-          <button
-            type="button"
-            className="more-actions-btn"
-            aria-label="More actions"
-            onClick={() => setMoreOpen(true)}
-          >
-            <Icon token="more-vert" size={16} tone="var(--color-text)" />
-          </button>
+          <MoreActionsControl
+            actions={vm.moreActions}
+            interceptActionIds={
+              isTabletUp ? CUSTOMIZE_METRICS_ACTION_ID : undefined
+            }
+            onIntercept={() => setCustomizeOpen(true)}
+          />
         </span>
       </div>
       {/* Product/Time read-only summary pills (AC-P4-01-38) — static labels,
@@ -179,16 +187,18 @@ export default function PerformanceMY({
             className="filter-pill"
             aria-label={`${t("insights.dashboard.filter.product")}: ${t(`insights.businessLine.${f.businessLine}`)}`}
           >
-            <span className="muted">
+            <span className="muted" style={{ marginRight: 4 }}>
               {t("insights.dashboard.filter.product")}
-            </span>{" "}
+            </span>
             {t(`insights.businessLine.${f.businessLine}`)}
           </span>
           <span
             className="filter-pill"
             aria-label={`${t("insights.dashboard.filter.time")}: ${t(`insights.period.${f.period}`)}`}
           >
-            <span className="muted">{t("insights.dashboard.filter.time")}</span>{" "}
+            <span className="muted" style={{ marginRight: 4 }}>
+              {t("insights.dashboard.filter.time")}
+            </span>
             {t(`insights.period.${f.period}`)}
           </span>
         </div>
@@ -235,13 +245,24 @@ export default function PerformanceMY({
               action={
                 vm.focusMetrics.items.length === 0 &&
                 vm.focusMetrics.addEnabled ? (
-                  <Link
-                    className="icon-btn"
-                    aria-label="Add focus metric"
-                    to={href({ route: "insights/customize-metrics" })}
-                  >
-                    <Icon token="add" size={21} tone="var(--color-text)" />
-                  </Link>
+                  isTabletUp ? (
+                    <button
+                      type="button"
+                      className="icon-btn"
+                      aria-label="Add focus metric"
+                      onClick={() => setCustomizeOpen(true)}
+                    >
+                      <Icon token="add" size={21} tone="var(--color-text)" />
+                    </button>
+                  ) : (
+                    <Link
+                      className="icon-btn"
+                      aria-label="Add focus metric"
+                      to={href({ route: "insights/customize-metrics" })}
+                    >
+                      <Icon token="add" size={21} tone="var(--color-text)" />
+                    </Link>
+                  )
                 ) : undefined
               }
             >
@@ -263,7 +284,7 @@ export default function PerformanceMY({
       )}
 
       {/* PRIORITY MILESTONES — header + add (6588:16764) + 308×238 carousel */}
-      {vm.milestones.visible && (
+      {!vm.milestones.visible && (
         <>
           <div className="section spread">
             <span className="title14">
@@ -323,17 +344,22 @@ export default function PerformanceMY({
         </div>
       )}
 
-      {moreOpen && (
-        <MoreActionsSheet
-          actions={vm.moreActions}
-          onClose={() => setMoreOpen(false)}
-        />
-      )}
       {filterOpen && (
         <FilterSheet
           f={f}
           onApply={(patch) => refetch(patch)}
           onClose={() => setFilterOpen(false)}
+        />
+      )}
+      {customizeOpen && (
+        <CustomizeMetricsMY
+          query={{ scope: f.scope }}
+          onClose={() => setCustomizeOpen(false)}
+          onSaved={() => {
+            setCustomizeOpen(false);
+            setToast(t("insights.toast.focusMetricsAdded"));
+            void load(lens);
+          }}
         />
       )}
     </>

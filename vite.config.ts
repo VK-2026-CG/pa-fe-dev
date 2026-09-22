@@ -24,8 +24,18 @@ export default defineConfig(({ mode, command }) => {
         '@spec': path.resolve(__dirname, './vendor/spec'),
       },
     },
-    server: { port: 3600 },
-    preview: { port: 3600 },
+    // Expose the frontend to the LAN. API calls remain same-origin for every
+    // client and are forwarded to the BFF running on this host.
+    server: {
+      host: '0.0.0.0',
+      port: 3600,
+      proxy: { '/api': 'http://127.0.0.1:4600' },
+    },
+    preview: {
+      host: '0.0.0.0',
+      port: 3600,
+      proxy: { '/api': 'http://127.0.0.1:4600' },
+    },
     define: {
       /**
        * `src/lib/apiClient.ts` reads this instead of `import.meta.env.VITE_BFF_URL`

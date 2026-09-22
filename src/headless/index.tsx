@@ -67,6 +67,24 @@ export function useIsDesktop(): boolean {
   return isDesktop;
 }
 
+/**
+ * useIsTabletUp — same pattern as `useIsDesktop`, reading `--bp-tablet-min`
+ * (768px) instead of `--bp-desktop-min`. True at `breakpoint.tablet` and
+ * `breakpoint.desktop`; false only below 768px (mobile).
+ */
+export function useIsTabletUp(): boolean {
+  const [isTabletUp, setIsTabletUp] = useState(false);
+  useEffect(() => {
+    const raw = getComputedStyle(document.documentElement).getPropertyValue('--bp-tablet-min').trim();
+    const mql = window.matchMedia(`(min-width: ${raw || '768px'})`);
+    const sync = () => setIsTabletUp(mql.matches);
+    sync();
+    mql.addEventListener('change', sync);
+    return () => mql.removeEventListener('change', sync);
+  }, []);
+  return isTabletUp;
+}
+
 /* ── Collapse: disclosure with a11y wiring (reco panel, accordions) ────── */
 export function Collapse({
   open: openProp, defaultOpen = false, onOpenChange, trigger, children,
@@ -202,7 +220,49 @@ export function useEscapeKey(onClose: () => void): void {
   }, [onClose]);
 }
 
-/* ── Layer (backdrop + Escape/outside dismiss) → sheets & menus ────────── */
+const FOCUSABLE_SELECTOR =
+  'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+/**
+ * useFocusTrap — on mount, moves focus into the container (first focusable
+ * element, falling back to the container itself) and cycles Tab/Shift+Tab
+ * within it; on unmount, returns focus to whatever was focused before.
+ * Shared by every `Layer`-based sheet/menu (Filter, More actions, Customize).
+ */
+export function useFocusTrap(containerRef: { current: HTMLElement | null }): void {
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+    const getFocusable = () =>
+      Array.from(container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR));
+    // `preventScroll` throughout: focusing a sheet control must never move
+    // the page underneath it (dashboard scroll position is contractual —
+    // S-P4-04 AC-P4-04-33/S-P4-01 AC-P4-01-58).
+    (getFocusable()[0] ?? container).focus({ preventScroll: true });
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') return;
+      const items = getFocusable();
+      if (items.length === 0) return;
+      const first = items[0]!;
+      const last = items[items.length - 1]!;
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus({ preventScroll: true });
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus({ preventScroll: true });
+      }
+    };
+    container.addEventListener('keydown', onKeyDown);
+    return () => {
+      container.removeEventListener('keydown', onKeyDown);
+      previouslyFocused?.focus({ preventScroll: true });
+    };
+  }, [containerRef]);
+}
+
+/* ── Layer (backdrop + Escape/outside dismiss + focus trap) → sheets & menus ── */
 export function Layer({
   onClose, backdropClassName, children, align = 'end',
 }: {
@@ -210,10 +270,17 @@ export function Layer({
   align?: 'end' | 'none';
 }) {
   useEscapeKey(onClose);
+  const trapRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(trapRef);
   return (
     <div className={backdropClassName} onClick={onClose}
       style={align === 'end' ? { display: 'flex', alignItems: 'flex-end', justifyContent: 'center' } : undefined}>
-      <div onClick={(e) => e.stopPropagation()} style={{ width: align === 'end' ? '100%' : undefined }}>
+      <div
+        ref={trapRef}
+        tabIndex={-1}
+        onClick={(e) => e.stopPropagation()}
+        style={{ width: align === 'end' ? '100%' : undefined, outline: 'none' }}
+      >
         {children}
       </div>
     </div>

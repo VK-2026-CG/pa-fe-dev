@@ -3,7 +3,7 @@
  * folder for the real Prudential DLS; keep the exported names + props.
  * Geometry per docs/design/figma-measurements.md; icons per public/icons/MANIFEST.json.
  */
-import { useState, type CSSProperties, type ReactNode } from "react";
+import { useRef, useState, type CSSProperties, type ReactNode } from "react";
 import {
   Carousel as HCarousel,
   Checkbox as HCheckbox,
@@ -13,6 +13,7 @@ import {
   ReorderHandle as HReorderHandle,
   Switch as HSwitch,
   useEscapeKey,
+  useFocusTrap,
   type CarouselApi,
 } from "@/headless";
 
@@ -170,6 +171,7 @@ export function BottomSheet({
       <div
         className="sheet"
         role="dialog"
+        aria-modal="true"
         aria-label={typeof title === "string" ? title : undefined}
       >
         <div className="sheet-head">
@@ -267,13 +269,15 @@ export function MenuPopover({
   children: ReactNode;
 }) {
   useEscapeKey(onClose);
+  const trapRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(trapRef);
   return (
     <>
       <div
         style={{ position: "fixed", inset: 0, zIndex: 25 }}
         onClick={onClose}
       />
-      <div className="menu" role="menu">
+      <div ref={trapRef} className="menu" role="menu" tabIndex={-1}>
         {children}
       </div>
     </>
@@ -389,9 +393,32 @@ export function MetricPanel({
   );
 }
 
-/* ── Customize Metrics skin (S-P4-04): white sheet + rounded pill rows ─── */
-export function CustomizeSurface({ children }: { children: ReactNode }) {
-  return <div className="cust-surface">{children}</div>;
+/**
+ * Customize Metrics overlay chrome (S-P4-04, v1.4.0 responsive contract,
+ * AC-P4-04-11..31): bottom sheet below `breakpoint.tablet`, right-anchored
+ * side sheet at `breakpoint.tablet` and above (`dls.css` media queries own
+ * the geometry split — this component only wires backdrop/Escape/focus-trap
+ * via `Layer` and the dialog a11y attributes).
+ */
+export function CustomizeSurface({
+  onClose,
+  children,
+}: {
+  onClose: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <Layer onClose={onClose} backdropClassName="cust-backdrop" align="none">
+      <div
+        className="cust-surface"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="cust-title"
+      >
+        {children}
+      </div>
+    </Layer>
+  );
 }
 
 export function CustomizeHeader({
@@ -405,7 +432,7 @@ export function CustomizeHeader({
 }) {
   return (
     <div className="cust-head">
-      <h1>{title}</h1>
+      <h1 id="cust-title">{title}</h1>
       <button className="cust-close" aria-label={closeLabel} onClick={onClose}>
         <Icon token="close" size={24} tone="var(--color-text)" />
       </button>
@@ -413,19 +440,29 @@ export function CustomizeHeader({
   );
 }
 
+/** Scrolls independently of the fixed header/footer (AC-P4-04-12/18/21). */
+export function CustomizeScrollArea({ children }: { children: ReactNode }) {
+  return <div className="cust-scroll">{children}</div>;
+}
+
 export function CustomizeSection({
   title,
   description,
+  /** Priority Metrics only — shaded full-width heading band (AC-P4-04-32). */
+  shaded,
   children,
 }: {
   title: ReactNode;
   description: ReactNode;
+  shaded?: boolean;
   children: ReactNode;
 }) {
   return (
     <section className="cust-section">
-      <h2>{title}</h2>
-      <span className="desc">{description}</span>
+      <div className={`cust-section-head ${shaded ? "shaded" : ""}`}>
+        <h2>{title}</h2>
+        <span className="desc">{description}</span>
+      </div>
       <ul className="cust-list">{children}</ul>
     </section>
   );
@@ -450,7 +487,7 @@ export function SelectionBox({
       label={label}
       onChange={onChange}
     >
-      <span className={`cust-box ${checked ? "on" : ""}`}>
+      <span className={`cust-box ${checked ? "on" : ""} ${disabled ? "locked" : ""}`}>
         {checked && (
           <Icon
             className="tick"
@@ -498,16 +535,19 @@ export function CustomizeMetricRow({
   children,
   dragging,
   dropTarget,
+  selected,
   reorderIndex,
 }: {
   children: ReactNode;
   dragging?: boolean;
   dropTarget?: boolean;
+  /** Selected, unlocked row — stronger border treatment (AC-P4-04-25). */
+  selected?: boolean;
   reorderIndex?: number;
 }) {
   return (
     <li
-      className={`cust-row ${dragging ? "dragging" : ""} ${dropTarget ? "drop-target" : ""}`}
+      className={`cust-row ${dragging ? "dragging" : ""} ${dropTarget ? "drop-target" : ""} ${selected ? "selected" : ""}`}
       {...(reorderIndex === undefined
         ? {}
         : { "data-reorder-index": reorderIndex })}
