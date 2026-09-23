@@ -32,6 +32,58 @@ test.describe('Metric detail (S-P4-02)', () => {
     await expect(page.getByText(/^Penders$/)).toBeVisible();
   });
 
+  test('CASE_COUNT SELF has no Penders card and no gauge legend penders (AC-P4-02-37)', async ({ context, page }) => {
+    await setPersona(context, 'AGENT_P4');
+    await page.goto('/insights/metric-detail?metricCode=CASE_COUNT');
+
+    await expect(page.getByText(/^Penders$/)).toHaveCount(0);
+  });
+
+  test('CASE_COUNT TEAM shows a Penders card in addition to the gauge legend penders (AC-P4-02-37)', async ({ context, page }) => {
+    await setPersona(context, 'LEADER_P2');
+    await page.goto('/insights/metric-detail?metricCode=CASE_COUNT&scope=TEAM');
+
+    // Unlike TPC/PTPC (whose value-only combined-card face drops the gauge
+    // legend, AC-P4-02-23), CASE_COUNT keeps its standalone donut-270 face
+    // (widget-contracts.md) — so at TEAM scope "Penders" legitimately appears
+    // twice: once in the gauge legend, once as its own KPI card heading.
+    await expect(page.getByText(/^Penders$/)).toHaveCount(2);
+    await expect(page.locator('.card').filter({ hasText: /YTD \(/ })).toBeVisible();
+  });
+
+  test('FYP never gains a Penders card at either scope -- the one "Penders" text is always the gauge legend (AC-P4-02-39)', async ({ context, page }) => {
+    await setPersona(context, 'AGENT_P4');
+    await page.goto('/insights/metric-detail?metricCode=FYP');
+    // insights.gauge.penders and insights.detail.penders both render as the
+    // literal string "Penders" -- one match here is the gauge legend value
+    // (money, kept per AC-P4-02-39), not a card; zero would mean the legend
+    // regressed, two would mean a Penders KPI card was wrongly added.
+    await expect(page.getByText(/^Penders$/)).toHaveCount(1);
+
+    await setPersona(context, 'LEADER_P2');
+    await page.goto('/insights/metric-detail?metricCode=FYP&scope=TEAM');
+    // Unlike CASE_COUNT TEAM (2 "Penders" mentions: legend + its own KPI
+    // card), FYP TEAM stays at 1 -- it never gains a Penders card, a
+    // confirmed divergence from the TPC/PTPC/CASE_COUNT pattern, not a gap.
+    await expect(page.getByText(/^Penders$/)).toHaveCount(1);
+  });
+
+  test('FYP renders a 7-product breakdown table with a plain Credit Point row, no second (repriced) table (AC-P4-02-40)', async ({ context, page }) => {
+    await setPersona(context, 'AGENT_P4');
+    const watch = watchConsole(page);
+    await page.goto('/insights/metric-detail?metricCode=FYP');
+
+    await expect(page.locator('table.table')).toHaveCount(1); // no WITH_REPRICING variant (no repricing capability)
+    const rows = page.locator('table.table tbody tr'); // 7 product rows + 1 Total row
+    await expect(rows).toHaveCount(8);
+    await expect(page.getByText(/Credit Point/i).first()).toBeVisible();
+    await expect(page.getByText(/Unit Trust/i)).toBeVisible();
+    await expect(page.getByText(/Group Premium/i)).toBeVisible();
+
+    expect(watch.errors, watch.errors.join('\n')).toEqual([]);
+    expect(watch.warnings, watch.warnings.join('\n')).toEqual([]);
+  });
+
   test('breakdown table shows exactly one value column, matching the Business Line filter (AC-P4-02-35)', async ({ context, page }) => {
     await setPersona(context, 'AGENT_P4');
     await page.goto('/insights/metric-detail?metricCode=TPC'); // default businessLine=ALL ("Both")

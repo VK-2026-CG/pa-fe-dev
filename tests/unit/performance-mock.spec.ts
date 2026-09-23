@@ -10,10 +10,12 @@ const samples = parsePerformanceSamples([
   { id: 'persistency', kind: 'PERSISTENCY', agentId: 'MOCK_PERSISTENCY' },
 ]);
 
-test('AC-PA-DIRECT-12 configured production starts on INSURANCE/SELF/YTD, including fixed-agent mode', () => {
-  const expected = { scope: 'SELF', period: 'YTD', businessLine: 'INSURANCE', basis: 'STANDARD' };
-  expect(initialPerformanceLens(samples[0], '')).toEqual(expected);
-  expect(initialPerformanceLens(undefined, 'MOCK_PRODUCTION')).toEqual(expected);
+test('AC-PA-DIRECT-12 configured production sample starts on INSURANCE/SELF/YTD', () => {
+  expect(initialPerformanceLens(samples[0], '')).toEqual({ scope: 'SELF', period: 'YTD', businessLine: 'INSURANCE', basis: 'STANDARD' });
+});
+
+test('AC-PA-DIRECT-12 fixed-agent mode starts on ALL/SELF/YTD', () => {
+  expect(initialPerformanceLens(undefined, 'MOCK_PRODUCTION')).toEqual({ scope: 'SELF', period: 'YTD', businessLine: 'ALL', basis: 'STANDARD' });
 });
 
 test('AC-PA-DIRECT-13 AC-PA-DIRECT-14 Group samples select their own identity and exact lens', () => {

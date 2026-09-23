@@ -22,11 +22,16 @@ import { getPerformanceSample } from "@/lib/performanceMock";
  * inert (falls through to the default) outside a Vite build.
  */
 declare const __BFF_URL__: string | undefined;
+declare const __DEV_PERSONA__: string | undefined;
 declare const __PERFORMANCE_AGENT_ID__: string | undefined;
 declare const __PERFORMANCE_TENANT__: string | undefined;
 const BFF_BASE_URL: string =
   (typeof __BFF_URL__ !== "undefined" && __BFF_URL__) ||
   "";
+/** `VITE_PERSONA` (.env.local) overrides the stored/default persona — lets a
+ * dev flip persona without the header dropdown, mirroring `VITE_PERFORMANCE_AGENT_ID`. */
+const DEV_PERSONA_ID: string =
+  (typeof __DEV_PERSONA__ !== "undefined" && __DEV_PERSONA__) || "";
 const CONTEST_ADMIN_PREFIX = "/api/bff/v1/contest-admin";
 const PERFORMANCE_PREFIX = "/api/bff/v1/performance";
 const PERFORMANCE_AGENT_ID =
@@ -76,7 +81,7 @@ export function apiFetch(
   const headers = bffHeaders(
     path,
     init.headers,
-    personaById(getStoredPersonaId()).id,
+    personaById(DEV_PERSONA_ID || getStoredPersonaId()).id,
     getPerformanceSample()?.agentId ?? PERFORMANCE_AGENT_ID,
   );
   return fetch(`${BFF_BASE_URL}${path}`, { ...init, headers });

@@ -4,7 +4,7 @@
  * the styled DLS skin from `@/dls-stub` and behaviour from `@/headless`.
  */
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { t } from "@/lib/i18n";
 import { href } from "@/lib/nav";
 import { apiFetch } from "@/lib/apiClient";
@@ -42,6 +42,7 @@ export default function PerformanceMY({
   persona,
 }: CdkPageProps["performance"]) {
   const initialToast = query.toast;
+  const [, setSearchParams] = useSearchParams();
   const [lens, setLens] = useState<LensState>(() => initialPerformanceLens());
   const [vm, setVm] = useState<PerformanceDashboardVM | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -50,6 +51,17 @@ export default function PerformanceMY({
   const [toast, setToast] = useState<string | undefined>(
     initialToast ? t(initialToast) : undefined,
   );
+
+  useEffect(() => {
+    if (!initialToast) return;
+    // Consume the one-shot ?toast= trigger so a later reload of this URL
+    // doesn't replay it.
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.delete("toast");
+      return next;
+    }, { replace: true });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const loadSeq = useRef(0);
   /** breakpoint.tablet/desktop opens Customize Metrics in place; mobile still
    * navigates to the standalone route (S-P4-04 v1.5.0, AC-P4-04-33/37). */
@@ -325,21 +337,6 @@ export default function PerformanceMY({
           </div>
         </>
       )}
-
-      {/* Footer link row 343×52 (6588:17798) */}
-      {vm.footerLinks.map((l) => (
-        <div className="section" key={l.id}>
-          <Link className="footer-link" to={href(l.nav)}>
-            <Icon token="quick.VIEW_MOC" size={20} tone="var(--color-brand)" />
-            <span style={{ flex: 1 }}>{t("insights.dashboard.viewMoc")}</span>
-            <Icon
-              token="arrow-right-s"
-              size={20}
-              tone="var(--color-text-muted)"
-            />
-          </Link>
-        </div>
-      ))}
 
       {/* AI recommendations — sticky overlay pinned to the bottom of the
           screen (v1.5.5, was inline below the header); collapsed 44h bar
