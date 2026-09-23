@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { t } from "@/lib/i18n";
-import { href } from "@/lib/nav";
 import { formatDateAsOf } from "@/lib/format";
 import { apiFetch } from "@/lib/apiClient";
 import {
@@ -17,7 +16,7 @@ import {
 } from "@/components/metrics";
 import { ContextPill } from "@/components/chrome";
 import { NoticeBanner, StateEmpty, StateProcessing } from "@/components/ui";
-import { Icon, Tag } from "@/dls-stub";
+import { Tag } from "@/dls-stub";
 import type { MetricDetailVM } from "@spec/performance-vm";
 
 export default function MetricDetailMY({
@@ -251,23 +250,6 @@ export default function MetricDetailMY({
             }
             return nodes;
           })()}
-          {vm.historyNav && (
-            <div className="section">
-              <Link className="footer-link" to={href(vm.historyNav)}>
-                <Icon
-                  token="sheet.HISTORICAL_DATA"
-                  size={20}
-                  tone="var(--color-brand)"
-                />
-                <span style={{ flex: 1 }}>{t("insights.history.title")}</span>
-                <Icon
-                  token="arrow-right-s"
-                  size={20}
-                  tone="var(--color-text-muted)"
-                />
-              </Link>
-            </div>
-          )}
         </>
       )}
     </>

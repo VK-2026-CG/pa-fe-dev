@@ -132,7 +132,7 @@ test.describe.serial('Customize metrics (S-P4-04)', () => {
     await page.goto('/insights/performance');
     await page.goto('/insights/customize-metrics');
 
-    await page.getByRole('checkbox', { name: '2nd Year Persistency' }).click();
+    await page.getByRole('checkbox', { name: 'Second Year Persistency' }).click();
     await page.getByRole('button', { name: 'Close' }).click();
 
     await expect(page).toHaveURL(/insights\/performance/);

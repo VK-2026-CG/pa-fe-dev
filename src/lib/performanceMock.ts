@@ -69,6 +69,6 @@ export function initialPerformanceLens(
     return { scope: group ? 'TEAM' : 'SELF', period: 'YTD', businessLine: 'INSURANCE', basis: 'STANDARD',
       ...(group ? { teamView: 'GROUP' } : {}) };
   }
-  if (fixedAgentId) return { scope: 'SELF', period: 'YTD', businessLine: 'INSURANCE', basis: 'STANDARD' };
+  if (fixedAgentId) return { scope: 'SELF', period: 'YTD', businessLine: 'ALL', basis: 'STANDARD' };
   return { scope: 'SELF', businessLine: 'ALL', basis: 'STANDARD' };
 }

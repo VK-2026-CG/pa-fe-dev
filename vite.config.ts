@@ -45,6 +45,7 @@ export default defineConfig(({ mode, command }) => {
        * bare identifier (guarded with `typeof`) parses fine in both worlds.
        */
       __BFF_URL__: JSON.stringify(env.VITE_BFF_URL ?? ''),
+      __DEV_PERSONA__: JSON.stringify(env.VITE_PERSONA ?? ''),
       __PERFORMANCE_AGENT_ID__: JSON.stringify(env.VITE_PERFORMANCE_AGENT_ID ?? ''),
       __PERFORMANCE_TENANT__: JSON.stringify(env.VITE_PERFORMANCE_TENANT ?? 'MY'),
       __PERFORMANCE_SAMPLES__: JSON.stringify(samples),

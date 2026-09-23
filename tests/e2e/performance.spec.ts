@@ -38,7 +38,7 @@ test.describe("Performance dashboard (S-P4-01) on the 375 mobile shell", () => {
     await expect(page.getByRole("link", { name: "Add milestone" })).toHaveCount(
       0,
     );
-    await expect(page.getByRole("link", { name: "View MOC" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "View MOC" })).toHaveCount(0);
 
     await page.getByLabel("Scope switcher").click();
     await page.locator(".sheet").getByRole("radio", { name: "Team" }).click();
@@ -52,7 +52,7 @@ test.describe("Performance dashboard (S-P4-01) on the 375 mobile shell", () => {
     await expect(page.getByRole("link", { name: "Add milestone" })).toHaveCount(
       0,
     );
-    await expect(page.getByRole("link", { name: "View MOC" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "View MOC" })).toHaveCount(0);
 
     expect(watch.errors, watch.errors.join("\n")).toEqual([]);
     expect(watch.warnings, watch.warnings.join("\n")).toEqual([]);
