@@ -39,6 +39,9 @@ export function MetricCard({ vm, variant = 'priority' }: { vm: MetricCardVM; var
   const stateText = dataState === 'PROCESSING'
     ? t('insights.state.processing.title')
     : t('insights.state.empty.title');
+  // Every currency value on a priority or focus card uses TPC's compact form
+  // ("11.9K"), at both SELF and TEAM scope; other kinds still follow `valueDisplay`.
+  const compact = vm.valueDisplay === 'COMPACT' || vm.value?.kind === 'MONEY';
   return (
     <Link to={href(vm.nav)} className={`mcard ${variant === 'simple' ? 'simple' : ''}`}>
       <div className="head">
@@ -55,7 +58,7 @@ export function MetricCard({ vm, variant = 'priority' }: { vm: MetricCardVM; var
         </div>
       ) : (
         <div className="spread foot" style={{ alignItems: 'flex-end' }}>
-          <span className="value">{formatScalar(vm.value, vm.valueDisplay === 'COMPACT')}</span>
+          <span className="value">{formatScalar(vm.value, compact)}</span>
           {vm.delta && <DeltaLine delta={vm.delta} full />}
         </div>
       )}

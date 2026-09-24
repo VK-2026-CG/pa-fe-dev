@@ -20,9 +20,9 @@ test('AC-PA-DIRECT-12 production sample displays imported values instead of ALL/
   expect(new URL(res.url()).searchParams.get('businessLine')).toBe('INSURANCE');
   expect(new URL(res.url()).searchParams.get('scope')).toBe('SELF');
   expect(new URL(res.url()).searchParams.get('period')).toBe('YTD');
-  await expect(card(page, 'TPC').locator('.value')).toHaveText('RM 48,546.12');
-  await expect(card(page, 'PTPC').locator('.value')).toHaveText('RM 29,248.02');
-  await expect(card(page, 'FYP').locator('.value')).toHaveText('RM 68,779.01');
+  await expect(card(page, 'TPC').locator('.value')).toHaveText('48.5K');
+  await expect(card(page, 'PTPC').locator('.value')).toHaveText('29.2K');
+  await expect(card(page, 'FYP').locator('.value')).toHaveText('68.8K');
   await expect(card(page, 'CASE_COUNT').locator('.value')).toHaveText('8');
   await expect(card(page, 'FYC')).toContainText(en['insights.state.empty.title']);
   expect(consoleWatch.errors).toEqual([]);
@@ -42,7 +42,7 @@ test('AC-PA-DIRECT-13 MAPA selection switches identity and displays its supplied
   await expect(card(page, 'MANPOWER').locator('.value')).toHaveText('12');
   await expect(card(page, 'ACTIVITY_RATIO').locator('.value')).toHaveText('12%');
   await expect(card(page, 'PRODUCTIVITY').locator('.value')).toHaveText('1.0');
-  await expect(card(page, 'AVERAGE_CASE_SIZE').locator('.value')).toHaveText('RM 3,922');
+  await expect(card(page, 'AVERAGE_CASE_SIZE').locator('.value')).toHaveText('3.9K');
   await expect(card(page, 'TPC')).toContainText(en['insights.state.empty.title']);
   expect(consoleWatch.errors).toEqual([]);
   expect(consoleWatch.warnings).toEqual([]);

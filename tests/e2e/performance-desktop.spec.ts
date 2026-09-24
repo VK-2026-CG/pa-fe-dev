@@ -86,7 +86,7 @@ test.describe("Performance dashboard (S-P4-01) at desktop viewport (≥1024px)",
 
     if (count === "0") {
       await expect(
-        panel.getByRole("link", { name: "Add focus metric" }),
+        panel.getByRole("button", { name: "Add focus metric" }),
       ).toBeVisible();
     } else {
       await expect(

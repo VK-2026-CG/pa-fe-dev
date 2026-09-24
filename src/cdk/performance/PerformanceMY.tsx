@@ -9,10 +9,12 @@ import { t } from "@/lib/i18n";
 import { href } from "@/lib/nav";
 import { apiFetch } from "@/lib/apiClient";
 import {
+  getPerformanceSample,
   initialPerformanceLens,
   PERFORMANCE_SAMPLES,
   type PerformanceLens,
 } from "@/lib/performanceMock";
+import type { PersonaId } from "@/lib/persona";
 import { PerformanceSamplePicker } from "./parts/PerformanceSamplePicker";
 import { MetricCard, MilestoneCard } from "@/components/metrics";
 import {
@@ -26,16 +28,53 @@ import {
 } from "@/components/chrome";
 import { Toast } from "@/components/ui";
 import { CarouselRow, FilterButton, Icon, MetricPanel } from "@/dls-stub";
-import { useIsTabletUp } from "@/headless";
 import CustomizeMetricsMY from "@/cdk/customize-metrics/CustomizeMetricsMY";
 import type { CdkPageProps } from "@/cdk/types";
 import type { PerformanceDashboardVM } from "@spec/performance-vm";
 
-/** Rows intercepted at breakpoint.tablet/desktop to open in place instead of
- * navigating (S-P4-01 v1.5.15, AC-P4-01-58). */
+/** Rows intercepted at every breakpoint to open in place instead of
+ * navigating (S-P4-01 v1.5.15, AC-P4-01-58; mobile renders the same surface
+ * as a bottom sheet via `.cust-surface` media queries). */
 const CUSTOMIZE_METRICS_ACTION_ID = new Set(["CUSTOMIZE_METRICS"]);
 
 type LensState = PerformanceLens;
+
+/** Last applied lens for this tab, so leaving the dashboard and coming back
+ * (Back, a hard reload, a post-save redirect) keeps the user's filters.
+ * Keyed by identity so a TEAM lens never leaks into an agent persona. */
+const LENS_STORAGE_KEY = "pa_performance_lens";
+
+function lensIdentity(persona: PersonaId): string {
+  return `${persona}|${getPerformanceSample()?.id ?? ""}`;
+}
+
+function readStoredLens(persona: PersonaId): LensState | null {
+  try {
+    const raw = window.sessionStorage.getItem(LENS_STORAGE_KEY);
+    if (!raw) return null;
+    const stored = JSON.parse(raw) as { identity?: unknown; lens?: Partial<LensState> };
+    const l = stored.lens;
+    if (stored.identity !== lensIdentity(persona) || !l
+      || typeof l.scope !== "string" || typeof l.businessLine !== "string" || typeof l.basis !== "string") {
+      return null;
+    }
+    return l as LensState;
+  } catch {
+    return null;
+  }
+}
+
+function writeStoredLens(persona: PersonaId, lens: LensState | null): void {
+  try {
+    if (lens) {
+      window.sessionStorage.setItem(LENS_STORAGE_KEY, JSON.stringify({ identity: lensIdentity(persona), lens }));
+    } else {
+      window.sessionStorage.removeItem(LENS_STORAGE_KEY);
+    }
+  } catch {
+    /* storage unavailable (private mode) — filters just won't persist */
+  }
+}
 
 export default function PerformanceMY({
   query,
@@ -43,7 +82,9 @@ export default function PerformanceMY({
 }: CdkPageProps["performance"]) {
   const initialToast = query.toast;
   const [, setSearchParams] = useSearchParams();
-  const [lens, setLens] = useState<LensState>(() => initialPerformanceLens());
+  const [lens, setLens] = useState<LensState>(
+    () => readStoredLens(persona) ?? initialPerformanceLens(),
+  );
   const [vm, setVm] = useState<PerformanceDashboardVM | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [filterOpen, setFilterOpen] = useState(false);
@@ -63,9 +104,6 @@ export default function PerformanceMY({
     }, { replace: true });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const loadSeq = useRef(0);
-  /** breakpoint.tablet/desktop opens Customize Metrics in place; mobile still
-   * navigates to the standalone route (S-P4-04 v1.5.0, AC-P4-04-33/37). */
-  const isTabletUp = useIsTabletUp();
 
   const load = useCallback(async (l: LensState) => {
     const seq = ++loadSeq.current;
@@ -79,20 +117,24 @@ export default function PerformanceMY({
     const res = await apiFetch(`/api/bff/v1/performance/dashboard?${params}`);
     if (seq !== loadSeq.current) return;
     if (!res.ok) {
+      // Drop a lens the BFF rejects so the next visit starts from defaults.
+      writeStoredLens(persona, null);
       setError(`${res.status}`);
       return;
     }
     const data: PerformanceDashboardVM = await res.json();
-    setError(null);
-    setVm(data);
-    setLens({
+    const applied: LensState = {
       scope: data.filters.scope,
       period: data.filters.period,
       businessLine: data.filters.businessLine,
       basis: data.filters.basis,
       teamView: data.filters.teamView,
-    });
-  }, []);
+    };
+    setError(null);
+    setVm(data);
+    setLens(applied);
+    writeStoredLens(persona, applied);
+  }, [persona]);
 
   useEffect(() => {
     void load(lens); /* initial */
@@ -199,9 +241,7 @@ export default function PerformanceMY({
           />
           <MoreActionsControl
             actions={vm.moreActions}
-            interceptActionIds={
-              isTabletUp ? CUSTOMIZE_METRICS_ACTION_ID : undefined
-            }
+            interceptActionIds={CUSTOMIZE_METRICS_ACTION_ID}
             onIntercept={() => setCustomizeOpen(true)}
           />
         </span>
@@ -263,24 +303,14 @@ export default function PerformanceMY({
               action={
                 vm.focusMetrics.items.length === 0 &&
                 vm.focusMetrics.addEnabled ? (
-                  isTabletUp ? (
-                    <button
-                      type="button"
-                      className="icon-btn"
-                      aria-label="Add focus metric"
-                      onClick={() => setCustomizeOpen(true)}
-                    >
-                      <Icon token="add" size={21} tone="var(--color-text)" />
-                    </button>
-                  ) : (
-                    <Link
-                      className="icon-btn"
-                      aria-label="Add focus metric"
-                      to={href({ route: "insights/customize-metrics" })}
-                    >
-                      <Icon token="add" size={21} tone="var(--color-text)" />
-                    </Link>
-                  )
+                  <button
+                    type="button"
+                    className="icon-btn"
+                    aria-label="Add focus metric"
+                    onClick={() => setCustomizeOpen(true)}
+                  >
+                    <Icon token="add" size={21} tone="var(--color-text)" />
+                  </button>
                 ) : undefined
               }
             >
