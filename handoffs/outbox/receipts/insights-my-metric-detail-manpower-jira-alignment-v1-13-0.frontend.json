@@ -1,0 +1,114 @@
+{
+  "schemaVersion": "1.0",
+  "receiptId": "insights-my-metric-detail-manpower-jira-alignment-v1-13-0.frontend",
+  "handoffId": "insights-my-metric-detail-manpower-jira-alignment-v1-13-0",
+  "jiraId": "ARVIJ-159",
+  "consumer": "frontend",
+  "status": "IN_PROGRESS",
+  "specCommit": "03bf2e64fbb99ac9431dfd80feaa60edddd15360",
+  "implementation": {
+    "repository": "PruactionWeb",
+    "commit": "83691d859e4734cefb9ac9f01a5a1a31736191f1",
+    "dirty": false
+  },
+  "validation": [
+    {
+      "command": "npm run typecheck",
+      "status": "PASS",
+      "summary": "tsc --noEmit clean at 83691d8."
+    },
+    {
+      "command": "PW_SKIP_WEBSERVER=1 npm run test:unit",
+      "status": "PASS",
+      "summary": "37 passed at 83691d8."
+    },
+    {
+      "command": "APP_PORT=3610 SVC_PORT=4610 npx playwright test --project=e2e --project=desktop",
+      "status": "FAIL",
+      "summary": "83 passed / 19 failed at 83691d8 against backend c5a7a83. Failures are in personas/entitlements (incl. the PERSISTENCY_CY TEAM 403), EMPTY/PROCESSING/notice states, TPC combined card + desktop reflow, view sheet, milestones, roadmap, focus-metric header and contest-admin nav; the 5 metric-detail ones reproduce with the v1.16.0 changes reverted. Alternate ports: a local dev server holds 3600."
+    },
+    {
+      "command": "npm run build",
+      "status": "PASS",
+      "summary": "vite build succeeds at 83691d8."
+    },
+    {
+      "command": "SPEC_DIR=../pa-spec-dev SPEC_REF=03bf2e6 HANDOFF_REF=8475f42 npm run sync:specs",
+      "status": "FAIL",
+      "summary": "Single-file contracts (performance-vm.ts, en.json, configs, SPEC_COMMIT/HANDOFF_COMMIT) synced; the package-folder swap failed with \"Permission denied\" moving vendor/spec/common under OneDrive (twice) and rolled back. Those package targets were never present in this repo. Inbound handoffs were copied with the script's own git-archive step."
+    },
+    {
+      "command": "npm run typecheck",
+      "status": "PASS",
+      "summary": "(earlier uncommitted run) tsc --noEmit clean."
+    },
+    {
+      "command": "npx playwright test (APP_PORT=3700 SVC_PORT=4700)",
+      "status": "FAIL",
+      "summary": "(earlier uncommitted run) 106 passed / 13 failed / 8 did not run. The 13 failures are identical to the pre-change baseline (none involve MANPOWER or bars); 2 new AC-named tests pass. Alternate ports used because a pre-existing local server holds 3600."
+    },
+    {
+      "command": "npx vite build",
+      "status": "PASS",
+      "summary": "(earlier uncommitted run) Production build succeeds."
+    },
+    {
+      "command": "npm run test:mock",
+      "status": "NOT_RUN",
+      "summary": "(earlier uncommitted run) Cannot start: data/performance-mocks/samples.json is absent locally (environment gap, unrelated)."
+    }
+  ],
+  "operationCoverage": [
+    {
+      "operationId": "GET /api/bff/v1/performance/metrics/:metricCode",
+      "status": "IMPLEMENTED",
+      "evidence": "w.metric-detail.bar-comparison renders the stacked-bars face when layout=STACKED (src/components/metrics.tsx StackedBarComparison); grouped/simple paths unchanged."
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-P4-02-11",
+      "status": "PASS",
+      "evidence": "metric-detail.spec.ts 'NEW_RECRUIT_CONTRACTED keeps simple bars'."
+    },
+    {
+      "id": "AC-P4-02-12",
+      "status": "PASS",
+      "evidence": "Stacked test: exactly one .chart-delta (totals only, none for earliest year)."
+    },
+    {
+      "id": "AC-P4-02-42",
+      "status": "PASS",
+      "evidence": "metric-detail.spec.ts MANPOWER TEAM: 4 segments, 2 total labels, Existing Agents/New Recruits legend, no Opening/Closing."
+    },
+    {
+      "id": "AC-P4-02-43",
+      "status": "PASS",
+      "evidence": "Same test: single chip matching /^[+-]?\\d+%$/."
+    },
+    {
+      "id": "AC-P4-02-44",
+      "status": "PASS",
+      "evidence": "Manpower Growth card renders a % value via DeltaVM.display; no unit inference."
+    },
+    {
+      "id": "AC-P4-02-45",
+      "status": "PASS",
+      "evidence": "formatPct renders pct as-is (no re-rounding); whole-number % asserted in e2e."
+    }
+  ],
+  "migrations": [
+    {
+      "name": "None",
+      "status": "NOT_REQUIRED",
+      "evidence": "UI-only change."
+    }
+  ],
+  "gaps": [
+    "Stacked segment colors reuse existing --color-chart-prior/--color-chart-primary tokens; no approved visual baseline exists (spec UX-source blocker), so designValidation is not claimed.",
+    "Real MANPOWER data remains blocked on OQ-51; UI verified against the backend stub only.",
+    "Full e2e/desktop suite has 19 failures outside this handoff; COMPLETE needs a green suite.",
+    "sync:specs package-folder swap fails under OneDrive (vendor/spec/common Permission denied); re-run outside OneDrive or with the dev server stopped."
+  ],
+  "updatedAt": "2026-09-24T14:37:04.028Z"
+}

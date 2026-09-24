@@ -1,0 +1,98 @@
+{
+  "schemaVersion": "1.0",
+  "receiptId": "insights-my-metric-detail-activity-ratio-jira-alignment-v1-14-0.frontend",
+  "handoffId": "insights-my-metric-detail-activity-ratio-jira-alignment-v1-14-0",
+  "jiraId": "ARVIJ-160",
+  "consumer": "frontend",
+  "status": "IN_PROGRESS",
+  "specCommit": "03bf2e64fbb99ac9431dfd80feaa60edddd15360",
+  "implementation": {
+    "repository": "PruactionWeb",
+    "commit": "83691d859e4734cefb9ac9f01a5a1a31736191f1",
+    "dirty": false
+  },
+  "validation": [
+    {
+      "command": "npm run typecheck",
+      "status": "PASS",
+      "summary": "tsc --noEmit clean at 83691d8."
+    },
+    {
+      "command": "PW_SKIP_WEBSERVER=1 npm run test:unit",
+      "status": "PASS",
+      "summary": "37 passed at 83691d8."
+    },
+    {
+      "command": "APP_PORT=3610 SVC_PORT=4610 npx playwright test --project=e2e --project=desktop",
+      "status": "FAIL",
+      "summary": "83 passed / 19 failed at 83691d8 against backend c5a7a83. Failures are in personas/entitlements (incl. the PERSISTENCY_CY TEAM 403), EMPTY/PROCESSING/notice states, TPC combined card + desktop reflow, view sheet, milestones, roadmap, focus-metric header and contest-admin nav; the 5 metric-detail ones reproduce with the v1.16.0 changes reverted. Alternate ports: a local dev server holds 3600."
+    },
+    {
+      "command": "npm run build",
+      "status": "PASS",
+      "summary": "vite build succeeds at 83691d8."
+    },
+    {
+      "command": "SPEC_DIR=../pa-spec-dev SPEC_REF=03bf2e6 HANDOFF_REF=8475f42 npm run sync:specs",
+      "status": "FAIL",
+      "summary": "Single-file contracts (performance-vm.ts, en.json, configs, SPEC_COMMIT/HANDOFF_COMMIT) synced; the package-folder swap failed with \"Permission denied\" moving vendor/spec/common under OneDrive (twice) and rolled back. Those package targets were never present in this repo. Inbound handoffs were copied with the script's own git-archive step."
+    },
+    {
+      "command": "npm run typecheck",
+      "status": "PASS",
+      "summary": "(earlier uncommitted run) tsc --noEmit clean."
+    },
+    {
+      "command": "npm run test:unit",
+      "status": "PASS",
+      "summary": "(earlier uncommitted run) 34 passed, including 4 new AC-named format/MoM-header tests."
+    },
+    {
+      "command": "npx playwright test --project=e2e (APP_PORT=3700 SVC_PORT=4700)",
+      "status": "FAIL",
+      "summary": "(earlier uncommitted run) 61 passed / 16 failed. Both new AC-named tests pass. The 16 failures are persona/entitlement (403), empty/processing state, notice, dashboard milestones, layout and view-sheet tests that do not touch ACTIVITY_RATIO, formatting or the History header; the v1.13.0 receipt recorded 13 pre-existing failures in the same areas. Alternate ports used because local dev servers hold 3600/4600."
+    },
+    {
+      "command": "npx vite build",
+      "status": "PASS",
+      "summary": "(earlier uncommitted run) Production build succeeds."
+    }
+  ],
+  "operationCoverage": [
+    {
+      "operationId": "GET /api/bff/v1/performance/metrics/:metricCode",
+      "status": "IMPLEMENTED",
+      "evidence": "No change needed: comparison card renders DeltaVM.display=PCT via formatDelta; label key activityRatioChange unchanged."
+    },
+    {
+      "operationId": "GET /api/bff/v1/performance/metrics/:metricCode/history",
+      "status": "IMPLEMENTED",
+      "evidence": "MoM header now follows DeltaVM.display (momHeaderKey in src/lib/format.ts) instead of valueType === 'MONEY', per widget-contracts §2 / AC-P4-03-13."
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-P4-02-48",
+      "status": "PASS",
+      "evidence": "e2e metric-detail.spec.ts 'ACTIVITY_RATIO TEAM keeps the 90% threshold gauge and shows its change as a whole-number %'; e2e history.spec.ts 'ACTIVITY_RATIO MoM header reads MoM % Change'; unit momHeaderKey tests."
+    },
+    {
+      "id": "AC-P4-02-49",
+      "status": "PASS",
+      "evidence": "unit format.spec.ts: pct 18 renders '+18%' as-is (no re-rounding)."
+    }
+  ],
+  "migrations": [
+    {
+      "name": "None",
+      "status": "NOT_REQUIRED",
+      "evidence": "UI-only change."
+    }
+  ],
+  "gaps": [
+    "The MoM header fix also moves other COUNT metrics with PCT deltas (CASE_COUNT, MANPOWER) from 'MoM Delta' to 'MoM % Change', as widget-contracts §2 already required.",
+    "Full e2e/desktop suite has 19 failures outside this handoff; COMPLETE needs a green suite.",
+    "sync:specs package-folder swap fails under OneDrive (vendor/spec/common Permission denied); re-run outside OneDrive or with the dev server stopped."
+  ],
+  "updatedAt": "2026-09-24T14:37:04.028Z"
+}

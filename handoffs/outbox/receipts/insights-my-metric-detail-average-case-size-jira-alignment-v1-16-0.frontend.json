@@ -1,0 +1,84 @@
+{
+  "schemaVersion": "1.0",
+  "receiptId": "insights-my-metric-detail-average-case-size-jira-alignment-v1-16-0.frontend",
+  "handoffId": "insights-my-metric-detail-average-case-size-jira-alignment-v1-16-0",
+  "jiraId": "ARVIJ-162",
+  "consumer": "frontend",
+  "status": "IN_PROGRESS",
+  "specCommit": "03bf2e64fbb99ac9431dfd80feaa60edddd15360",
+  "implementation": {
+    "repository": "PruactionWeb",
+    "commit": "83691d859e4734cefb9ac9f01a5a1a31736191f1",
+    "dirty": false
+  },
+  "validation": [
+    {
+      "command": "npm run typecheck",
+      "status": "PASS",
+      "summary": "tsc --noEmit clean at 83691d8."
+    },
+    {
+      "command": "PW_SKIP_WEBSERVER=1 npm run test:unit",
+      "status": "PASS",
+      "summary": "37 passed at 83691d8."
+    },
+    {
+      "command": "APP_PORT=3610 SVC_PORT=4610 npx playwright test --project=e2e --project=desktop",
+      "status": "FAIL",
+      "summary": "83 passed / 19 failed at 83691d8 against backend c5a7a83. Failures are in personas/entitlements (incl. the PERSISTENCY_CY TEAM 403), EMPTY/PROCESSING/notice states, TPC combined card + desktop reflow, view sheet, milestones, roadmap, focus-metric header and contest-admin nav; the 5 metric-detail ones reproduce with the v1.16.0 changes reverted. Alternate ports: a local dev server holds 3600."
+    },
+    {
+      "command": "npm run build",
+      "status": "PASS",
+      "summary": "vite build succeeds at 83691d8."
+    },
+    {
+      "command": "SPEC_DIR=../pa-spec-dev SPEC_REF=03bf2e6 HANDOFF_REF=8475f42 npm run sync:specs",
+      "status": "FAIL",
+      "summary": "Single-file contracts (performance-vm.ts, en.json, configs, SPEC_COMMIT/HANDOFF_COMMIT) synced; the package-folder swap failed with \"Permission denied\" moving vendor/spec/common under OneDrive (twice) and rolled back. Those package targets were never present in this repo. Inbound handoffs were copied with the script's own git-archive step."
+    }
+  ],
+  "operationCoverage": [
+    {
+      "operationId": "GET /api/bff/v1/performance/metrics/:metricCode",
+      "status": "IMPLEMENTED",
+      "evidence": "comparisonLabelKey maps AVERAGE_CASE_SIZE to insights.comparison.averageCaseSizeChange (src/components/metrics.tsx); the delta renders DeltaVM.display=PCT via formatDelta as-is; values stay formatMoney; gauge not switched to bars (OQ-66)."
+    },
+    {
+      "operationId": "GET /api/bff/v1/performance/metrics/:metricCode/history",
+      "status": "IMPLEMENTED",
+      "evidence": "No source change needed: momHeaderKey follows DeltaVM.display, so AVERAGE_CASE_SIZE reads 'MoM % Change'."
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-P4-02-13",
+      "status": "PASS",
+      "evidence": "Display-driven; unit format.spec.ts ABS money case still renders '+RM 20,000' for any ABS metric."
+    },
+    {
+      "id": "AC-P4-02-52",
+      "status": "PASS",
+      "evidence": "e2e metric-detail.spec.ts 'AVERAGE_CASE_SIZE TEAM shows its change as a whole-number %, never an absolute RM amount (AC-P4-02-52/53)'; unit format.spec.ts 'AVERAGE_CASE_SIZE uses \"Average Case Size Change\", not \"Absolute Change\" (AC-P4-02-52)'. See gap: the label is mapped but not visible in the combined card."
+    },
+    {
+      "id": "AC-P4-02-53",
+      "status": "PASS",
+      "evidence": "unit format.spec.ts: pct 9 renders '+9%' as-is even with a stale '+RM 400' abs present (no re-rounding, no ABS fallback)."
+    }
+  ],
+  "migrations": [
+    {
+      "name": "None",
+      "status": "NOT_REQUIRED",
+      "evidence": "UI label mapping only."
+    }
+  ],
+  "gaps": [
+    "Spec/UI divergence: AVERAGE_CASE_SIZE renders in the combined value-only card (COMBINED_CARD_METRICS, 'requester direction 2026-09-24'), whose delta-line face (AC-P4-02-25) hides the labelled change row, so 'Average Case Size Change' is mapped but not shown. The spec still describes a standalone gauge + labelled comparison for AVERAGE_CASE_SIZE; the handoff's e2e expectation of a visible label cannot be met without reverting that direction. Needs an /update-spec decision.",
+    "OQ-66 (extended): no bar chart implemented, by design.",
+    "Full e2e/desktop suite has 19 failures outside this handoff; COMPLETE needs a green suite.",
+    "sync:specs package-folder swap fails under OneDrive (vendor/spec/common Permission denied); re-run outside OneDrive or with the dev server stopped."
+  ],
+  "updatedAt": "2026-09-24T14:37:04.028Z"
+}
