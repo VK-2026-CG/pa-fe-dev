@@ -264,4 +264,51 @@ test.describe("Performance dashboard (S-P4-01) on the 375 mobile shell", () => {
 
     await expect(page).toHaveURL(/insights\/history/);
   });
+
+  test("applied filters survive leaving the dashboard and coming back (S-P4-01)", async ({
+    page,
+  }) => {
+    const pills = page.locator(".filter-row");
+    await page.goto("/insights/performance");
+
+    await page.getByRole("button", { name: "Filter" }).click();
+    const sheet = page.locator(".sheet");
+    await sheet.getByRole("radio").filter({ hasText: "Takaful" }).click();
+    await sheet.getByRole("radio").filter({ hasText: "MTD" }).click();
+    await sheet.getByRole("button", { name: "Apply" }).click();
+    await expect(pills).toContainText("Takaful");
+    await expect(pills).toContainText("MTD");
+
+    await page.locator(".mcard").first().click();
+    await expect(page).toHaveURL(/insights\/metric-detail/);
+    await page.locator("button.back").click();
+    await expect(pills).toContainText("Takaful");
+    await expect(pills).toContainText("MTD");
+
+    await page.goto("/insights/performance");
+    await expect(pills).toContainText("Takaful");
+    await expect(pills).toContainText("MTD");
+  });
+
+  test("Customize Metrics opens in place as a bottom sheet on mobile, no navigation (AC-P4-01-58)", async ({
+    page,
+  }) => {
+    await page.goto("/insights/performance");
+
+    await page.getByRole("button", { name: "More actions" }).click();
+    await page.locator(".sheet").getByRole("button", { name: "Customize Metrics" }).click();
+
+    const surface = page.locator(".cust-surface");
+    await expect(surface).toBeVisible();
+    await expect(page).toHaveURL(/insights\/performance/);
+    const box = await surface.boundingBox();
+    const viewport = page.viewportSize()!;
+    expect(box!.width).toBeCloseTo(viewport.width, 0);
+    expect(box!.y + box!.height).toBeCloseTo(viewport.height, 0);
+
+    await surface.locator(".cust-close").click();
+    await expect(surface).toHaveCount(0);
+    await expect(page).toHaveURL(/insights\/performance/);
+    await expect(page.getByRole("heading", { name: "Performance" })).toBeVisible();
+  });
 });
