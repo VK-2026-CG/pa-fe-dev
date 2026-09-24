@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { t } from '@/lib/i18n';
-import { formatScalar } from '@/lib/format';
+import { formatScalar, momHeaderKey } from '@/lib/format';
 import { apiFetch } from '@/lib/apiClient';
 import { DeltaBadge } from '@/components/ui';
 import { Icon } from '@/dls-stub';
@@ -82,7 +82,7 @@ export default function HistoryMY({ query }: { query: Record<string, string | un
               {vm.years.map((y) => <th key={y} className="num history-year">{y}</th>)}
               {vm.momDeltas && (
                 <th className="num history-mom">
-                  {vm.valueType === 'MONEY' ? t('insights.history.momPctChange') : t('insights.history.momDelta')}
+                  {t(momHeaderKey(vm.momDeltas, vm.valueType))}
                 </th>
               )}
             </tr>

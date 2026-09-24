@@ -86,6 +86,17 @@ export function formatDelta(d: DeltaVM): string {
   return '';
 }
 
+/**
+ * MoM column header key — follows the deltas' `display`, never the value type
+ * (widget-contracts §2, AC-P4-03-13): PCT → "MoM % Change", PP/ABS → "MoM Delta".
+ * All-null columns fall back to the pre-existing MONEY ⇒ PCT reading.
+ */
+export function momHeaderKey(momDeltas: Array<DeltaVM | null>, valueType: string): string {
+  const display = momDeltas.find((d) => d != null)?.display;
+  const pct = display ? display === 'PCT' : valueType === 'MONEY';
+  return pct ? 'insights.history.momPctChange' : 'insights.history.momDelta';
+}
+
 export function toneFor(sentiment: DeltaVM['sentiment']): 'success' | 'danger' | 'muted' {
   return sentiment === 'POSITIVE' ? 'success' : sentiment === 'NEGATIVE' ? 'danger' : 'muted';
 }

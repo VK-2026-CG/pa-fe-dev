@@ -104,20 +104,31 @@ export function MilestoneCard({ vm }: { vm: MilestoneCardVM }) {
 }
 
 /* ── w.metric-detail.gauge — card w/ 270×220 donut + legend (6588:18612) ─ */
-function GaugeCardBody({ s, metricCode, valueOnly = false }: { s: GaugeSectionVM; metricCode: string; valueOnly?: boolean }) {
+function GaugeCardBody({ s, metricCode, valueOnly = false, repricing = true }: { s: GaugeSectionVM; metricCode: string; valueOnly?: boolean; repricing?: boolean }) {
   const R = 90; const C = 2 * Math.PI * R; const SWEEP = 0.75;
   // AC-P4-02-24: heading is the variant alone when one is present.
   const heading = s.variant
     ? t(`insights.variant.${s.variant}`)
     : t(`insights.metric.${metricCode}.title`);
-  // AC-P4-02-23: value-only face — no donut, no penders legend.
+  // AC-P4-02-23: value-only face — no donut. Repricing metrics (TPC/PTPC)
+  // name the variant and drop penders; the others (FYP/FYC/AVERAGE_CASE_SIZE)
+  // need no heading — the page title already names the metric, and the
+  // variant the BFF still stamps on their gauge carries no meaning without a
+  // "With repricing" counterpart — and keep their money penders
+  // (AC-P4-02-39) as a second value line, since the donut legend is gone.
   if (valueOnly) {
     return (
       <>
-        <div className="title16">{heading}</div>
+        {repricing && <div className="title16">{heading}</div>}
         <div className="gauge-value-only">
           <span className="k muted">{t('insights.gauge.collected')}</span>
           <span className="v">{formatScalar(s.collected)}</span>
+          {!repricing && s.penders && (
+            <>
+              <span className="k muted gauge-penders-k">{t('insights.gauge.penders')}</span>
+              <span className="v2">{formatScalar(s.penders)}</span>
+            </>
+          )}
         </div>
       </>
     );
@@ -188,7 +199,11 @@ export function ThresholdArc({ s, metricCode }: { s: ThresholdGaugeSectionVM; me
 }
 
 /* ── w.metric-detail.bar-comparison ────────────────────────────────────── */
+/** Series token per measure index — shared by bars and legend (no raw colors). */
+const seriesFill = (mi: number) => (mi === 0 ? 'var(--color-chart-prior)' : 'var(--color-chart-primary)');
+
 export function BarComparison({ s, metricCode }: { s: BarComparisonSectionVM; metricCode: string }) {
+  if (s.layout === 'STACKED' && s.totals) return <StackedBarComparison s={s} totals={s.totals} metricCode={metricCode} />;
   const all = s.measures.flatMap((m) => m.points.map((p) => (p.value.kind === 'MONEY' ? Number(p.value.amount) : p.value.value)));
   const max = Math.max(...all, 1);
   const grouped = s.measures.length > 1;
@@ -249,6 +264,70 @@ export function BarComparison({ s, metricCode }: { s: BarComparisonSectionVM; me
   );
 }
 
+/**
+ * `stacked-bars` face (S-P4-02 v1.13.0, AC-P4-02-42/43): each year's measures
+ * stack bottom-up in `measures[]` order (MANPOWER: Existing Agents + New
+ * Recruits). The total label and the only delta chip come from `totals[]` —
+ * never summed here. Segment tokens are provisional (no approved baseline).
+ */
+function StackedBarComparison({ s, totals, metricCode }: {
+  s: BarComparisonSectionVM; totals: NonNullable<BarComparisonSectionVM['totals']>; metricCode: string;
+}) {
+  const num = (v: BarComparisonSectionVM['measures'][number]['points'][number]['value']) =>
+    (v.kind === 'MONEY' ? Number(v.amount) : v.value);
+  const max = Math.max(...totals.map((t) => num(t.value)), 1);
+  const W = 311; const H = 160; const plotH = 100; const baseY = 130; const barW = 44;
+  const groupW = W / s.years.length;
+  return (
+    <div className="card pad bars-stacked">
+      <div className="title16">{t(`insights.metric.${metricCode}.title`)}</div>
+      <svg width="100%" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={t(`insights.metric.${metricCode}.title`)}>
+        {s.years.map((year, yi) => {
+          const total = totals.find((tt) => tt.year === year);
+          const x = yi * groupW + groupW / 2 - barW / 2;
+          let y = baseY;
+          const segs = s.measures.map((m, mi) => {
+            const p = m.points.find((pt) => pt.year === year);
+            if (!p) return null;
+            const h = (num(p.value) / max) * plotH;
+            y -= h;
+            return <rect key={`${year}-${m.measureCode ?? mi}`} className="bar-seg" x={x} y={y} width={barW} height={h} fill={seriesFill(mi)} />;
+          });
+          const topY = total ? baseY - Math.max(4, (num(total.value) / max) * plotH) : y;
+          return (
+            <g key={year}>
+              {segs}
+              {total?.change && (
+                <text x={x + barW / 2} y={topY - 18} textAnchor="middle" className="chart-delta"
+                  fill={total.change.sentiment === 'NEGATIVE' ? 'var(--tone-danger)' : 'var(--tone-success)'}>
+                  {formatDelta(total.change)}
+                </text>
+              )}
+              {total && (
+                <text x={x + barW / 2} y={topY - 5} textAnchor="middle" className="chart-point">
+                  {total.value.kind === 'MONEY' ? formatScalar(total.value).replace('RM ', '') : formatScalar(total.value)}
+                </text>
+              )}
+              <text x={yi * groupW + groupW / 2} y={H - 8} textAnchor="middle" className="chart-axis">{year}</text>
+            </g>
+          );
+        })}
+      </svg>
+      <div className="spread caption muted">
+        <span>{s.axisUnitCode ? t(`insights.axis.${s.axisUnitCode}`) : ''}</span>
+        <span className="row" style={{ gap: 12 }}>
+          {s.measures.map((m, mi) => m.measureCode && (
+            <span key={m.measureCode}>
+              <span style={{ color: seriesFill(mi) }}>■</span>{' '}
+              {t(`insights.measure.${m.measureCode}`)}
+            </span>
+          ))}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 /* ── w.metric-detail.comparison — YoY card (rows 38h, growth Tag) ──────── */
 /**
  * AC-P4-02-24/25: rows render the bare year with a muted "Collected"
@@ -301,7 +380,8 @@ function ComparisonCardBody({
       </div>
       {/* AC-P4-02-25 replaces this labelled row with the delta line above, but
           only for the TPC/PTPC combined card — AC-P4-02-13/-03 still require
-          it for PP/ABS metrics (persistency, manpower, productivity, …). */}
+          it for standalone comparison cards (persistency, productivity, …, and
+          manpower — PCT since S-P4-02 v1.13.0, pre-rounded per R-PCT-ROUNDUP). */}
       {!deltaLine && (
         <>
           <hr className="hairline" />
@@ -335,20 +415,27 @@ export function ComparisonCard({ s, metricCode, labelKey }: { s: ComparisonSecti
  * (AC-P4-02-28).
  */
 export function GaugeComparisonCard({
-  gauge, comparison, metricCode, labelKey, period,
-}: { gauge: GaugeSectionVM; comparison: ComparisonSectionVM; metricCode: string; labelKey: string; period?: string }) {
+  gauge, comparison, metricCode, labelKey, period, repricing = true,
+}: { gauge: GaugeSectionVM; comparison?: ComparisonSectionVM; metricCode: string; labelKey: string; period?: string; repricing?: boolean }) {
+  // No comparison in the payload (e.g. no prior-year data): the same card
+  // keeps its value-only face, content-sized, rather than falling back to
+  // the standalone donut.
   return (
-    <div className="card pad gauge-comparison">
+    <div className={`card pad gauge-comparison${comparison ? '' : ' gauge-only'}`}>
       <div className="gc-gauge">
-        <GaugeCardBody s={gauge} metricCode={metricCode} valueOnly />
+        <GaugeCardBody s={gauge} metricCode={metricCode} valueOnly repricing={repricing} />
       </div>
-      <div className="gc-divider" />
-      <div className="gc-comparison">
-        <ComparisonCardBody
-          s={comparison} metricCode={metricCode} labelKey={labelKey}
-          deltaLine showHeading={false} period={period}
-        />
-      </div>
+      {comparison && (
+        <>
+          <div className="gc-divider" />
+          <div className="gc-comparison">
+            <ComparisonCardBody
+              s={comparison} metricCode={metricCode} labelKey={labelKey}
+              deltaLine showHeading={false} period={period}
+            />
+          </div>
+        </>
+      )}
     </div>
   );
 }
@@ -369,12 +456,16 @@ export function VariantValueCard({ s }: { s: VariantValueSectionVM }) {
     </div>
   );
 }
+/**
+ * AC-P4-02-26: a single-row card — label left, value right. Non-navigable
+ * until the link destination is confirmed (OQ-30); no "Cases" unit until its
+ * copy key exists.
+ */
 export function PendersCard({ s }: { s: PendersSectionVM }) {
   return (
-    <div className="card pad">
-      <div className="title14">{t('insights.detail.penders')}</div>
-      <div className="yoy-row" style={{ marginTop: 8 }}>
-        <span className="k">{`YTD (${s.periodLabelYear})`}</span>
+    <div className="card pad penders-card">
+      <div className="yoy-row">
+        <span className="k">{t('insights.detail.penders')}</span>
         <span className="v">{formatScalar(s.value)}</span>
       </div>
     </div>
@@ -429,7 +520,8 @@ export function comparisonLabelKey(metricCode: string, display: 'PCT' | 'PP' | '
   if (metricCode === 'MANPOWER') return 'insights.comparison.manpowerGrowth';
   if (metricCode === 'PRODUCTIVITY') return 'insights.comparison.productivityChange';
   if (metricCode === 'ACTIVITY_RATIO') return 'insights.comparison.activityRatioChange';
-  if (metricCode === 'AVERAGE_CASE_SIZE') return 'insights.comparison.absoluteChange';
+  // S-P4-02 v1.16.0 (AC-P4-02-52): ACS change is a %, so "Absolute Change" no longer fits.
+  if (metricCode === 'AVERAGE_CASE_SIZE') return 'insights.comparison.averageCaseSizeChange';
   if (metricCode.startsWith('PERSISTENCY')) return 'insights.comparison.persistencyChange';
   if (metricCode === 'NEW_RECRUIT_CONTRACTED') return 'insights.comparison.pctChange'; // OQ-12: design label kept
   return display === 'PCT' ? 'insights.comparison.growth' : 'insights.comparison.pctChange';

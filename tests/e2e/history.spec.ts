@@ -29,6 +29,29 @@ test.describe('Historical data (S-P4-03)', () => {
     await expect(january).toContainText('N/A');
   });
 
+  test('ACTIVITY_RATIO MoM header reads "MoM % Change" now its display is PCT (AC-P4-03-13, AC-P4-02-48)', async ({ context, page }) => {
+    await setPersona(context, 'LEADER_P2');
+    const watch = watchConsole(page);
+    await page.goto('/insights/history?metricCode=ACTIVITY_RATIO&scope=TEAM&window=CURRENT_YEAR');
+
+    await expect(page.getByRole('columnheader', { name: 'MoM % Change' })).toBeVisible();
+    await expect(page.locator('td.history-mom', { hasText: /pp/ })).toHaveCount(0);
+
+    expect(watch.errors, watch.errors.join('\n')).toEqual([]);
+    expect(watch.warnings, watch.warnings.join('\n')).toEqual([]);
+  });
+
+  test('PRODUCTIVITY MoM header reads "MoM % Change" now its display is PCT (AC-P4-03-13, AC-P4-02-50)', async ({ context, page }) => {
+    await setPersona(context, 'LEADER_P2');
+    const watch = watchConsole(page);
+    await page.goto('/insights/history?metricCode=PRODUCTIVITY&scope=TEAM&window=CURRENT_YEAR');
+
+    await expect(page.getByRole('columnheader', { name: 'MoM % Change' })).toBeVisible();
+
+    expect(watch.errors, watch.errors.join('\n')).toEqual([]);
+    expect(watch.warnings, watch.warnings.join('\n')).toEqual([]);
+  });
+
   test('metric pill switches the series (AC-P4-03-12)', async ({ context, page }) => {
     await setPersona(context, 'LEADER_P2');
     await page.goto('/insights/history?metricCode=TPC&window=CURRENT_YEAR');

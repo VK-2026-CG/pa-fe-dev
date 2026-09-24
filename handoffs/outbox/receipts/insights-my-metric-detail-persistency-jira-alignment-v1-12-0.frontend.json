@@ -1,0 +1,88 @@
+{
+  "schemaVersion": "1.0",
+  "receiptId": "insights-my-metric-detail-persistency-jira-alignment-v1-12-0.frontend",
+  "handoffId": "insights-my-metric-detail-persistency-jira-alignment-v1-12-0",
+  "consumer": "frontend",
+  "status": "IN_PROGRESS",
+  "specCommit": "03bf2e64fbb99ac9431dfd80feaa60edddd15360",
+  "implementation": {
+    "repository": "PruactionWeb",
+    "commit": "83691d859e4734cefb9ac9f01a5a1a31736191f1",
+    "dirty": false
+  },
+  "validation": [
+    {
+      "command": "npm run typecheck",
+      "status": "PASS",
+      "summary": "tsc --noEmit clean at 83691d8."
+    },
+    {
+      "command": "PW_SKIP_WEBSERVER=1 npm run test:unit",
+      "status": "PASS",
+      "summary": "37 passed at 83691d8."
+    },
+    {
+      "command": "APP_PORT=3610 SVC_PORT=4610 npx playwright test --project=e2e --project=desktop",
+      "status": "FAIL",
+      "summary": "83 passed / 19 failed at 83691d8 against backend c5a7a83. Failures are in personas/entitlements (incl. the PERSISTENCY_CY TEAM 403), EMPTY/PROCESSING/notice states, TPC combined card + desktop reflow, view sheet, milestones, roadmap, focus-metric header and contest-admin nav; the 5 metric-detail ones reproduce with the v1.16.0 changes reverted. Alternate ports: a local dev server holds 3600."
+    },
+    {
+      "command": "npm run build",
+      "status": "PASS",
+      "summary": "vite build succeeds at 83691d8."
+    },
+    {
+      "command": "SPEC_DIR=../pa-spec-dev SPEC_REF=03bf2e6 HANDOFF_REF=8475f42 npm run sync:specs",
+      "status": "FAIL",
+      "summary": "Single-file contracts (performance-vm.ts, en.json, configs, SPEC_COMMIT/HANDOFF_COMMIT) synced; the package-folder swap failed with \"Permission denied\" moving vendor/spec/common under OneDrive (twice) and rolled back. Those package targets were never present in this repo. Inbound handoffs were copied with the script's own git-archive step."
+    },
+    {
+      "command": "npm run typecheck",
+      "status": "PASS",
+      "summary": "(earlier uncommitted run) tsc --noEmit clean."
+    },
+    {
+      "command": "APP_PORT=3711 SVC_PORT=4711 npx playwright test --project=e2e --project=desktop",
+      "status": "FAIL",
+      "summary": "(earlier uncommitted run) 84 passed / 13 failed against the updated backend build. The same 13 fail against a baseline backend build without the v1.12.0 change (S-P4-01 personas/milestones/focus header, S-P4-02 EMPTY/PROCESSING/combined card/notice, contest nav, roadmap); none are persistency tests. The 7 new AC-P4-02-46/47 tests fail on the baseline and pass after. Alternate ports used because 3600 was already in use locally."
+    }
+  ],
+  "operationCoverage": [],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-P4-02-03",
+      "status": "PASS",
+      "evidence": "Threshold gauge with per-metric marker: metric-detail.spec.ts persistency tests assert 'Threshold 90%/85%/80%'."
+    },
+    {
+      "id": "AC-P4-02-25",
+      "status": "PASS",
+      "evidence": "No code change: persistency receives no COMPARISON section, so no labelled change row renders; FYP/team metrics keep theirs (existing tests)."
+    },
+    {
+      "id": "AC-P4-02-46",
+      "status": "PASS",
+      "evidence": "metric-detail.spec.ts '<code>[ TEAM] shows only the threshold gauge ... no year-on-year comparison' x6 (SELF and TEAM for CY/Y1/Y2); 'persistency at or above threshold tints the ring success'."
+    },
+    {
+      "id": "AC-P4-02-47",
+      "status": "PASS",
+      "evidence": "metric-detail.spec.ts 'persistency opened with MTD shows YTD in the Time pill; Back keeps the earlier page's period'. No source change: the pill renders vm.context.period and Back is history navigation."
+    }
+  ],
+  "migrations": [
+    {
+      "name": "None",
+      "status": "NOT_REQUIRED",
+      "evidence": "Tests only; no source, i18n or vendor change."
+    }
+  ],
+  "gaps": [
+    "comparisonLabelKey's PERSISTENCY branch (src/components/metrics.tsx) is now unreachable; kept for forward compatibility as the handoff allows.",
+    "OQ-59: S-P4-01 persistency card ('calculated annually' text, YTD value, PP delta) not changed; needs an S-P4-01 revision.",
+    "Below-threshold (danger) ring not covered by e2e: the stub data has no persistency value under its threshold; covered by the backend sentiment rule and the existing ThresholdArc tone mapping.",
+    "Full e2e/desktop suite has 19 failures outside this handoff; COMPLETE needs a green suite.",
+    "sync:specs package-folder swap fails under OneDrive (vendor/spec/common Permission denied); re-run outside OneDrive or with the dev server stopped."
+  ],
+  "updatedAt": "2026-09-24T14:37:04.028Z"
+}

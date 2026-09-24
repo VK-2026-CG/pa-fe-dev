@@ -19,6 +19,17 @@ import { NoticeBanner, StateEmpty, StateProcessing } from "@/components/ui";
 import { Tag } from "@/dls-stub";
 import type { MetricDetailVM } from "@spec/performance-vm";
 
+/** Metrics whose gauge + comparison render as the combined value-only card (AC-P4-02-21/23). */
+const COMBINED_CARD_METRICS = new Set([
+  "TPC",
+  "PTPC",
+  "FYP",
+  "FYC",
+  "AVERAGE_CASE_SIZE",
+]);
+/** Of those, the metrics with a repricing capability — the card is headed by the variant. */
+const REPRICING_METRICS = new Set(["TPC", "PTPC"]);
+
 export default function MetricDetailMY({
   query,
 }: {
@@ -118,36 +129,37 @@ export default function MetricDetailMY({
           {(() => {
             const nodes: React.ReactNode[] = [];
             const secs = vm.sections;
-            // AC-P4-02-21 (MetricDetail_S-P4-02 v1.3.0): for TPC/PTPC, a
-            // gauge.primary immediately followed by comparison.primary
-            // renders as one combined card instead of two. sections[]
-            // order and every other pairing/section are unchanged.
-            const pairsGaugeComparison =
-              metricCode === "TPC" || metricCode === "PTPC";
+            // AC-P4-02-21 (MetricDetail_S-P4-02 v1.3.0): a gauge.primary
+            // immediately followed by comparison.primary renders as one
+            // combined value-only card instead of two. Originally TPC/PTPC;
+            // extended to FYP/FYC/AVERAGE_CASE_SIZE (requester direction,
+            // 2026-09-24). A gauge with no comparison keeps the same
+            // value-only card, never the standalone donut. sections[] order
+            // and every other pairing/section are unchanged.
+            const pairsGaugeComparison = COMBINED_CARD_METRICS.has(metricCode);
             for (let i = 0; i < secs.length; i++) {
               const s = secs[i];
               if (!s) continue;
               const next = secs[i + 1];
-              if (
-                pairsGaugeComparison &&
-                s.type === "GAUGE" &&
-                next?.type === "COMPARISON"
-              ) {
+              if (pairsGaugeComparison && s.type === "GAUGE") {
+                const comparison = next?.type === "COMPARISON" ? next : undefined;
                 nodes.push(
                   <div className="section" key={s.id}>
                     <GaugeComparisonCard
                       gauge={s}
-                      comparison={next}
+                      comparison={comparison}
                       metricCode={metricCode}
-                      labelKey={comparisonLabelKey(
-                        metricCode,
-                        next.change.display,
-                      )}
+                      labelKey={
+                        comparison
+                          ? comparisonLabelKey(metricCode, comparison.change.display)
+                          : ""
+                      }
                       period={c.period}
+                      repricing={REPRICING_METRICS.has(metricCode)}
                     />
                   </div>,
                 );
-                i += 1; // consumed the paired comparison section too
+                if (comparison) i += 1; // consumed the paired comparison section too
                 continue;
               }
               // AC-P4-02-27 (v1.5.0): variant.with-repricing + penders.primary
@@ -166,9 +178,8 @@ export default function MetricDetailMY({
               // AC-P4-02-29/-30 (v1.6.0): two adjacent BREAKDOWN sections
               // share one "Breakdown by Product" heading and a two-column row
               // at breakpoint.desktop. Only paired when both are present — a
-              // lone breakdown table stays full-width. No fixture emits two
-              // BREAKDOWN sections today (OQ-38), so this path is unrendered
-              // until breakdown.with-repricing exists.
+              // lone breakdown table stays full-width. TPC/PTPC emit both
+              // variants (OQ-38 closed in v1.8.0); FYP emits only one.
               if (s.type === "BREAKDOWN" && next?.type === "BREAKDOWN") {
                 nodes.push(
                   <div className="section" key={s.id}>
