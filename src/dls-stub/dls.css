@@ -1435,6 +1435,15 @@ svg text {
   line-height: var(--lh-title);
   font-weight: 800;
 }
+/* Money penders under Collected for non-repricing metrics (FYP/FYC). */
+.gauge-value-only .gauge-penders-k {
+  margin-top: 8px;
+}
+.gauge-value-only .v2 {
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  font-weight: 700;
+}
 
 /* Comparison delta line under the current-year value (AC-P4-02-25),
    replacing the separate labelled growth row for the combined card. */
@@ -1498,6 +1507,10 @@ svg text {
     width: 1px;
     height: auto;
     align-self: stretch;
+  }
+  /* Gauge half alone (no comparison section): content-sized, not 336px. */
+  .gauge-comparison.gauge-only {
+    height: auto;
   }
 }
 

@@ -2,7 +2,7 @@
  * PRUAction — Performance (P4) View Models
  * Contract C3: Next.js BFF → UI (CDK widgets)
  *
- * @version 1.5.0  (card-level data states — see CHANGES below)
+ * @version 1.6.0  (stacked bar-comparison layout — see CHANGES below)
  * @module domains/insights/bff/performance-vm
  *
  * ─────────────────────────────────────────────────────────────────────────────
@@ -53,6 +53,17 @@
  *    for per-card data-gap messaging (e.g. a missing product feed).
  *  - No layer may substitute a zero or synthesized value for a missing one
  *    (C1 §7.12).
+ *
+ * v1.6.0 CHANGES (S-P4-02 v1.13.0, ARVIJ-159 Team Manpower — additive):
+ *  - `BarComparisonSectionVM.layout?` ('GROUPED' | 'STACKED', default
+ *    GROUPED) and `BarComparisonSectionVM.totals?` (required when STACKED).
+ *    MANPOWER now emits STACKED EXISTING_AGENTS + NEW_RECRUITS (superseding
+ *    grouped OPENING/CLOSING); the per-year total and its delta chip come
+ *    from `totals[]`, never summed client-side. NEW_RECRUIT_CONTRACTED is
+ *    unaffected (layout absent ⇒ GROUPED rules, single measure).
+ *  - Semantics only: MANPOWER `DeltaVM.display` is PCT (catalog flip from
+ *    ABS) and its `pct` follows the shared round-away-from-zero rule
+ *    (widget-contracts.md §2 `R-PCT-ROUNDUP`) — applied by the producer.
  *
  * v1.4.0 CHANGES (desktop layout, screenshot-derived — legacy-contract.md A6/A7):
  *  - `focusMetrics` becomes `{ visible, addEnabled, items }` (was a bare
@@ -138,11 +149,17 @@ export interface DeltaVM {
   sentiment: Sentiment;
   /** Which field the badge renders — from catalog `changeDisplay` (D-10). */
   display: 'PCT' | 'PP' | 'ABS';
-  /** "+27% vs LY". */
+  /** "+27% vs LY". Already rounded by the producer for metrics opted into
+   *  widget-contracts.md §2 `R-PCT-ROUNDUP` (MANPOWER, v1.6.0; ACTIVITY_RATIO,
+   *  S-P4-02 v1.14.0 — a relative % of the ratio, not a pp difference;
+   *  PRODUCTIVITY, S-P4-02 v1.15.0 — a relative % of the decimal value, not
+   *  the absolute difference; AVERAGE_CASE_SIZE, S-P4-02 v1.16.0 — a
+   *  relative % of the money amount) — render as-is, never re-round. */
   pct?: number;
   /** "+2pp". */
   pp?: number;
-  /** "+RM 20,000" / "+7" / "+0.4" — absolute delta as a scalar. */
+  /** "+7" — absolute delta as a scalar. PRODUCTIVITY's "+0.4" moved to `pct`
+   *  in S-P4-02 v1.15.0 and AVERAGE_CASE_SIZE's "+RM 20,000" in v1.16.0. */
   abs?: MetricScalar;
 }
 
@@ -242,8 +259,9 @@ export interface DashboardFiltersVM {
 /** Header persona switcher (avatar dropdown, top-right). Absent for non-leaders. */
 export interface ScopeSwitcherVM {
   current: Scope;
-  /** P2 + TEAM config capability, also supplied in SELF for staged selection.
-   * Absent means no Direct/Group selector; API authorization is unchanged. */
+  /** S-P4-01 v1.5.18: P2 + TEAM config capability, supplied even in SELF
+   * so the mobile View sheet can stage TEAM/GROUP before its single Apply.
+   * Absent means no Direct/Group selector; never grants API authorization. */
   teamViewOptions?: TeamView[];
   options: Array<{
     scope: Scope;                          // i18n: insights.scope.{SELF|TEAM}
@@ -402,7 +420,15 @@ export interface VariantValueSectionVM {
   value: MetricScalar;
 }
 
-/** Penders card for count metrics (widget `w.metric-detail.penders`). */
+/**
+ * Penders card for count metrics (widget `w.metric-detail.penders`).
+ * v1.7.0 (ARVIJ-19/157): for TPC/PTPC this section is emitted ONLY at
+ * `scope=TEAM` — `value.kind` is COUNT (sum of all agents' Penders cases in
+ * the selected teamView unit). At `scope=SELF` this section is never emitted
+ * for TPC/PTPC; Self's Penders is a MONEY amount inside the gauge legend
+ * (`GaugeSectionVM.penders`) instead. `nav`/link field intentionally absent —
+ * blocked pending the Activity Management route (OQ-30).
+ */
 export interface PendersSectionVM {
   type: 'PENDERS';
   id: string;
@@ -428,8 +454,13 @@ export interface BreakdownSectionVM {
 
 /**
  * Year-over-year bar chart (widget `w.metric-detail.bar-comparison`, v1.1.0).
- * One measure ⇒ simple bars (NEW_RECRUIT_CONTRACTED); two ⇒ grouped bars
- * (MANPOWER Opening/Closing). Delta chips render per point from `change`.
+ * One measure ⇒ simple bars (NEW_RECRUIT_CONTRACTED); two with
+ * `layout` absent/GROUPED ⇒ grouped bars; delta chips render per point
+ * from `change`.
+ * v1.6.0 (S-P4-02 v1.13.0): `layout='STACKED'` ⇒ measures stack into one
+ * bar per year (MANPOWER: EXISTING_AGENTS + NEW_RECRUITS = Total Manpower);
+ * the total label and the only delta chip come from `totals[]`, and
+ * segment points carry no `change`.
  */
 export interface BarComparisonSectionVM {
   type: 'BAR_COMPARISON';
@@ -441,6 +472,12 @@ export interface BarComparisonSectionVM {
     measureCode?: string;                  // i18n: insights.measure.{code}; absent for single-measure
     points: Array<{ year: number; value: MetricScalar; change?: DeltaVM }>;
   }>;
+  /** v1.6.0 — absent ⇒ 'GROUPED' (pre-v1.6.0 behavior). */
+  layout?: 'GROUPED' | 'STACKED';
+  /** v1.6.0 — required when `layout='STACKED'`, absent otherwise. One entry
+   *  per `years` entry, same order; `value` = sum of the measures' points
+   *  for that year (BFF/domain-computed); `change` vs previous year's total. */
+  totals?: Array<{ year: number; value: MetricScalar; change?: DeltaVM }>;
 }
 
 export type MetricDetailSectionVM =
