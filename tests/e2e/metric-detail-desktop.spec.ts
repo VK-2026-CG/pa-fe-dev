@@ -86,4 +86,26 @@ test.describe('Metric detail (S-P4-02) responsive gauge/comparison card', () => 
     expect(watch.errors, watch.errors.join('\n')).toEqual([]);
     expect(watch.warnings, watch.warnings.join('\n')).toEqual([]);
   });
+
+  test('SELF pairs With Repricing + Penders into one row at breakpoint.desktop (AC-P4-02-27/59)', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    await page.goto('/insights/metric-detail?metricCode=TPC');
+
+    const pair = page.locator('.section-pair', { has: page.locator('.penders-card') });
+    await expect(pair).toHaveCount(1);
+    const variantBox = (await pair.locator('.card:not(.penders-card)').boundingBox())!;
+    const pendersBox = (await pair.locator('.penders-card').boundingBox())!;
+    expect(variantBox.x).toBeLessThan(pendersBox.x);
+    expect(Math.abs(variantBox.y - pendersBox.y)).toBeLessThan(4);
+  });
+
+  test('SELF stacks With Repricing above Penders below breakpoint.desktop (AC-P4-02-27/59)', async ({ page }) => {
+    await page.setViewportSize({ width: 900, height: 1000 });
+    await page.goto('/insights/metric-detail?metricCode=TPC');
+
+    const pair = page.locator('.section-pair', { has: page.locator('.penders-card') });
+    const variantBox = (await pair.locator('.card:not(.penders-card)').boundingBox())!;
+    const pendersBox = (await pair.locator('.penders-card').boundingBox())!;
+    expect(pendersBox.y).toBeGreaterThan(variantBox.y + variantBox.height - 1);
+  });
 });

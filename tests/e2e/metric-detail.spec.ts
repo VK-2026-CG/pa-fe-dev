@@ -21,14 +21,44 @@ test.describe('Metric detail (S-P4-02)', () => {
     expect(watch.warnings, watch.warnings.join('\n')).toEqual([]);
   });
 
-  test('TPC SELF has no Penders card; CREDIT_POINTS renders a computed value, not a notice (AC-P4-02-31/33)', async ({ context, page }) => {
+  test('TPC SELF shows the Penders card; CREDIT_POINTS renders a computed value, not a notice (AC-P4-02-33/58)', async ({ context, page }) => {
     await setPersona(context, 'AGENT_P4');
     await page.goto('/insights/metric-detail?metricCode=TPC');
 
     await expect(page.getByRole('status')).toHaveCount(0); // v1.7.0: no more PRODUCT_DATA_MISSING banner
-    await expect(page.getByText(/^Penders$/)).toHaveCount(0);
+    // v1.20.0 (AC-P4-02-58): the Penders card now renders at SELF too; the
+    // gauge's money penders stays hidden by the value-only face (AC-P4-02-23).
+    await expect(page.getByText(/^Penders$/)).toHaveCount(1);
+    await expect(page.locator('.penders-card')).toBeVisible();
     await expect(page.getByText(/Credit Point/i).first()).toBeVisible();
   });
+
+  // v1.20.0 (AC-P4-02-58): TPC/PTPC Penders card at SELF for every persona,
+  // with the same "{count} Cases" link face as TEAM (pa-be-dev SELF stub counts).
+  for (const { persona, code, count } of [
+    { persona: 'AGENT_P4', code: 'TPC', count: '2 Cases' },
+    { persona: 'AGENT_P4', code: 'PTPC', count: '1 Cases' },
+    { persona: 'LEADER_P3', code: 'TPC', count: '2 Cases' },
+    { persona: 'LEADER_P2', code: 'PTPC', count: '1 Cases' },
+  ] as const) {
+    test(`${persona} ${code} SELF Penders value reads "{count} Cases" with an external-link icon, not a link (AC-P4-02-56/57/58)`, async ({ context, page }) => {
+      await setPersona(context, persona);
+      const watch = watchConsole(page);
+      await page.goto(`/insights/metric-detail?metricCode=${code}`);
+
+      const penders = page.locator('.penders-card');
+      await expect(penders.locator('.k')).toHaveText('Penders');
+      const value = penders.locator('.penders-link');
+      await expect(value).toHaveText(count);
+      const icon = value.locator('.icon');
+      await expect(icon).toHaveCount(1);
+      await expect(icon).toHaveAttribute('aria-hidden', 'true');
+      await expect(penders.locator('a')).toHaveCount(0); // nav omitted while OQ-30 is open
+
+      expect(watch.errors, watch.errors.join('\n')).toEqual([]);
+      expect(watch.warnings, watch.warnings.join('\n')).toEqual([]);
+    });
+  }
 
   test('TPC TEAM shows a Penders card with a case count, distinct from the money penders in the gauge (AC-P4-02-32)', async ({ context, page }) => {
     await setPersona(context, 'LEADER_P2');
