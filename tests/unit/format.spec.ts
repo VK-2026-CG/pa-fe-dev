@@ -46,6 +46,21 @@ test.describe('comparison label per metric (S-P4-02 A1)', () => {
     expect(key).toBe('insights.comparison.averageCaseSizeChange');
     expect(t(key)).toBe('Average Case Size Change');
   });
+  test('NEW_RECRUIT_CONTRACTED uses "New Recruits Contracted Change", not "% Change" (AC-P4-02-55)', () => {
+    const key = comparisonLabelKey('NEW_RECRUIT_CONTRACTED', 'ABS');
+    expect(key).toBe('insights.comparison.newRecruitsContractedChange');
+    expect(t(key)).toBe('New Recruits Contracted Change');
+  });
+  test('NEW_RECRUIT_CONTRACTED ABS delta renders an absolute count, never a % (AC-P4-02-54/55)', () => {
+    expect(formatDelta({ comparisonBasis: 'LAST_YEAR', direction: 'UP', sentiment: 'POSITIVE', display: 'ABS', abs: { kind: 'COUNT', value: 2 } })).toBe('+2');
+  });
+  test('other metrics keep their labels (no regression)', () => {
+    expect(comparisonLabelKey('TPC', 'PCT')).toBe('insights.comparison.growth');
+    expect(comparisonLabelKey('MANPOWER', 'PCT')).toBe('insights.comparison.manpowerGrowth');
+    expect(comparisonLabelKey('PRODUCTIVITY', 'PCT')).toBe('insights.comparison.productivityChange');
+    expect(comparisonLabelKey('ACTIVITY_RATIO', 'PCT')).toBe('insights.comparison.activityRatioChange');
+    expect(comparisonLabelKey('UNKNOWN_METRIC', 'ABS')).toBe('insights.comparison.pctChange');
+  });
 });
 
 test.describe('MoM header follows DeltaVM.display, not valueType (AC-P4-03-13, AC-P4-02-48)', () => {

@@ -281,6 +281,22 @@ test.describe('Metric detail (S-P4-02)', () => {
     await expect(page.locator('.bars-stacked')).toHaveCount(0);
   });
 
+  for (const [persona, query] of [['AGENT_P4', ''], ['LEADER_P2', '&scope=TEAM&teamView=DIRECT']] as const) {
+    test(`NEW_RECRUIT_CONTRACTED ${query ? 'TEAM' : 'SELF'} shows "New Recruits Contracted Change" as an absolute count, no % and no goal (AC-P4-02-54/55)`, async ({ context, page }) => {
+      await setPersona(context, persona);
+      const watch = watchConsole(page);
+      await page.goto(`/insights/metric-detail?metricCode=NEW_RECRUIT_CONTRACTED${query}`);
+
+      await expect(page.getByText('New Recruits Contracted Change')).toBeVisible();
+      await expect(page.getByText('% Change')).toHaveCount(0);
+      await expect(page.getByText(/[+-]\d+%/)).toHaveCount(0);
+      await expect(page.getByText(/goal/i)).toHaveCount(0);
+
+      expect(watch.errors, watch.errors.join('\n')).toEqual([]);
+      expect(watch.warnings, watch.warnings.join('\n')).toEqual([]);
+    });
+  }
+
   for (const [code, threshold, query] of [
     ['PERSISTENCY_CY', 90, ''], ['PERSISTENCY_Y1', 85, ''], ['PERSISTENCY_Y2', 80, ''],
     ['PERSISTENCY_CY', 90, '&scope=TEAM&teamView=GROUP'], ['PERSISTENCY_Y1', 85, '&scope=TEAM&teamView=DIRECT'], ['PERSISTENCY_Y2', 80, '&scope=TEAM'],

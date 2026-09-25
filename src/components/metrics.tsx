@@ -523,6 +523,7 @@ export function comparisonLabelKey(metricCode: string, display: 'PCT' | 'PP' | '
   // S-P4-02 v1.16.0 (AC-P4-02-52): ACS change is a %, so "Absolute Change" no longer fits.
   if (metricCode === 'AVERAGE_CASE_SIZE') return 'insights.comparison.averageCaseSizeChange';
   if (metricCode.startsWith('PERSISTENCY')) return 'insights.comparison.persistencyChange';
-  if (metricCode === 'NEW_RECRUIT_CONTRACTED') return 'insights.comparison.pctChange'; // OQ-12: design label kept
+  // S-P4-02 v1.17.0 (AC-P4-02-55): NRC change is an absolute count, so "% Change" no longer fits (closes OQ-12).
+  if (metricCode === 'NEW_RECRUIT_CONTRACTED') return 'insights.comparison.newRecruitsContractedChange';
   return display === 'PCT' ? 'insights.comparison.growth' : 'insights.comparison.pctChange';
 }
