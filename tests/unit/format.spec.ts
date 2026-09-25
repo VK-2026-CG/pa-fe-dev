@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { formatAbs, formatDelta, formatMoney, formatPercent, formatScalar, momHeaderKey } from '@/lib/format';
+import { formatAbs, formatDelta, formatDetailScalar, formatMoney, formatMoneyPlain, formatPercent, formatScalar, momHeaderKey } from '@/lib/format';
 import { t } from '@/lib/i18n';
 import { comparisonLabelKey } from '@/components/metrics';
 
@@ -69,5 +69,37 @@ test.describe('scalars', () => {
   test('PERCENT and formatAbs on PERCENT → pp', () => {
     expect(formatPercent(95)).toBe('95%');
     expect(formatAbs({ kind: 'PERCENT', value: 2 })).toBe('+2pp');
+  });
+});
+
+test.describe('Metric Detail money display (S-P4-02 v1.17.0/v1.18.0)', () => {
+  const money = (amount: string) => ({ kind: 'MONEY', amount, currency: 'MYR' }) as const;
+
+  test('compact, no currency prefix for TPC/PTPC/FYC/FYP/AVERAGE_CASE_SIZE values incl. the breakdown Total (AC-P4-02-54)', () => {
+    for (const code of ['TPC', 'PTPC', 'FYC', 'FYP', 'AVERAGE_CASE_SIZE']) {
+      expect(formatDetailScalar(money('100000.00'), code)).toBe('100K');
+    }
+    expect(formatDetailScalar(money('78740.00'), 'TPC')).toBe('78.7K');
+    expect(formatDetailScalar(money('80102.70'), 'TPC')).toBe('80.1K');
+    expect(formatDetailScalar(money('5200.00'), 'AVERAGE_CASE_SIZE')).toBe('5.2K');
+    expect(formatDetailScalar(money('1250000.00'), 'FYP')).toBe('1.3M');
+    expect(formatDetailScalar(money('980.40'), 'FYC')).toBe('980');
+  });
+
+  test('breakdown product rows show the plain value: no prefix, no K/M, formatMoney cents rule (AC-P4-02-55)', () => {
+    expect(formatMoneyPlain('24690.00')).toBe('24,690');
+    expect(formatMoneyPlain('4250.70')).toBe('4,250.70');
+    expect(formatMoneyPlain('-1234.50')).toBe('-1,234.50');
+    expect(formatDetailScalar(money('15345.00'), 'TPC', 'row')).toBe('15,345');
+    expect(formatDetailScalar(money('4250.70'), 'FYP', 'row')).toBe('4,250.70');
+  });
+
+  test('other metrics, non-MONEY scalars and a missing metric code are unchanged (AC-P4-02-54)', () => {
+    expect(formatDetailScalar(money('100000.00'), 'APE')).toBe('RM 100,000');
+    expect(formatDetailScalar(money('15345.00'), 'APE', 'row')).toBe('RM 15,345');
+    expect(formatDetailScalar(money('100000.00'), undefined)).toBe('RM 100,000');
+    expect(formatDetailScalar({ kind: 'COUNT', value: 6 }, 'TPC')).toBe('6');
+    expect(formatDetailScalar({ kind: 'COUNT', value: 1200 }, 'TPC', 'row')).toBe('1,200');
+    expect(formatDetailScalar(undefined, 'TPC')).toBe('-');
   });
 });

@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { t } from '@/lib/i18n';
 import { href } from '@/lib/nav';
-import { formatScalar, formatDelta, toneFor } from '@/lib/format';
+import { formatScalar, formatDetailScalar, formatDelta, toneFor } from '@/lib/format';
 import { Icon, ProgressBar, Tag } from '@/dls-stub';
 import { clampPct } from '@/headless';
 import type {
@@ -122,11 +122,11 @@ function GaugeCardBody({ s, metricCode, valueOnly = false, repricing = true }: {
         {repricing && <div className="title16">{heading}</div>}
         <div className="gauge-value-only">
           <span className="k muted">{t('insights.gauge.collected')}</span>
-          <span className="v">{formatScalar(s.collected)}</span>
+          <span className="v">{formatDetailScalar(s.collected, metricCode)}</span>
           {!repricing && s.penders && (
             <>
               <span className="k muted gauge-penders-k">{t('insights.gauge.penders')}</span>
-              <span className="v2">{formatScalar(s.penders)}</span>
+              <span className="v2">{formatDetailScalar(s.penders, metricCode)}</span>
             </>
           )}
         </div>
@@ -137,24 +137,24 @@ function GaugeCardBody({ s, metricCode, valueOnly = false, repricing = true }: {
     <>
       <div className="title16">{heading}</div>
       <div style={{ display: 'flex', justifyContent: 'center' }}>
-        <svg width="270" height="210" viewBox="0 0 270 210" role="img" aria-label={formatScalar(s.collected)}>
+        <svg width="270" height="210" viewBox="0 0 270 210" role="img" aria-label={formatDetailScalar(s.collected, metricCode)}>
           <g transform="rotate(135 135 108)">
             <circle cx="135" cy="108" r={R} fill="none" stroke="var(--color-chart-primary-soft)" strokeWidth="18" strokeLinecap="round" strokeDasharray={`${C * SWEEP} ${C}`} />
             <circle cx="135" cy="108" r={R} fill="none" stroke="var(--color-chart-primary)" strokeWidth="18" strokeLinecap="round" strokeDasharray={`${C * SWEEP * 0.72} ${C}`} />
           </g>
           <text x="135" y="100" textAnchor="middle" className="chart-label">{t('insights.gauge.collected')}</text>
-          <text x="135" y="124" textAnchor="middle" className="chart-value">{formatScalar(s.collected)}</text>
+          <text x="135" y="124" textAnchor="middle" className="chart-value">{formatDetailScalar(s.collected, metricCode)}</text>
         </svg>
       </div>
       <div className="gauge-legend">
         <span>
           <span className="k"><span className="dot" style={{ background: 'var(--color-chart-primary)' }} />{t('insights.gauge.collected')}</span>
-          <span className="v" style={{ display: 'block', marginLeft: 13 }}>{formatScalar(s.collected)}</span>
+          <span className="v" style={{ display: 'block', marginLeft: 13 }}>{formatDetailScalar(s.collected, metricCode)}</span>
         </span>
         {s.penders && (
           <span>
             <span className="k"><span className="dot" style={{ background: 'var(--color-chart-primary-soft)' }} />{t('insights.gauge.penders')}</span>
-            <span className="v" style={{ display: 'block', marginLeft: 13 }}>{formatScalar(s.penders)}</span>
+            <span className="v" style={{ display: 'block', marginLeft: 13 }}>{formatDetailScalar(s.penders, metricCode)}</span>
           </span>
         )}
       </div>
@@ -363,11 +363,11 @@ function ComparisonCardBody({
         </span>
         {deltaLine ? (
           <span className="yoy-value">
-            <span className="v">{formatScalar(s.current)}</span>
+            <span className="v">{formatDetailScalar(s.current, metricCode)}</span>
             <DeltaLine delta={s.change} />
           </span>
         ) : (
-          <span className="v">{formatScalar(s.current)}</span>
+          <span className="v">{formatDetailScalar(s.current, metricCode)}</span>
         )}
       </div>
       <hr className="hairline" />
@@ -376,7 +376,7 @@ function ComparisonCardBody({
           <span className="k">{yearLabel(s.priorYear)}</span>
           <span className="sub" style={{ display: 'block' }}>{t('insights.comparison.collected')}</span>
         </span>
-        <span className="v text-semibold">{formatScalar(s.prior)}</span>
+        <span className="v text-semibold">{formatDetailScalar(s.prior, metricCode)}</span>
       </div>
       {/* AC-P4-02-25 replaces this labelled row with the delta line above, but
           only for the TPC/PTPC combined card — AC-P4-02-13/-03 still require
@@ -441,7 +441,7 @@ export function GaugeComparisonCard({
 }
 
 /* ── Variant value / penders — single-row YoY cards (6588:18661) ───────── */
-export function VariantValueCard({ s }: { s: VariantValueSectionVM }) {
+export function VariantValueCard({ s, metricCode }: { s: VariantValueSectionVM; metricCode?: string }) {
   return (
     <div className="card pad">
       {/* AC-P4-02-24: variant-only heading, bare year. */}
@@ -451,29 +451,56 @@ export function VariantValueCard({ s }: { s: VariantValueSectionVM }) {
           <span className="k">{s.periodLabelYear}</span>
           <span className="sub" style={{ display: 'block' }}>{t('insights.comparison.collected')}</span>
         </span>
-        <span className="v">{formatScalar(s.value)}</span>
+        <span className="v">{formatDetailScalar(s.value, metricCode)}</span>
       </div>
     </div>
   );
 }
 /**
- * AC-P4-02-26: a single-row card — label left, value right. Non-navigable
- * until the link destination is confirmed (OQ-30); no "Cases" unit until its
- * copy key exists.
+ * AC-P4-02-26: a single-row card — label left, value right.
+ * AC-P4-02-56 (v1.19.0): with `linkFace` (TPC/PTPC) the COUNT value reads
+ * "{count} Cases" with a trailing external-link glyph in link colour; other
+ * metrics keep the bare count.
+ * AC-P4-02-57: navigable only when the BFF supplies `nav` — it omits it while
+ * the destination is open (OQ-30), so the value is then a plain span.
  */
-export function PendersCard({ s }: { s: PendersSectionVM }) {
+export function PendersCard({ s, linkFace = false }: { s: PendersSectionVM; linkFace?: boolean }) {
+  if (!linkFace || s.value.kind !== 'COUNT') {
+    return (
+      <div className="card pad penders-card">
+        <div className="yoy-row">
+          <span className="k">{t('insights.detail.penders')}</span>
+          <span className="v">{formatScalar(s.value)}</span>
+        </div>
+      </div>
+    );
+  }
+  const face = (
+    <>
+      {t('insights.detail.pendersCases', { count: formatScalar(s.value) })}
+      <Icon token="external-link-line" size={16} tone="currentColor" />
+    </>
+  );
   return (
     <div className="card pad penders-card">
       <div className="yoy-row">
         <span className="k">{t('insights.detail.penders')}</span>
-        <span className="v">{formatScalar(s.value)}</span>
+        {s.nav ? (
+          <Link to={href(s.nav)} className="penders-link">{face}</Link>
+        ) : (
+          <span className="penders-link">{face}</span>
+        )}
       </div>
     </div>
   );
 }
 
 /* ── w.metric-detail.breakdown-table — header 40h / rows 48h / 177+116 ─── */
-export function BreakdownTable({ s }: { s: BreakdownSectionVM }) {
+/**
+ * S-P4-02 v1.18.0: for the compact-money metrics, product rows show the plain
+ * value (AC-P4-02-55) and only the Total is compact (AC-P4-02-54).
+ */
+export function BreakdownTable({ s, metricCode }: { s: BreakdownSectionVM; metricCode?: string }) {
   return (
     <div className="card pad">
       {/* AC-P4-02-30: card heading is the variant alone, matching the
@@ -497,7 +524,7 @@ export function BreakdownTable({ s }: { s: BreakdownSectionVM }) {
                 <td className="colfirst">{t(`insights.product.${r.productCode}`)}{r.weightPct !== undefined ? ` (${r.weightPct}%)` : ''}</td>
                 {s.columns.map((c) => {
                   const cell = r.cells.find((x) => x.businessLine === c);
-                  return <td key={c} className="num colval">{cell ? formatScalar(cell.value) : '-'}</td>;
+                  return <td key={c} className="num colval">{cell ? formatDetailScalar(cell.value, metricCode, 'row') : '-'}</td>;
                 })}
               </tr>
             ))}
@@ -505,7 +532,7 @@ export function BreakdownTable({ s }: { s: BreakdownSectionVM }) {
               <td className="colfirst total">{t('insights.detail.total')}</td>
               {s.columns.map((c) => {
                 const tot = s.totals.find((x) => x.businessLine === c);
-                return <td key={c} className="num colval total">{tot ? formatScalar(tot.value) : '-'}</td>;
+                return <td key={c} className="num colval total">{tot ? formatDetailScalar(tot.value, metricCode) : '-'}</td>;
               })}
             </tr>
           </tbody>

@@ -1,0 +1,93 @@
+{
+  "schemaVersion": "1.0",
+  "receiptId": "frontend-insights-my-metric-detail-penders-link-v1-19-0",
+  "handoffId": "insights-my-metric-detail-penders-link-v1-19-0",
+  "consumer": "frontend",
+  "status": "IN_PROGRESS",
+  "specCommit": "296d9cb3cd3b2d27c53ec5a62c8747103b7757c0",
+  "implementation": {
+    "repository": "PruactionWeb",
+    "commit": "0d82cac56cdf2126e33f71e76ae368bec2afa90e",
+    "dirty": true
+  },
+  "validation": [
+    {
+      "command": "SPEC_DIR=../pa-spec-dev SPEC_REF=296d9cb HANDOFF_REF=7180f40 npm run sync:specs",
+      "status": "FAIL",
+      "summary": "Single-file contracts (performance-vm.ts C3 1.7.0, en.json with insights.detail.pendersCases, configs, SPEC_COMMIT/HANDOFF_COMMIT) synced. The package-folder swap failed twice with \"Permission denied\" moving vendor/spec/common under OneDrive and rolled back, the same failure recorded in the v1.15.0 receipt. The inbound handoff was copied verbatim from spec commit 7180f40 with git show."
+    },
+    {
+      "command": "npm run typecheck",
+      "status": "PASS",
+      "summary": "tsc --noEmit clean (uncommitted working tree)."
+    },
+    {
+      "command": "npm run test:unit",
+      "status": "PASS",
+      "summary": "40 passed, including the i18n key scan (insights.detail.pendersCases resolves from vendor/spec/en.json)."
+    },
+    {
+      "command": "APP_PORT=3610 SVC_PORT=4610 npx playwright test tests/e2e/metric-detail.spec.ts --project=e2e",
+      "status": "FAIL",
+      "summary": "36 passed / 4 failed. All 6 AC-P4-02-54/56/57 Penders tests pass. The 4 failures (EMPTY/PROCESSING state, TPC combined card, notice dismiss) fail identically with every working-tree change stashed at 0d82cac, so they are pre-existing."
+    },
+    {
+      "command": "APP_PORT=3610 SVC_PORT=4610 npx playwright test --project=e2e --project=desktop",
+      "status": "FAIL",
+      "summary": "100 passed / 13 failed. All 13 also fail with every working-tree change stashed at 0d82cac (personas/entitlements, dashboard milestones and customize sheet, view sheet, roadmap, contest-admin nav, metric-detail states/notice/combined card and desktop reflow). None touch the Penders card. Alternate ports were used because processes that could not be stopped (access denied) hold 3600/4600."
+    },
+    {
+      "command": "npm run build",
+      "status": "PASS",
+      "summary": "vite build succeeds."
+    },
+    {
+      "command": "npm run assets:validate",
+      "status": "FAIL",
+      "summary": "\"Spec assets not vendored\": public/spec-assets never populated because the sync package swap fails under OneDrive. public/icons/external-link-line.svg (via scripts/copy-icons.mjs) has SHA-256 b1fc63ac9ade56c6ecdbad85d712e39cdf1957be1a097a15471ab8dc319e0d63, identical to the spec manifest's icon.external-link-line."
+    },
+    {
+      "command": "npm run handoff:validate",
+      "status": "FAIL",
+      "summary": "Only failures: older inbound handoffs (v1.12.0-v1.15.0) pinned to spec 03bf2e6 do not match vendor SPEC_COMMIT 296d9cb. That mismatch existed against the previous 8757c16 pin too. Nothing is reported for this handoff."
+    }
+  ],
+  "operationCoverage": [
+    {
+      "operationId": "GET /api/bff/v1/performance/metrics/:metricCode",
+      "status": "IMPLEMENTED",
+      "evidence": "PendersCard (src/components/metrics.tsx) renders the PENDERS section's optional nav via href() when present. The backend emits no nav (required: false; OQ-30), which the AC-P4-02-57 e2e confirms against the live pa-be-dev response."
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-P4-02-26",
+      "status": "PASS",
+      "evidence": "Single-row card retained: e2e metric-detail.spec.ts 'TPC TEAM shows a Penders card with a case count ... (AC-P4-02-32)' (one .yoy-row, no year row) still passes; the amended unit/link face is covered by AC-P4-02-56/57."
+    },
+    {
+      "id": "AC-P4-02-56",
+      "status": "PASS",
+      "evidence": "e2e metric-detail.spec.ts: 'TPC TEAM Penders value reads \"{count} Cases\" with an external-link icon' ('6 Cases', aria-hidden icon masked with external-link-line.svg, zero console errors/warnings); the same for PTPC; 'CASE_COUNT TEAM Penders card keeps the bare count, no Cases unit or link face'; 'TPC TEAM Penders card keeps its COUNT format ... (AC-P4-02-54)' updated to the '{count} Cases' face. Colour --color-link #1d4ed8 in src/dls-stub/dls.css only."
+    },
+    {
+      "id": "AC-P4-02-57",
+      "status": "PASS",
+      "evidence": "e2e metric-detail.spec.ts: 'TPC TEAM Penders value is not a link while the BFF omits nav' (no <a>, no link role, no href, no tabindex); 'TPC TEAM Penders value links to href(nav) when the VM supplies nav' (nav injected into the real BFF response via page.route; link named '6 Cases', href /insights/history?metricCode=TPC, click navigates)."
+    }
+  ],
+  "migrations": [
+    {
+      "name": "None",
+      "status": "NOT_REQUIRED",
+      "evidence": "UI-only change; C3 field is optional and absent from BFF output."
+    }
+  ],
+  "gaps": [
+    "Implementation is uncommitted and shares the working tree with uncommitted v1.18.0 work (format.ts, metrics.tsx, tests); COMPLETE needs a committed, clean tree.",
+    "Full e2e/desktop suite has 13 pre-existing failures outside this handoff; COMPLETE needs a green suite.",
+    "sync:specs package-folder swap fails under OneDrive (vendor/spec/common Permission denied), so public/spec-assets is absent and assets:validate cannot run; re-run outside OneDrive.",
+    "OQ-30 open: no real nav destination; OQ-75 color.link and OQ-76 icon size/Figma node are unapproved, so no pixel-perfect claim."
+  ],
+  "updatedAt": "2026-09-25T00:00:00.000Z"
+}

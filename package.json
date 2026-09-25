@@ -5,6 +5,7 @@
   "description": "PRUAction Performance module — Vite + React Router SPA (spec repo: pruaction-spec). BFF composition now lives in pa-be-dev.",
   "scripts": {
     "dev": "vite --port 3600",
+    "dev:mock": "vite --port 3600 --mode mock",
     "build": "vite build",
     "start": "vite preview --port 3600",
     "test": "playwright test",

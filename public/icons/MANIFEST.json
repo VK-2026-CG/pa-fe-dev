@@ -7,6 +7,7 @@
   "quick.TEAM_DRILLDOWN":        { "figmaNodeId": null,          "source": "remixicon team-line" },
   "quick.VIEW_MOC":              { "figmaNodeId": null,          "source": "remixicon trophy-line" },
   "arrow-right-up-line":         { "figmaNodeId": "6588:17652", "source": "remixicon arrow-right-up-line (layer name verbatim)" },
+  "external-link-line":          { "figmaNodeId": null,          "source": "remixicon external-link-line; spec icon.external-link-line SUBSTITUTE_PENDING_UX_APPROVAL (S-P4-02 v1.19.0, OQ-76)" },
   "arrow-up-s":                  { "figmaNodeId": "6588:16586", "source": "remixicon arrow-up-s-line ('Arrow Up')" },
   "arrow-down-s":                { "figmaNodeId": "6588:16648", "source": "remixicon arrow-down-s-line ('Arrow Down')" },
   "arrow-left-s":                { "figmaNodeId": "6588:17280", "source": "remixicon arrow-left-s-line ('Arrow Left')" },

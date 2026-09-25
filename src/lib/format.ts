@@ -41,6 +41,31 @@ function formatCompactNumber(value: number): string {
 export function formatMoneyCompact(amount: string): string {
   return formatCompactNumber(Number(amount));
 }
+/** "24690.00" → "24,690" · "4250.70" → "4,250.70": `formatMoney` without the currency prefix. */
+export function formatMoneyPlain(amount: string): string {
+  const neg = amount.startsWith('-');
+  const [i = '0', f = ''] = (neg ? amount.slice(1) : amount).split('.');
+  const cents = (f + '00').slice(0, 2);
+  return `${neg ? '-' : ''}${group(i)}${cents === '00' ? '' : `.${cents}`}`;
+}
+
+/**
+ * Metric Detail money display (S-P4-02 v1.17.0/v1.18.0, widget-contracts §2
+ * `R-MONEY-COMPACT`). For these metrics only, every MONEY value renders
+ * compact with no currency prefix (AC-P4-02-54), except breakdown product
+ * rows, which render the plain value (AC-P4-02-55). No VM field carries this
+ * choice, so it is keyed on `context.metricCode`.
+ */
+const COMPACT_MONEY_DETAIL_METRICS: ReadonlySet<string> = new Set(['TPC', 'PTPC', 'FYC', 'FYP', 'AVERAGE_CASE_SIZE']);
+
+/** `role: 'row'` = a breakdown product row; `'value'` = every other detail value, incl. the breakdown Total. */
+export function formatDetailScalar(
+  v: MetricScalar | null | undefined, metricCode: string | undefined, role: 'value' | 'row' = 'value',
+): string {
+  if (!v || v.kind !== 'MONEY' || !metricCode || !COMPACT_MONEY_DETAIL_METRICS.has(metricCode)) return formatScalar(v);
+  return role === 'row' ? formatMoneyPlain(v.amount) : formatMoneyCompact(v.amount);
+}
+
 export function formatPercent(value: number): string {
   return `${Number.isInteger(value) ? value : value.toFixed(2).replace(/0+$/, '').replace(/\.$/, '')}%`;
 }

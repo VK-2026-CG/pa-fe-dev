@@ -2,6 +2,11 @@ import { expect, test } from '@playwright/test';
 import { setPersona } from '../support/personas';
 import { watchConsole } from '../support/console';
 
+/** R-MONEY-COMPACT output: "960K", "78.7K", "1.3M" or a plain integer below 1,000. No currency prefix. */
+const COMPACT = /^\d+(\.\d)?[KM]$|^\d{1,3}$/;
+/** AC-P4-02-55 product-row output: "24,690" / "4,250.70" — grouped digits, no prefix, no K/M. */
+const PLAIN = /^-?\d{1,3}(,\d{3})*(\.\d{2})?$/;
+
 test.describe('Metric detail (S-P4-02)', () => {
   test('TPC renders sections in BFF order (AC-P4-02-01/03)', async ({ context, page }) => {
     await setPersona(context, 'AGENT_P4');
@@ -212,8 +217,10 @@ test.describe('Metric detail (S-P4-02)', () => {
     await expect(delta).toBeVisible();
     await expect(delta).toContainText(/[+-]?\d+%/);
     await expect(delta).not.toContainText('RM');
-    // Values stay money; the retired "Absolute Change" label never renders.
-    await expect(combined).toContainText('RM');
+    // Values stay money, now compact with no currency prefix (AC-P4-02-54);
+    // the retired "Absolute Change" label never renders.
+    await expect(combined).not.toContainText('RM');
+    await expect(combined.locator('.yoy-value .v')).toHaveText(COMPACT);
     await expect(page.getByText('Absolute Change')).toHaveCount(0);
   });
 
@@ -328,5 +335,126 @@ test.describe('Metric detail (S-P4-02)', () => {
     await expect(notice).toBeVisible();
     await notice.getByRole('button', { name: 'Dismiss' }).click();
     await expect(notice).toHaveCount(0);
+  });
+
+  test('TPC money values are compact with no currency prefix; delta unchanged (AC-P4-02-54)', async ({ context, page }) => {
+    await setPersona(context, 'AGENT_P4');
+    const watch = watchConsole(page);
+    await page.goto('/insights/metric-detail?metricCode=TPC');
+
+    const combined = page.locator('.gauge-comparison');
+    await expect(combined.locator('.gauge-value-only .v')).toHaveText(COMPACT);
+    await expect(combined.locator('.yoy-value .v')).toHaveText(COMPACT);
+    await expect(combined.locator('.gc-comparison .yoy-row .v.text-semibold')).toHaveText(COMPACT);
+    await expect(combined).not.toContainText('RM');
+    await expect(combined.locator('.yoy-value .delta-line')).toContainText(/[+-]?\d+(\.\d+)?%/);
+
+    const repricing = page.locator('.card').filter({ hasText: 'With Repricing' }).filter({ hasNot: page.locator('table') });
+    await expect(repricing.locator('.v')).toHaveText(COMPACT);
+
+    expect(watch.errors, watch.errors.join('\n')).toEqual([]);
+    expect(watch.warnings, watch.warnings.join('\n')).toEqual([]);
+  });
+
+  test('breakdown product rows show plain values and only the Total is compact, in both tables (AC-P4-02-54/55)', async ({ context, page }) => {
+    await setPersona(context, 'AGENT_P4');
+    await page.goto('/insights/metric-detail?metricCode=TPC');
+
+    const tables = page.locator('table.table');
+    await expect(tables).toHaveCount(2); // Without + With Repricing
+    for (const table of await tables.all()) {
+      const rows = table.locator('tbody tr');
+      const n = await rows.count();
+      for (let i = 0; i < n - 1; i++) await expect(rows.nth(i).locator('td.colval')).toHaveText(PLAIN);
+      await expect(rows.nth(n - 1).locator('td.colval.total')).toHaveText(COMPACT);
+      await expect(table).not.toContainText('RM');
+    }
+    // The weightPct suffix is untouched (AC-P4-02-06; OQ-72 still open).
+    await expect(page.getByText('Credit Points (10%)').first()).toBeVisible();
+  });
+
+  test('FYP: gauge collected and penders are compact; its 7 breakdown rows are plain (AC-P4-02-54/55)', async ({ context, page }) => {
+    await setPersona(context, 'AGENT_P4');
+    await page.goto('/insights/metric-detail?metricCode=FYP');
+
+    const gauge = page.locator('.gauge-comparison .gauge-value-only');
+    await expect(gauge.locator('.v')).toHaveText(COMPACT);
+    await expect(gauge.locator('.v2')).toHaveText(COMPACT);
+    const rows = page.locator('table.table tbody tr');
+    await expect(rows).toHaveCount(8);
+    for (let i = 0; i < 7; i++) await expect(rows.nth(i).locator('td.colval')).toHaveText(PLAIN);
+    await expect(rows.nth(7).locator('td.colval.total')).toHaveText(COMPACT);
+  });
+
+  test('TPC TEAM Penders card keeps its COUNT format, untouched by money compaction (AC-P4-02-54)', async ({ context, page }) => {
+    await setPersona(context, 'LEADER_P2');
+    await page.goto('/insights/metric-detail?metricCode=TPC&scope=TEAM');
+    // v1.19.0 (AC-P4-02-56) wraps the count in "{count} Cases"; the count itself stays formatCount.
+    await expect(page.locator('.penders-card .penders-link')).toHaveText(/^\d{1,3}(,\d{3})* Cases$/);
+  });
+
+  for (const code of ['TPC', 'PTPC']) {
+    test(`${code} TEAM Penders value reads "{count} Cases" with an external-link icon (AC-P4-02-56)`, async ({ context, page }) => {
+      await setPersona(context, 'LEADER_P2');
+      const watch = watchConsole(page);
+      await page.goto(`/insights/metric-detail?metricCode=${code}&scope=TEAM`);
+
+      const penders = page.locator('.penders-card');
+      await expect(penders.locator('.k')).toHaveText('Penders');
+      const value = penders.locator('.penders-link');
+      await expect(value).toHaveText(/^\d{1,3}(,\d{3})* Cases$/);
+      if (code === 'TPC') await expect(value).toHaveText('6 Cases'); // pa-be-dev TEAM stub count
+      const icon = value.locator('.icon');
+      await expect(icon).toHaveCount(1);
+      await expect(icon).toHaveAttribute('aria-hidden', 'true');
+      await expect(icon).toHaveCSS('mask-image', /external-link-line\.svg/);
+
+      expect(watch.errors, watch.errors.join('\n')).toEqual([]);
+      expect(watch.warnings, watch.warnings.join('\n')).toEqual([]);
+    });
+  }
+
+  test('CASE_COUNT TEAM Penders card keeps the bare count, no Cases unit or link face (AC-P4-02-56)', async ({ context, page }) => {
+    await setPersona(context, 'LEADER_P2');
+    await page.goto('/insights/metric-detail?metricCode=CASE_COUNT&scope=TEAM');
+
+    const penders = page.locator('.penders-card');
+    await expect(penders).toBeVisible();
+    await expect(penders.locator('.penders-link')).toHaveCount(0);
+    await expect(penders).not.toContainText('Cases');
+    await expect(penders.locator('.v')).toHaveText(/^\d{1,3}(,\d{3})*$/);
+  });
+
+  test('TPC TEAM Penders value is not a link while the BFF omits nav (AC-P4-02-57)', async ({ context, page }) => {
+    await setPersona(context, 'LEADER_P2');
+    await page.goto('/insights/metric-detail?metricCode=TPC&scope=TEAM');
+
+    const value = page.locator('.penders-card .penders-link');
+    await expect(value).toHaveText('6 Cases');
+    await expect(page.locator('.penders-card a')).toHaveCount(0);
+    await expect(page.getByRole('link', { name: /Cases/ })).toHaveCount(0);
+    await expect(value).not.toHaveAttribute('href', /.*/);
+    await expect(value).not.toHaveAttribute('tabindex', /.*/);
+  });
+
+  test('TPC TEAM Penders value links to href(nav) when the VM supplies nav (AC-P4-02-57)', async ({ context, page }) => {
+    await setPersona(context, 'LEADER_P2');
+    // Test-only nav: OQ-30 keeps the real destination unconfirmed, so the BFF
+    // never sends one. Inject it into the real BFF response.
+    const nav = { route: 'insights/history', params: { metricCode: 'TPC' } };
+    await page.route('**/api/bff/v1/performance/metrics/TPC?*', async (route) => {
+      const response = await route.fetch();
+      const vm = await response.json();
+      for (const s of vm.sections) if (s.type === 'PENDERS') s.nav = nav;
+      await route.fulfill({ response, json: vm });
+    });
+    await page.goto('/insights/metric-detail?metricCode=TPC&scope=TEAM');
+
+    const link = page.getByRole('link', { name: '6 Cases' });
+    await expect(link).toBeVisible();
+    await expect(link).toHaveAttribute('href', '/insights/history?metricCode=TPC');
+    await expect(link.locator('.icon')).toHaveCount(1);
+    await link.click();
+    await expect(page).toHaveURL(/\/insights\/history\?metricCode=TPC/);
   });
 });

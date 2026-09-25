@@ -168,8 +168,8 @@ export default function MetricDetailMY({
               if (s.type === "VARIANT_VALUE" && next?.type === "PENDERS") {
                 nodes.push(
                   <div className="section section-pair" key={s.id}>
-                    <VariantValueCard s={s} />
-                    <PendersCard s={next} />
+                    <VariantValueCard s={s} metricCode={metricCode} />
+                    <PendersCard s={next} linkFace={REPRICING_METRICS.has(metricCode)} />
                   </div>,
                 );
                 i += 1; // consumed the paired penders section too
@@ -187,8 +187,8 @@ export default function MetricDetailMY({
                       {t("insights.detail.breakdownByProduct")}
                     </div>
                     <div className="section-pair">
-                      <BreakdownTable s={s} />
-                      <BreakdownTable s={next} />
+                      <BreakdownTable s={s} metricCode={metricCode} />
+                      <BreakdownTable s={next} metricCode={metricCode} />
                     </div>
                   </div>,
                 );
@@ -234,14 +234,14 @@ export default function MetricDetailMY({
                 case "VARIANT_VALUE":
                   nodes.push(
                     <div className="section" key={s.id}>
-                      <VariantValueCard s={s} />
+                      <VariantValueCard s={s} metricCode={metricCode} />
                     </div>,
                   );
                   break;
                 case "PENDERS":
                   nodes.push(
                     <div className="section" key={s.id}>
-                      <PendersCard s={s} />
+                      <PendersCard s={s} linkFace={REPRICING_METRICS.has(metricCode)} />
                     </div>,
                   );
                   break;
@@ -251,7 +251,7 @@ export default function MetricDetailMY({
                       <div className="title14" style={{ marginBottom: 8 }}>
                         {t("insights.detail.breakdownByProduct")}
                       </div>
-                      <BreakdownTable s={s} />
+                      <BreakdownTable s={s} metricCode={metricCode} />
                     </div>,
                   );
                   break;
