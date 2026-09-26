@@ -743,3 +743,135 @@ export function ScopePill({
     </span>
   );
 }
+
+/* ── Avatar (S-P4-07 0.2.0): photo when supplied, else initials ─────────── */
+export function Avatar({ name, src, className }: { name: string; src?: string; className?: string }) {
+  const initials = name.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join("");
+  return (
+    <span className={`avatar ${className ?? ""}`.trim()} aria-hidden>
+      {src ? <img src={src} alt="" /> : initials}
+    </span>
+  );
+}
+
+/* ── SearchField: leading glyph + borderless input in a bordered box ───── */
+export function SearchField({
+  value,
+  onChange,
+  placeholder,
+  className,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder: string;
+  className?: string;
+}) {
+  return (
+    <label className={`search-field ${className ?? ""}`.trim()}>
+      <span className="search-field-glyph" aria-hidden />
+      <input
+        type="search"
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        placeholder={placeholder}
+        aria-label={placeholder}
+      />
+    </label>
+  );
+}
+
+/**
+ * Drawer: bottom sheet below `breakpoint.tablet`, full-height right side
+ * drawer at `breakpoint.tablet` and above (geometry in `dls.css`, same
+ * `align="none"` split as the Filter/Customize sheets). Header with title +
+ * close, independently scrolling body, optional fixed footer.
+ */
+export function Drawer({
+  title,
+  closeLabel,
+  onClose,
+  footer,
+  children,
+  className,
+}: {
+  title: ReactNode;
+  closeLabel: string;
+  onClose: () => void;
+  footer?: ReactNode;
+  children: ReactNode;
+  className?: string;
+}) {
+  const titleId = useId();
+  return (
+    <Layer onClose={onClose} backdropClassName="drawer-backdrop" align="none">
+      <div
+        className={`drawer ${className ?? ""}`.trim()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+      >
+        <div className="drawer-head">
+          <h2 id={titleId}>{title}</h2>
+          <button type="button" className="drawer-close" aria-label={closeLabel} onClick={onClose}>
+            <Icon token="close" size={24} tone="var(--drawer-ink)" />
+          </button>
+        </div>
+        <div className="drawer-body">{children}</div>
+        {footer && <div className="drawer-foot">{footer}</div>}
+      </div>
+    </Layer>
+  );
+}
+
+/* ── CheckRow: brand checkbox + label; the whole row is the control ────── */
+export function CheckRow({
+  checked,
+  label,
+  onChange,
+  strong,
+}: {
+  checked: boolean;
+  label: string;
+  onChange: () => void;
+  /** Group/master rows render their label bold. */
+  strong?: boolean;
+}) {
+  return (
+    <HCheckbox checked={checked} label={label} onChange={onChange} className={`check-row ${strong ? "strong" : ""}`}>
+      <span className={`check-box ${checked ? "on" : ""}`} aria-hidden>
+        {checked && <Icon token="check" size={14} tone="var(--color-surface)" />}
+      </span>
+      <span className="check-label">{label}</span>
+    </HCheckbox>
+  );
+}
+
+/* ── RadioRow group: brand radio + label per option ────────────────────── */
+export function RadioRows<T extends string>({
+  value,
+  options,
+  onChange,
+  label,
+  className,
+}: {
+  value: T;
+  options: T[];
+  onChange: (value: T) => void;
+  label: (option: T) => string;
+  className?: string;
+}) {
+  return (
+    <RadioGroup
+      value={value}
+      options={options}
+      onChange={onChange}
+      className={className}
+      renderOption={(option, selected) => (
+        <span className="radio-row">
+          <span className={`radio-dot ${selected ? "on" : ""}`} aria-hidden />
+          <span>{label(option)}</span>
+        </span>
+      )}
+    />
+  );
+}

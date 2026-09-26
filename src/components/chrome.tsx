@@ -39,21 +39,46 @@ import type {
  * out of PerformanceMY when the second consumer appeared. Static label, not
  * a control.
  */
-export function ContextPill({ labelKey, value }: { labelKey: string; value: string }) {
-  return (
-    <span className="filter-pill" aria-label={`${t(labelKey)}: ${value}`}>
+export function ContextPill({
+  labelKey,
+  value,
+  onClick,
+  className,
+}: {
+  labelKey: string;
+  value: string;
+  /** S-P4-07 0.2.0: the My Team filter/sort chips open the Filters sheet. Absent ⇒ static label. */
+  onClick?: () => void;
+  className?: string;
+}) {
+  const content = (
+    <>
       <span className="muted" style={{ marginRight: 4 }}>
         {t(labelKey)}
       </span>
       {value}
+    </>
+  );
+  const cls = `filter-pill ${className ?? ""}`.trim();
+  return onClick ? (
+    <button type="button" className={cls} aria-label={`${t(labelKey)}: ${value}`} onClick={onClick}>
+      {content}
+    </button>
+  ) : (
+    <span className={cls} aria-label={`${t(labelKey)}: ${value}`}>
+      {content}
     </span>
   );
 }
 
 /* ── w.quick-links (tiles 80×122, icon 62, per Figma 6588:16556) ───────── */
-export function QuickLinkRail({ links }: { links: QuickLinkVM[] }) {
+export function QuickLinkRail({ links, wide }: {
+  links: QuickLinkVM[];
+  /** S-P4-01 2.1.0 viewing mode: wide tiles, icon + label inline (AC-P4-01-85). */
+  wide?: boolean;
+}) {
   return (
-    <nav className="quick" aria-label="Quick links">
+    <nav className={`quick ${wide ? "quick-wide" : ""}`.trim()} aria-label="Quick links">
       {links.map((l) => (
         <Link key={l.id} to={href(l.nav)}>
           <span className="ic">

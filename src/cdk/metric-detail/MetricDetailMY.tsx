@@ -16,7 +16,6 @@ import {
 } from "@/components/metrics";
 import { ContextPill } from "@/components/chrome";
 import { NoticeBanner, StateEmpty, StateProcessing } from "@/components/ui";
-import { Tag } from "@/dls-stub";
 import type { MetricDetailVM } from "@spec/performance-vm";
 
 /** Metrics whose gauge + comparison render as the combined value-only card (AC-P4-02-21/23). */
@@ -83,18 +82,14 @@ export default function MetricDetailMY({
       <div className="section">
         <h1 className="page-title">{t(`insights.metric.${metricCode}.title`)}</h1>
       </div>
-      {/* Context strip — teamView chip first (AC-P4-02-10), then the labelled
-          Product/Time pills shared with S-P4-01 (AC-P4-02-22). */}
+      {/* Context strip — the labelled Product/Time pills shared with S-P4-01
+          (AC-P4-02-22). No teamView chip at any scope (AC-P4-02-60); ALL
+          reads "Both" (AC-P4-02-61). */}
       <div className="section">
         <div className="filter-row">
-          {c.teamView && <Tag>{t(`insights.teamView.${c.teamView}`)}</Tag>}
           <ContextPill
             labelKey="insights.dashboard.filter.product"
-            value={
-              c.businessLine === "ALL"
-                ? t("insights.businessLine.ALL.chip")
-                : t(`insights.businessLine.${c.businessLine}`)
-            }
+            value={t(`insights.businessLine.${c.businessLine}`)}
           />
           <ContextPill
             labelKey="insights.dashboard.filter.time"

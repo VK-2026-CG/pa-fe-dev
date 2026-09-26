@@ -103,3 +103,16 @@ test.describe('Metric Detail money display (S-P4-02 v1.17.0/v1.18.0)', () => {
     expect(formatDetailScalar(undefined, 'TPC')).toBe('-');
   });
 });
+
+test.describe('S-P4-07 compact formatting (D-P4-07-05)', () => {
+  test('member TPC/PTPC compact without currency; KPI money keeps prefix', async () => {
+    const { formatScalarCompact, formatDateAsOfNumeric } = await import('@/lib/format');
+    expect(formatScalarCompact({ kind: 'MONEY', amount: '172000.00', currency: 'MYR' }, false)).toBe('172K');
+    expect(formatScalarCompact({ kind: 'MONEY', amount: '560000.00', currency: 'MYR' }, true)).toBe('RM 560K');
+    expect(formatScalarCompact({ kind: 'COUNT', value: 100 }, true)).toBe('100');
+    expect(formatScalarCompact({ kind: 'PERCENT', value: 98 }, true)).toBe('98%');
+    expect(formatScalarCompact({ kind: 'DECIMAL', value: 8.9, precision: 1 }, true)).toBe('8.9');
+    expect(formatScalarCompact(undefined, true)).toBe('-');
+    expect(formatDateAsOfNumeric('2026-09-03')).toBe('As of 03/09/2026');
+  });
+});

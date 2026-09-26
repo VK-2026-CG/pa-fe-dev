@@ -130,12 +130,69 @@ test.describe('Metric detail (S-P4-02)', () => {
 
     // TPC emits both breakdown.without-repricing and breakdown.with-repricing
     // (AC-P4-02-29) — each table independently has exactly one value column.
+    // The header is screen-reader only since v1.21.0 (AC-P4-02-62), so its
+    // text is read from the column header's accessible name, not asserted visible.
     const firstTable = page.locator('table.table').first();
     await expect(firstTable.locator('thead th.colval')).toHaveCount(1);
-    await expect(firstTable.locator('thead th.colval')).toHaveText('Both');
+    await expect(firstTable.getByRole('columnheader', { name: 'Both' })).toHaveCount(1);
+    for (const row of await firstTable.locator('tbody tr').all()) {
+      await expect(row.locator('td.colval')).toHaveCount(1);
+    }
 
     await page.goto('/insights/metric-detail?metricCode=TPC&businessLine=INSURANCE');
-    await expect(page.locator('table.table').first().locator('thead th.colval')).toHaveText('Insurance');
+    await expect(
+      page.locator('table.table').first().getByRole('columnheader', { name: 'Insurance' }),
+    ).toHaveCount(1);
+  });
+
+  for (const code of ['TPC', 'FYP'] as const) {
+    test(`${code} breakdown header row is screen-reader only; product rows start under the variant heading (AC-P4-02-62)`, async ({ context, page }) => {
+      await setPersona(context, 'AGENT_P4');
+      const watch = watchConsole(page);
+      await page.goto(`/insights/metric-detail?metricCode=${code}`);
+
+      const table = page.locator('table.table').first();
+      // Real column headers stay in the accessibility tree…
+      await expect(table.getByRole('columnheader', { name: 'Product' })).toHaveCount(1);
+      await expect(table.getByRole('columnheader', { name: 'Both' })).toHaveCount(1);
+      // …but the header row takes no visible space.
+      await expect(table.locator('thead')).toBeHidden();
+      await expect(table.locator('thead th').first()).toBeHidden();
+      // First visible row is a product row, not a header.
+      await expect(table.locator('tbody tr').first()).toContainText('Linked Premium');
+
+      expect(watch.errors, watch.errors.join('\n')).toEqual([]);
+      expect(watch.warnings, watch.warnings.join('\n')).toEqual([]);
+    });
+  }
+
+  test('TEAM drilldown renders no Direct/Group chip; the strip is exactly Product then Time (AC-P4-02-60)', async ({ context, page }) => {
+    await setPersona(context, 'LEADER_P2');
+    const watch = watchConsole(page);
+    for (const teamView of ['DIRECT', 'GROUP'] as const) {
+      await page.goto(`/insights/metric-detail?metricCode=TPC&scope=TEAM&teamView=${teamView}`);
+      await expect(page.locator('h1.page-title')).toHaveText('TPC');
+
+      const strip = page.locator('.filter-row');
+      await expect(strip.locator('> *')).toHaveCount(2);
+      await expect(strip.locator('.filter-pill').first()).toContainText('Product');
+      await expect(strip.locator('.filter-pill').last()).toContainText('Time');
+      await expect(strip.getByText(/^(Direct|Group)$/)).toHaveCount(0);
+    }
+
+    expect(watch.errors, watch.errors.join('\n')).toEqual([]);
+    expect(watch.warnings, watch.warnings.join('\n')).toEqual([]);
+  });
+
+  test('Product pill reads "Both" for ALL and the line name otherwise (AC-P4-02-61)', async ({ context, page }) => {
+    await setPersona(context, 'AGENT_P4');
+    await page.goto('/insights/metric-detail?metricCode=TPC'); // default businessLine=ALL
+    const product = page.locator('.filter-pill').first();
+    await expect(product).toContainText('Both');
+    await expect(product).not.toContainText('Insurance + Takaful');
+
+    await page.goto('/insights/metric-detail?metricCode=TPC&businessLine=TAKAFUL');
+    await expect(page.locator('.filter-pill').first()).toContainText('Takaful');
   });
 
   test('EMPTY persona shows the designed empty state (AC-P4-02-18)', async ({ context, page }) => {
@@ -183,6 +240,7 @@ test.describe('Metric detail (S-P4-02)', () => {
     const pills = page.locator('.filter-pill');
     await expect(pills).toHaveCount(2);
     await expect(pills.first()).toContainText('Product');
+    await expect(pills.first()).toContainText('Both'); // AC-P4-02-61 (v1.21.0)
     await expect(pills.last()).toContainText('Time');
     await expect(pills.last()).toContainText('YTD');
   });

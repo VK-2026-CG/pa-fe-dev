@@ -16,6 +16,7 @@ import {
 } from "@/lib/performanceMock";
 import type { PersonaId } from "@/lib/persona";
 import { PerformanceSamplePicker } from "./parts/PerformanceSamplePicker";
+import { ViewingBanner } from "./parts/ViewingBanner";
 import { MetricCard, MilestoneCard } from "@/components/metrics";
 import {
   ContextPill,
@@ -81,6 +82,8 @@ export default function PerformanceMY({
   persona,
 }: CdkPageProps["performance"]) {
   const initialToast = query.toast;
+  /** S-P4-01 2.1.0 viewing mode: a leader viewing a downline member (AC-P4-01-82..83). */
+  const subjectAgentId = query.subjectAgentId?.trim() || undefined;
   const [, setSearchParams] = useSearchParams();
   const [lens, setLens] = useState<LensState>(
     () => readStoredLens(persona) ?? initialPerformanceLens(),
@@ -114,11 +117,13 @@ export default function PerformanceMY({
     });
     if (l.period) params.set("period", l.period);
     if (l.scope === "TEAM" && l.teamView) params.set("teamView", l.teamView);
+    if (subjectAgentId) params.set("subjectAgentId", subjectAgentId);
     const res = await apiFetch(`/api/bff/v1/performance/dashboard?${params}`);
     if (seq !== loadSeq.current) return;
     if (!res.ok) {
-      // Drop a lens the BFF rejects so the next visit starts from defaults.
-      writeStoredLens(persona, null);
+      // Drop a lens the BFF rejects so the next visit starts from defaults
+      // (not in viewing mode: a rejected subject, e.g. 403, says nothing about the leader's own lens).
+      if (!subjectAgentId) writeStoredLens(persona, null);
       setError(`${res.status}`);
       return;
     }
@@ -133,12 +138,14 @@ export default function PerformanceMY({
     setError(null);
     setVm(data);
     setLens(applied);
-    writeStoredLens(persona, applied);
-  }, [persona]);
+    // Viewing mode shows a member's lens (scope follows their role); never persist it as the leader's own.
+    if (!subjectAgentId) writeStoredLens(persona, applied);
+  }, [persona, subjectAgentId]);
 
   useEffect(() => {
-    void load(lens); /* initial */
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    setVm(null);
+    void load(lens); /* initial, and again when entering/leaving viewing mode */
+  }, [subjectAgentId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const refetch = (patch: Partial<LensState>) => {
     const next = { ...lens, ...patch };
@@ -191,39 +198,43 @@ export default function PerformanceMY({
         <div className="section muted">{t("insights.dev.sample.notice")}</div>
       )} */}
 
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-        className="section"
-      >
-        <h1>
-          Performance{" "}
-          {f.scope === "TEAM" && f.teamView && (
-            <span
-              className="caption muted"
-              style={{ fontWeight: 400, marginLeft: 6 }}
-            >
-              {t("insights.dashboard.teamViewSuffix", {
-                view: t(`insights.teamView.${f.teamView}`),
-              })}
-            </span>
+      {vm.viewing ? (
+        <ViewingBanner viewing={vm.viewing} />
+      ) : (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+          className="section"
+        >
+          <h1>
+            {t("insights.dashboard.title")}{" "}
+            {f.scope === "TEAM" && f.teamView && (
+              <span
+                className="caption muted"
+                style={{ fontWeight: 400, marginLeft: 6 }}
+              >
+                {t("insights.dashboard.teamViewSuffix", {
+                  view: t(`insights.teamView.${f.teamView}`),
+                })}
+              </span>
+            )}
+          </h1>
+          {vm.scopeSwitcher && (
+            <ScopeSwitcher
+              vm={vm.scopeSwitcher}
+              teamView={f.teamView}
+              onSelect={(scope, teamView) => refetch({ scope, ...(teamView ? { teamView } : {}) })}
+            />
           )}
-        </h1>
-        {vm.scopeSwitcher && (
-          <ScopeSwitcher
-            vm={vm.scopeSwitcher}
-            teamView={f.teamView}
-            onSelect={(scope, teamView) => refetch({ scope, ...(teamView ? { teamView } : {}) })}
-          />
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Quick-link rail — 80×122 tiles (Figma 6588:16556) */}
       <div className="section">
-        <QuickLinkRail links={vm.quickLinks} />
+        <QuickLinkRail links={vm.quickLinks} wide={Boolean(vm.viewing)} />
       </div>
 
       {/* Header: title + unified Filter + more-actions, plus read-only summary
@@ -281,7 +292,7 @@ export default function PerformanceMY({
             showDots={false}
           >
             {vm.priorityMetrics.map((c) => (
-              <MetricCard key={c.metricCode} vm={c} variant="priority" />
+              <MetricCard key={c.metricCode} vm={c} variant="priority" navigable={!vm.viewing} />
             ))}
           </CarouselRow>
         </MetricPanel>
@@ -322,7 +333,7 @@ export default function PerformanceMY({
                   style={{ marginTop: 8 }}
                 >
                   {vm.focusMetrics.items.map((c) => (
-                    <MetricCard key={c.metricCode} vm={c} variant="simple" />
+                    <MetricCard key={c.metricCode} vm={c} variant="simple" navigable={!vm.viewing} />
                   ))}
                 </CarouselRow>
               )}

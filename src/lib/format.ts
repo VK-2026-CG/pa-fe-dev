@@ -66,6 +66,10 @@ export function formatDetailScalar(
   return role === 'row' ? formatMoneyPlain(v.amount) : formatMoneyCompact(v.amount);
 }
 
+/** "560000.00" MYR → "RM 560K" — compact value keeping the currency prefix (S-P4-07 KPI tiles, D-P4-07-05). */
+export function formatMoneyCompactCurrency(amount: string, currency: string): string {
+  return `${CURRENCY_PREFIX[currency] ?? currency} ${formatMoneyCompact(amount)}`;
+}
 export function formatPercent(value: number): string {
   return `${Number.isInteger(value) ? value : value.toFixed(2).replace(/0+$/, '').replace(/\.$/, '')}%`;
 }
@@ -134,4 +138,21 @@ export function formatShortDate(iso: string): string {
   const [y = '', m = '', d = ''] = iso.split('-');
   const months = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   return `${Number(d)} ${months[Number(m)] ?? m} ${y}`;
+}
+
+/**
+ * Compact scalar for S-P4-07 (D-P4-07-05 answers OQ-25 for that screen only):
+ * MONEY/COUNT abbreviate (K/M); MONEY keeps its currency prefix only when
+ * `withCurrency` — member TPC/PTPC render "172K", KPI tiles "RM 560K".
+ */
+export function formatScalarCompact(v: MetricScalar | null | undefined, withCurrency: boolean): string {
+  if (!v) return NO_VALUE;
+  if (v.kind === 'MONEY') return withCurrency ? formatMoneyCompactCurrency(v.amount, v.currency) : formatMoneyCompact(v.amount);
+  return formatScalar(v, true);
+}
+
+/** "2026-09-03" → "As of 03/09/2026" (S-P4-07 header, dd/mm/yyyy per the MY frames). */
+export function formatDateAsOfNumeric(iso: string): string {
+  const [y = '', m = '', d = ''] = iso.slice(0, 10).split('-');
+  return t('insights.detail.asOf', { date: `${d}/${m}/${y}` });
 }
