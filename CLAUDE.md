@@ -28,6 +28,7 @@ pa-be-dev now).
 | Task | Command |
 |---|---|
 | Dev server (:3600, needs pa-be-dev running) | `npm run dev` |
+| Dev server on stub data (pa-be-dev `npm run dev:mock` first) | `npm run dev:mock` |
 | All tests | `npm test` |
 | Pure module tests (no servers) | `npm run test:unit` |
 | Browser journeys (mobile + desktop) | `npm run test:e2e` |
@@ -64,6 +65,11 @@ only), AGENT_P4, plus AGENT_EMPTY / AGENT_PROCESSING which force the designed
 metric-detail states. It travels to pa-be-dev as an `x-persona` header on
 every BFF call. This is **not** real authentication; see
 `docs/security/README.md`.
+
+To see mock data for every persona / scope / period with no Mongo or local
+`.env`, run `npm run dev:mock` in pa-be-dev, then `npm run dev:mock` here
+(`.env.mock` blanks `VITE_PERSONA`/`VITE_PERFORMANCE_AGENT_ID` so the dropdown
+drives persona).
 
 ## Spec handoff workflow
 

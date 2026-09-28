@@ -21,6 +21,7 @@ const MAP = {
   'quick.VIEW_MOC': RX('Finance/trophy-line.svg'),
   // card + chrome
   'arrow-right-up-line': RX('Arrows/arrow-right-up-line.svg'), // card corner (6588:17652)
+  'external-link-line': RX('System/external-link-line.svg'),   // Penders link glyph (S-P4-02 v1.19.0; Figma node pending, OQ-76)
   'arrow-up-s': RX('Arrows/arrow-up-s-line.svg'),              // "Arrow Up" 6588:16586
   'arrow-down-s': RX('Arrows/arrow-down-s-line.svg'),
   'arrow-left-s': RX('Arrows/arrow-left-s-line.svg'),

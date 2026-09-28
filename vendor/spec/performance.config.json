@@ -1,6 +1,6 @@
 {
   "$schema": "../../screen-config.schema.json",
-  "configVersion": "2.2.0",
+  "configVersion": "3.0.0",
   "country": "MY",
   "module": "performance",
   "screens": {

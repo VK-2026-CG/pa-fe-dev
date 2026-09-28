@@ -27,6 +27,8 @@
   --tone-info-bg: #e8f0fb;
   --tone-muted: #6b7480;
   --tone-muted-bg: #eef0f3;
+  /* spec color.link — screenshot-sampled, REVIEW_REQUIRED (S-P4-02 v1.19.0, OQ-75) */
+  --color-link: #1d4ed8;
   --color-chart-primary: #2f6bff;
   --color-chart-primary-soft: #d7e3ff;
   --color-chart-prior: #8a919c;
@@ -1238,7 +1240,9 @@ svg text {
   padding: 8px 0;
   border-radius: 16px;
   background: var(--color-surface);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.12);
+  box-shadow:
+    0 6px 12px rgba(0, 0, 0, 0.15),
+    0 1px 2px rgba(0, 0, 0, 0.12);
 }
 .radio-dropdown-option {
   position: relative;
@@ -1403,6 +1407,28 @@ svg text {
   font-size: var(--fs-body);
   line-height: var(--lh-body);
   font-weight: 600;
+}
+
+/* Penders card: its single row sits vertically centred when the card is
+   stretched to match its paired With-repricing card (AC-P4-02-27). */
+.penders-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* AC-P4-02-56: Penders "{count} Cases" + external-link glyph, link colour.
+   Icon ≈16px / gap ≈4px are requester estimates (OQ-76). */
+.penders-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--color-link);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
 }
 
 /* AC-P4-02-27: variant.with-repricing + penders.primary share a row at
@@ -5046,4 +5072,3 @@ svg text {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
-

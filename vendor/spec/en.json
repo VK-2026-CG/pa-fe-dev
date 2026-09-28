@@ -124,6 +124,7 @@
   "insights.detail.breakdownByProduct": "Breakdown by Product",
   "insights.detail.comparisonTitle": "{period} Comparison",
   "insights.detail.penders": "Penders",
+  "insights.detail.pendersCases": "{count} Cases",
   "insights.gaugeLegend.currentValue": "Current Value",
   "insights.gaugeLegend.threshold": "Threshold",
   "insights.state.processing.title": "Data Temporarily Unavailable",
