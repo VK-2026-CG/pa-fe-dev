@@ -2,7 +2,7 @@
  * PRUAction — Performance (P4) View Models
  * Contract C3: Next.js BFF → UI (CDK widgets)
  *
- * @version 1.7.0  (optional Penders link — see CHANGES below)
+ * @version 1.8.0  (S-P4-07 "My Team" + dashboard viewing mode — see CHANGES below)
  * @module domains/insights/bff/performance-vm
  *
  * ─────────────────────────────────────────────────────────────────────────────
@@ -19,6 +19,27 @@
  * | GET  /api/bff/v1/performance/customize?scope        | CustomizeMetricsVM     | listMetricDefinitions + getMetricPreferences            |
  * | PUT  /api/bff/v1/performance/customize?scope        | CustomizeMetricsVM     | putMetricPreferences                                    |
  * | POST /api/bff/v1/performance/recommendations/:id/feedback | 204            | submitRecommendationFeedback                            |
+ * | GET  /api/bff/v1/performance/team-drilldown         | TeamDrilldownVM        | listTeamMembers (+ getTeamMemberDashboard when           |
+ * |        ?teamView&basis&query&sortBy&badges          |                        |   selectedAgentId) + team-drilldown config (C4)          |
+ * |        &parentAgentId&period&businessLine           |                        |                                                         |
+ * |        &performanceBasis&selectedAgentId            |                        |                                                         |
+ * | GET  /api/bff/v1/performance/dashboard              | PerformanceDashboardVM | as above, for `subjectAgentId` after proving it is in   |
+ * |        …&subjectAgentId (v1.8.0 viewing mode)       |   + `viewing`          |   the caller's downline (else 403 BFF-4033)             |
+ *
+ * v1.8.0 CHANGES (SPEC-2026-004 · S-P4-07 0.2.0 + S-P4-01 2.1.0):
+ *  - BREAKING (DRAFT S-P4-07 surface only): `TeamDrilldownFiltersVM.basis`
+ *    becomes optional — absent means all hierarchy levels. Everything else
+ *    below is additive.
+ *  - Team Drilldown "My Team" card data: optional `TeamMemberVM.badges`,
+ *    `goalStatus`, `tpc`, `ptpc`, `directReportCount`, `photoUrl`, `nav`.
+ *  - `TeamDrilldownVM.summary` (KPI tiles over the FILTERED set, D-P4-07-02),
+ *    `parent` (subteam drawer header) and `filterOptions` (Sort By + badge
+ *    groups from C4). Filters gain `sortBy`, `badges`, `parentAgentId`.
+ *  - `PerformanceDashboardVM.viewing` — a leader viewing a downline member's
+ *    dashboard ("Viewing {name}" banner + Exit View). Scope follows the
+ *    member's role (D-P4-07-03); read-only.
+ *  - Member card fields have no approved upstream source (OQ-79): the BFF
+ *    omits them in source mode and never synthesizes them.
  *
  * v1.5.1 CHANGES (closes README `OQ-25` — SPEC-2026-003, no shape change):
  *  - `MetricCardVM.valueDisplay` was recorded in v1.5.1 documenting a field
@@ -354,9 +375,27 @@ export interface MoreActionVM {
   order: number;
 }
 
+/**
+ * v1.8.0 (S-P4-01 viewing mode, D-P4-07-03). Present only when the leader
+ * requested `subjectAgentId`: the payload is the MEMBER's dashboard, composed
+ * in `scope` (SELF for an agent, TEAM/DIRECT for a member who leads a team).
+ * Read-only: the BFF omits `scopeSwitcher`, restricts `quickLinks` to config
+ * `viewing.quickLinks`, `moreActions` to non-mutating actions and sets
+ * `focusMetrics.addEnabled=false` / `milestones.addEnabled=false`.
+ */
+export interface DashboardViewingVM {
+  member: TeamMemberVM;
+  scope: Scope;
+  readOnly: true;
+  /** "Exit View" / close → back to S-P4-07. */
+  exitNav: RouteRef;
+}
+
 export interface PerformanceDashboardVM {
   meta: VMeta;
   filters: DashboardFiltersVM;
+  /** v1.8.0 — present only in viewing mode. */
+  viewing?: DashboardViewingVM;
   /** Present only for Agent Leaders (persona switcher in the header). */
   scopeSwitcher?: ScopeSwitcherVM;
   quickLinks: QuickLinkVM[];
@@ -631,18 +670,71 @@ export interface SaveCustomizeRequest {
 /** Hierarchy basis for S-P4-07 member listing; distinct from Performance `Basis`. */
 export type DrilldownBasis = "AGENT" | "AM" | "UM";
 
+/**
+ * v1.8.0 member qualification badge (i18n: insights.teamDrilldown.badge.{code}).
+ * Extensible — render unknown codes with the neutral badge tone. VIOLET is
+ * display-only (D-P4-07-01, OQ-80) and never appears in `filterOptions`.
+ */
+export type MemberBadgeCode =
+  | 'MDRT' | 'COT' | 'TOT'
+  | 'WP' | 'EWP' | 'SWP' | 'PWP' | 'MWP'
+  | 'PV' | 'ROOKIE' | 'VIOLET'
+  | (string & {});
+/** Filter group (i18n: insights.teamDrilldown.badgeGroup.{code}). */
+export type MemberBadgeGroupCode = 'MDRT' | 'PRUWEALTH_PLANNER' | 'PV' | 'ROOKIE' | (string & {});
+export type TeamMemberGoalStatus = 'SET' | 'NOT_SET';
+export type TeamDrilldownSortBy = 'TPC' | 'PTPC';
+
 export interface TeamMemberVM {
   agentId: string;
   displayName: string;
   hierarchyBasis: DrilldownBasis;
   roleCode: string;
+  /** v1.8.0 — display order; absent ⇒ no badge row (never synthesized, OQ-79). */
+  badges?: MemberBadgeCode[];
+  /** v1.8.0 — "Goal set" / "Goal not set"; absent ⇒ no goal indicator. */
+  goalStatus?: TeamMemberGoalStatus;
+  /** v1.8.0 — card values; widget renders compact without currency (D-P4-07-05). */
+  tpc?: MetricScalar;
+  ptpc?: MetricScalar;
+  /** v1.8.0 — > 0 only for members who lead a team; drives the subteam button. */
+  directReportCount?: number;
+  /** v1.8.0 — absent ⇒ initials avatar. */
+  photoUrl?: string;
+  /** v1.8.0 — card tap → S-P4-01 viewing mode for this member. */
+  nav?: RouteRef;
 }
 
 export interface TeamDrilldownFiltersVM {
   scope: Scope;
   teamView: TeamView;
-  basis: DrilldownBasis;
+  /**
+   * v1.8.0: OPTIONAL — absent when the request omitted `basis` (all levels,
+   * the S-P4-07 0.2.0 "My Team" list). BREAKING for readers of this field;
+   * the only reader is the S-P4-07 UI, updated in lockstep (SPEC-2026-004).
+   */
+  basis?: DrilldownBasis;
   search?: string;
+  /** v1.8.0 — defaults to C4 `memberList.defaultSortBy` (TPC). */
+  sortBy?: TeamDrilldownSortBy;
+  /** v1.8.0 — selected badge filter; absent/empty = "All Agent". */
+  badges?: MemberBadgeCode[];
+  /** v1.8.0 — set when the list is a member's subteam (drawer). */
+  parentAgentId?: string;
+}
+
+/** v1.8.0 KPI tile (widget `w.team-drilldown.summary-tile`). */
+export interface TeamDrilldownSummaryTileVM {
+  metricCode: string;                      // i18n: insights.metric.{code}.title
+  valueType: MetricScalar['kind'];
+  /** Absent ⇒ tile renders the no-value placeholder; never zero-filled. */
+  value?: MetricScalar;
+}
+
+/** v1.8.0 Filters sheet options, from C4 `team-drilldown.config.json`. */
+export interface TeamDrilldownFilterOptionsVM {
+  sortBy: TeamDrilldownSortBy[];
+  badgeGroups: Array<{ groupCode: MemberBadgeGroupCode; badges: MemberBadgeCode[] }>;
 }
 
 export interface TeamDrilldownSelectedMemberDashboardVM {
@@ -663,7 +755,14 @@ export interface TeamDrilldownVM {
   meta: VMeta;
   filters: TeamDrilldownFiltersVM;
   members: TeamMemberVM[];
+  /** Superseded for UI by S-P4-01 viewing mode (AC-P4-07-04 → AC-P4-07-14); kept for compatibility. */
   selectedMember?: TeamDrilldownSelectedMemberDashboardVM;
+  /** v1.8.0 — KPI tiles over the filtered set, C4 order. Absent in the subteam drawer. */
+  summary?: TeamDrilldownSummaryTileVM[];
+  /** v1.8.0 — the member whose team is listed (subteam drawer title). */
+  parent?: TeamMemberVM;
+  /** v1.8.0 — Filters sheet options. */
+  filterOptions?: TeamDrilldownFilterOptionsVM;
 }
 
 /* ───────────────────────────── Error envelope ───────────────────────────── */

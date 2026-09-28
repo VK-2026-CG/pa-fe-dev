@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { t } from '@/lib/i18n';
 import { href } from '@/lib/nav';
@@ -32,7 +33,11 @@ function DeltaLine({ delta, full }: { delta: DeltaVM; full?: boolean }) {
  * differs between the two. Goal target/progress remain valid VM fields,
  * still rendered on the Metric Detail (S-P4-02) screen.
  */
-export function MetricCard({ vm, variant = 'priority' }: { vm: MetricCardVM; variant?: 'priority' | 'simple' }) {
+export function MetricCard({ vm, variant = 'priority', navigable = true }: {
+  vm: MetricCardVM; variant?: 'priority' | 'simple';
+  /** S-P4-01 2.1.0 viewing mode: cards render without navigation (OQ-84). */
+  navigable?: boolean;
+}) {
   // A metric with no approved upstream source keeps its title and nav, but has
   // no value to show — never substitute a zero (VM 1.5.0 / C1 §7.13).
   const dataState = vm.dataState ?? 'OK';
@@ -43,7 +48,7 @@ export function MetricCard({ vm, variant = 'priority' }: { vm: MetricCardVM; var
   // ("11.9K"), at both SELF and TEAM scope; other kinds still follow `valueDisplay`.
   const compact = vm.valueDisplay === 'COMPACT' || vm.value?.kind === 'MONEY';
   return (
-    <Link to={href(vm.nav)} className={`mcard ${variant === 'simple' ? 'simple' : ''}`}>
+    <CardShell navigable={navigable} to={href(vm.nav)} className={`mcard ${variant === 'simple' ? 'simple' : ''} ${navigable ? '' : 'static'}`}>
       <div className="head">
         <span>
           <span className="name">{t(`insights.metric.${vm.metricCode}.title`)}</span>
@@ -62,8 +67,12 @@ export function MetricCard({ vm, variant = 'priority' }: { vm: MetricCardVM; var
           {vm.delta && <DeltaLine delta={vm.delta} full />}
         </div>
       )}
-    </Link>
+    </CardShell>
   );
+}
+
+function CardShell({ navigable, to, className, children }: { navigable: boolean; to: string; className: string; children: ReactNode }) {
+  return navigable ? <Link to={to} className={className}>{children}</Link> : <div className={className}>{children}</div>;
 }
 
 /* ── w.milestone.card — 308×238 (Figma 6588:16772) ─────────────────────── */
@@ -512,10 +521,16 @@ export function BreakdownTable({ s, metricCode }: { s: BreakdownSectionVM; metri
       </div>
       <div className="scroll-x">
         <table className="table">
-          <thead>
+          {/* AC-P4-02-62 (v1.21.0): header row is screen-reader only — the
+              business line is shown visually by the Product context pill. */}
+          <thead className="table-head-sr">
             <tr>
-              <th className="colfirst">{t('insights.detail.product')}</th>
-              {s.columns.map((c) => <th key={c} className="num colval">{t(`insights.businessLine.${c}`)}</th>)}
+              <th className="colfirst"><span className="sr-only">{t('insights.detail.product')}</span></th>
+              {s.columns.map((c) => (
+                <th key={c} className="num colval">
+                  <span className="sr-only">{t(`insights.businessLine.${c}`)}</span>
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody>

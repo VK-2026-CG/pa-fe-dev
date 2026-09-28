@@ -43,7 +43,7 @@ test.describe("Performance dashboard (S-P4-01) on the 375 mobile shell", () => {
     await page.getByLabel("Scope switcher").click();
     await page.locator(".sheet").getByRole("radio", { name: "Team" }).click();
     await page.locator(".sheet").getByRole("button", { name: "Apply" }).click();
-    await expect(page.getByRole("link", { name: "Team Drilldown" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "My Team" })).toBeVisible();
     await expect(
       page.getByRole("link", { name: "Introducer Drilldown" }),
     ).toHaveCount(0);
