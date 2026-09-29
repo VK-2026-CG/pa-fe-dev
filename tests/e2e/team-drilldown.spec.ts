@@ -108,6 +108,18 @@ test.describe('My Team (S-P4-07) — mobile', () => {
     await expect(page.locator('.td-card')).toHaveCount(0);
   });
 
+  test('Back exits directly to the performance landing page after drilldown search and subteam state', async ({ page }) => {
+    await page.goto('/insights/performance');
+    await page.goto('/insights/team-drilldown');
+    await page.getByPlaceholder('Search by Name/ID').fill('mar');
+    await page.getByRole('button', { name: "View Marcus Lee's team (24)" }).click();
+    await expect(page.getByRole('dialog', { name: "Marcus Lee's Team (24)" })).toBeVisible();
+    await page.getByRole('button', { name: 'Close' }).click();
+    await expect(page.locator('.td-card', { hasText: 'Marcus Lee' })).toBeVisible();
+    await page.getByRole('button', { name: 'Back' }).click();
+    await expect(page).toHaveURL(/\/insights\/performance(?:\?|$)/);
+  });
+  
   test('P3 leader sees only its direct agents (no subteam buttons)', async ({ context, page }) => {
     await setPersona(context, 'LEADER_P3');
     await page.goto('/insights/team-drilldown');

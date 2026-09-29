@@ -55,7 +55,7 @@ export default function TeamDrilldownMY() {
   const loadSeq = useRef(0);
 
   const update = useCallback(
-    (patch: Partial<ListState>, replace = false) => setSearchParams(toParams({ ...state, ...patch }), { replace }),
+    (patch: Partial<ListState>, replace = true) => setSearchParams(toParams({ ...state, ...patch }), { replace }),
     [state, setSearchParams],
   );
 
@@ -104,7 +104,7 @@ export default function TeamDrilldownMY() {
   return (
     <div className="td-page">
       <div className="td-header">
-        <button type="button" className="td-back" onClick={() => navigate(-1)}>
+        <button type="button" className="td-back" onClick={() => navigate('/insights/performance', { replace: true })}>
           <Icon token="arrow-upward" size={24} tone="var(--td-ink-soft)" style={{ transform: "rotate(-90deg)" }} />
           <span>{t("insights.common.back")}</span>
         </button>
