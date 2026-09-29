@@ -234,7 +234,19 @@ export default function PerformanceMY({
 
       {/* Quick-link rail — 80×122 tiles (Figma 6588:16556) */}
       <div className="section">
-        <QuickLinkRail links={vm.quickLinks} wide={Boolean(vm.viewing)} />
+        <QuickLinkRail
+          links={vm.quickLinks}
+          wide={Boolean(vm.viewing)}
+          /* Temporary WIP gating, not a spec rule (S-P4-01 has no per-link
+             disabled/clickable concept): their destination screens aren't
+             built yet, so everything but TEAM_DRILLDOWN is disabled for now.
+             Remove once those screens ship. */
+          disabledIds={
+            f.scope === "SELF"
+              ? vm.quickLinks.map((link) => link.id)
+              : vm.quickLinks.filter((link) => link.id !== "TEAM_DRILLDOWN").map((link) => link.id)
+          }
+        />
       </div>
 
       {/* Header: title + unified Filter + more-actions, plus read-only summary
@@ -382,11 +394,11 @@ export default function PerformanceMY({
       {/* AI recommendations — sticky overlay pinned to the bottom of the
           screen (v1.5.5, was inline below the header); collapsed 44h bar
           by default (6588:16581) */}
-      {vm.recommendations.visible && vm.recommendations.panel && (
+      {/* {vm.recommendations.visible && vm.recommendations.panel && (
         <div className="reco-overlay">
           <RecoPanel vm={vm.recommendations.panel} />
         </div>
-      )}
+      )} */}
 
       {filterOpen && (
         <FilterSheet

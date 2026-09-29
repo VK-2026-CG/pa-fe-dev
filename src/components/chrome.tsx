@@ -72,21 +72,53 @@ export function ContextPill({
 }
 
 /* ── w.quick-links (tiles 80×122, icon 62, per Figma 6588:16556) ───────── */
-export function QuickLinkRail({ links, wide }: {
+export function QuickLinkRail({
+  links,
+  wide,
+  disabledIds = [],
+}: {
   links: QuickLinkVM[];
   /** S-P4-01 2.1.0 viewing mode: wide tiles, icon + label inline (AC-P4-01-85). */
   wide?: boolean;
+  disabledIds?: string[];
 }) {
   return (
     <nav className={`quick ${wide ? "quick-wide" : ""}`.trim()} aria-label="Quick links">
-      {links.map((l) => (
-        <Link key={l.id} to={href(l.nav)}>
-          <span className="ic">
-            <Icon token={`quick.${l.id}`} size={26} tone="var(--color-brand)" />
-          </span>
-          <span className="lbl">{t(`insights.quicklink.${l.id}`)}</span>
-        </Link>
-      ))}
+      {links.map((l) => {
+        const disabled = disabledIds.includes(l.id);
+        const content = (
+          <>
+            <span className="ic">
+              <Icon
+                token={`quick.${l.id}`}
+                size={26}
+                tone={disabled ? "var(--color-brand)" : "var(--color-brand)"}
+              />
+            </span>
+            <span className="lbl">{t(`insights.quicklink.${l.id}`)}</span>
+          </>
+        );
+
+        return (
+          <Link
+            key={l.id}
+            to={disabled ? "#" : href(l.nav)}
+            aria-disabled={disabled}
+            style={{
+              cursor: disabled ? "no-drop" : undefined,
+              opacity: disabled ? 0.7 : 1,
+            }}
+            onClick={(event) => {
+              if (disabled) {
+                event.preventDefault();
+                event.stopPropagation();
+              }
+            }}
+          >
+            {content}
+          </Link>
+        );
+      })}
     </nav>
   );
 }

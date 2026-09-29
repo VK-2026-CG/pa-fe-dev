@@ -135,8 +135,7 @@ export default function CustomizeMetricsMY({
       <CustomizeScrollArea>
         <CustomizeSection
           title={t('insights.customize.priorityHeading')}
-          description={t('insights.customize.priorityDescription')}
-          shaded
+          description=""
         >
           {priority.map((item, i) => (
             <CustomizeMetricRow
@@ -162,7 +161,7 @@ export default function CustomizeMetricsMY({
 
         <CustomizeSection
           title={t('insights.customize.focusHeading')}
-          description={t('insights.customize.focusDescription')}
+          description=""
         >
           {focus.map((item, i) => (
             <CustomizeMetricRow key={item.metricCode} selected={item.selected}>
