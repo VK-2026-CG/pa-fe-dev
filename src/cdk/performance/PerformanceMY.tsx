@@ -207,7 +207,7 @@ export default function PerformanceMY({
             alignItems: "center",
             justifyContent: "space-between",
           }}
-          className="section"
+          className="section perf-head"
         >
           <h1>
             {t("insights.dashboard.title")}{" "}
@@ -232,8 +232,8 @@ export default function PerformanceMY({
         </div>
       )}
 
-      {/* Quick-link rail — 80×122 tiles (Figma 6588:16556) */}
-      <div className="section">
+      {/* Quick-link rail — 80×122 tiles (Figma 6588:16556); 76×100 on mobile */}
+      <div className="section perf-quick">
         <QuickLinkRail
           links={vm.quickLinks}
           wide={Boolean(vm.viewing)}
@@ -253,7 +253,7 @@ export default function PerformanceMY({
           pills (A7/v1.5.6 — unified across every breakpoint; this used to be
           desktop-only, with mobile showing a separate title+link row plus a
           period button/business-line tabs/toggle rows further down). */}
-      <div className="section spread">
+      <div className="section spread perf-tracking">
         <span className="title16">
           {t("insights.dashboard.metricTracking")}
         </span>

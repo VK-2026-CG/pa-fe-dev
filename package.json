@@ -22,6 +22,7 @@
     "assets:validate": "node scripts/validate-spec-assets.mjs"
   },
   "dependencies": {
+    "@fontsource-variable/open-sans": "^5.3.0",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "react-router-dom": "^6.28.1"
