@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "1.0",
+  "screenId": "CA-01",
+  "decisions": [
+    {
+      "requirementId": "UX-CA-01-HEADER",
+      "decision": "EXTEND_COMMON",
+      "reuseId": "component.global.page-header",
+      "justification": "Current helper exists but requires comparison with other page headers and a stable common contract"
+    },
+    {
+      "requirementId": "UX-CA-01-ROW",
+      "decision": "CREATE_SCREEN_LOCAL",
+      "reuseId": null,
+      "justification": "No approved common semantic table/mobile card adapter is registered; promotion candidate after a second consumer"
+    }
+  ]
+}

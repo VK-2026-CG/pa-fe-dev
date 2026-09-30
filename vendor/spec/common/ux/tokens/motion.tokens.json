@@ -1,0 +1,32 @@
+{
+  "schemaVersion": "1.0",
+  "tokens": [
+    {
+      "token": "motion.dialog.enter",
+      "type": "MOTION",
+      "value": {
+        "duration": "180ms",
+        "delay": "0ms",
+        "easing": "cubic-bezier(0, 0, 0.2, 1)",
+        "properties": {
+          "opacity": {
+            "from": 0,
+            "to": 1
+          },
+          "transform": {
+            "from": "translateY(8px)",
+            "to": "translateY(0)"
+          }
+        },
+        "reducedMotion": {
+          "duration": "0ms",
+          "transform": "none"
+        }
+      },
+      "sourceStatus": "BLOCKED",
+      "source": {
+        "reason": "UX motion ruling pending"
+      }
+    }
+  ]
+}

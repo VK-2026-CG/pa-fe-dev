@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "1.0",
+  "mappings": [
+    {
+      "target": "ContestPortfolioVM.contests",
+      "source": "listContests + getContest detail",
+      "function": "summary"
+    },
+    {
+      "target": "ContestPortfolioVM.metrics",
+      "source": "getContestOverview.metrics",
+      "rule": "TOTAL maps to TOTAL_CONTESTS"
+    },
+    {
+      "target": "ContestPortfolioVM.meta",
+      "source": "shared Contest BFF metadata pattern"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "1.0",
+  "rows": [
+    {
+      "uxElement": "portfolio.metrics",
+      "vm": "ContestPortfolioVM.metrics",
+      "operationId": "getContestOverview",
+      "apiField": "ContestOverview.metrics",
+      "mongo": "aggregated contests/approvals/runs"
+    },
+    {
+      "uxElement": "portfolio.results",
+      "vm": "ContestPortfolioVM.contests",
+      "operationId": "listContests",
+      "apiField": "ContestPage.items",
+      "mongo": "contests"
+    }
+  ]
+}

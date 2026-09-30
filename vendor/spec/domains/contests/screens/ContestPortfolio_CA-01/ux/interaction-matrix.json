@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "1.0",
+  "screenId": "CA-01",
+  "interactions": [
+    {
+      "element": "create-contest",
+      "inputs": [
+        "click",
+        "Enter",
+        "Space"
+      ],
+      "result": "Open creation-origin dialog",
+      "focusAfter": "dialog heading"
+    },
+    {
+      "element": "search",
+      "inputs": [
+        "type"
+      ],
+      "result": "Debounced URL and list update",
+      "focusAfter": "search remains focused"
+    },
+    {
+      "element": "contest-row",
+      "inputs": [
+        "click",
+        "Enter"
+      ],
+      "result": "Navigate using row-owned contest/version IDs",
+      "focusAfter": "destination page heading"
+    }
+  ]
+}

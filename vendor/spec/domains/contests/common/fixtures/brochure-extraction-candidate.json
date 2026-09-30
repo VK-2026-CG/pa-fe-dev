@@ -1,0 +1,31 @@
+{
+  "schemaVersion":"1.0",
+  "document":{"title":"Malaysia Growth Challenge 2027","contestCodeCandidate":"MGC2027","effectiveDate":"2027-01-01"},
+  "basics":{"name":"Malaysia Growth Challenge 2027","campaignStart":"2027-01-01","campaignEnd":"2027-12-31","sourceCitationIds":["citation_campaign"]},
+  "periods":[{"periodKey":"full_campaign","name":"Full campaign","from":"2027-01-01","to":"2027-12-31","sourceCitationIds":["citation_campaign"]}],
+  "audiences":[{"audienceCode":"PERSONAL","rankCodes":["AGENT"],"include":true,"sourceCitationIds":["citation_audience"]}],
+  "qualificationRoutes":[{
+    "routeKey":"personal_production","name":"Personal production","audienceCode":"PERSONAL","tierKeys":["silver"],
+    "expression":{"nodeKey":"personal_root","type":"ALL","children":[
+      {"nodeKey":"personal_fyp","type":"PREDICATE","metricCode":"FYP","operator":"GTE","operand":{"kind":"MONEY","value":"25000.00","currency":"MYR"},"context":{"periodKey":"full_campaign","audienceCode":"PERSONAL","aggregationCode":null,"repricingCode":null,"productScopeCode":null},"sourceCitationIds":["citation_qualification"]},
+      {"nodeKey":"personal_exclusions","type":"NOT","child":{"nodeKey":"excluded_products","type":"PREDICATE","metricCode":"PRODUCT_FAMILY","operator":"IN","operand":{"kind":"LOV_SET","lovKey":"product.family","valueCodes":["UNIT_TRUST","GROUP_BUSINESS"]},"context":{"periodKey":"full_campaign","audienceCode":"PERSONAL","aggregationCode":null,"repricingCode":null,"productScopeCode":null},"sourceCitationIds":["citation_exclusion"]}}
+    ]},
+    "sourceCitationIds":["citation_qualification","citation_exclusion"]
+  }],
+  "tiers":[{"tierKey":"silver","name":"Silver","rewardCode":"STAR_1","sourceCitationIds":["citation_reward"]}],
+  "targets":[{"tierKey":"silver","periodKey":"full_campaign","state":"EXPLICIT","value":"25000.00","sourceCitationIds":["citation_qualification"]}],
+  "calculationRules":[{"ruleKey":"fyp_credit","metricCode":"FYP","productCode":"REGULAR_PREMIUM","rate":"100.00","include":true,"sourceCitationIds":["citation_calculation"]}],
+  "rewards":[{"rewardCode":"STAR_1","name":"Star recognition","sourceCitationIds":["citation_reward"]}],
+  "governance":{"calculationFrequencyCode":"DAILY","approvalRouteCode":null,"sourceCitationIds":[]},
+  "trackingRules":[{"ruleKey":"submission_cutoff","type":"SUBMISSION_CUTOFF","effectiveTo":"2027-12-31","actionCode":"EXCLUDE_LATE_SUBMISSION","sourceCitationIds":["citation_campaign"]}],
+  "exclusions":[{"exclusionCode":"EXCLUDED_PRODUCTS","description":"Unit Trust and Group Business do not qualify.","sourceCitationIds":["citation_exclusion"]}],
+  "citations":[
+    {"citationId":"citation_campaign","page":1,"section":"Campaign period","evidenceExcerpt":"The campaign runs from 1 January to 31 December 2027.","confidence":"HIGH"},
+    {"citationId":"citation_audience","page":2,"section":"Eligibility","evidenceExcerpt":"Open to individual agents.","confidence":"HIGH"},
+    {"citationId":"citation_qualification","page":3,"section":"Qualification","evidenceExcerpt":"Minimum FYP of RM25,000 during the campaign.","confidence":"HIGH"},
+    {"citationId":"citation_exclusion","page":3,"section":"Exclusions","evidenceExcerpt":"Unit Trust and Group Business are excluded.","confidence":"HIGH"},
+    {"citationId":"citation_calculation","page":4,"section":"Production credit","evidenceExcerpt":"Regular premium FYP receives 100% credit.","confidence":"MEDIUM"},
+    {"citationId":"citation_reward","page":5,"section":"Recognition","evidenceExcerpt":"Qualifiers receive Star recognition.","confidence":"MEDIUM"}
+  ],
+  "unresolvedItems":[{"path":"/governance/approvalRouteCode","reasonCode":"NOT_PRESENT_IN_BROCHURE","sourceCitationIds":[]}]
+}

@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "1.0",
+  "screenId": "CA-01",
+  "standard": "WCAG 2.2 AA",
+  "requirements": [
+    "Landmarks and heading hierarchy",
+    "Persistent labels",
+    "Semantic table scopes",
+    "Equivalent mobile card semantics",
+    "Status not color-only",
+    "Dialog focus trap and restore",
+    "Safe alert and trace ID",
+    "Operable at 200% text and 400% zoom",
+    "Reduced-motion support"
+  ]
+}

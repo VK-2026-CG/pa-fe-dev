@@ -19,7 +19,7 @@ Current posture and gaps: `docs/security/README.md`. Risks:
   TEAM requires a leader; GROUP requires P2; otherwise 403 with
   `BFF-4031`/`BFF-4032`. UI gating is advisory only.
 - **Never weaken a guard** to make a screen or a test pass. If a screen needs
-  wider access, that is a spec question.
+  wider access, that is a backend authorization change, reviewed as such.
 - **Validate every input** before calling downstream. `parseLens()` allow-lists
   period, businessLine, basis, scope and teamView → 400 `BFF-4000`. New routes
   follow the same pattern.

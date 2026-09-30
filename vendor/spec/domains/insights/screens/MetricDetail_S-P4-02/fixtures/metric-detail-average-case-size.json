@@ -1,0 +1,9 @@
+{
+  "meta": { "screenId": "S-P4-02", "specVersion": "1.16.0", "configVersion": "2.1.0", "country": "MY", "asOfDate": "2026-07-27", "generatedAt": "2026-07-27T06:00:00Z", "traceId": "fx-detail-average-case-size-001", "partial": false },
+  "context": { "metricCode": "AVERAGE_CASE_SIZE", "scope": "TEAM", "teamView": "DIRECT", "businessLine": "ALL", "period": "YTD", "basis": "STANDARD", "asOfDate": "2026-07-27" },
+  "dataState": "OK",
+  "sections": [
+    { "type": "GAUGE", "id": "gauge.primary", "collected": { "kind": "MONEY", "amount": "5200.00", "currency": "MYR" } },
+    { "type": "COMPARISON", "id": "comparison.primary", "currentYear": 2026, "current": { "kind": "MONEY", "amount": "5200.00", "currency": "MYR" }, "priorYear": 2025, "prior": { "kind": "MONEY", "amount": "4800.00", "currency": "MYR" }, "change": { "comparisonBasis": "LAST_YEAR", "direction": "UP", "sentiment": "POSITIVE", "display": "PCT", "pct": 9 } }
+  ]
+}

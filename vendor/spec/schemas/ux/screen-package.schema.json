@@ -1,0 +1,137 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:pruaction:ux:screen-package:1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "screenId",
+    "screenKey",
+    "screenName",
+    "packageName",
+    "version",
+    "status",
+    "domainCode",
+    "country",
+    "route",
+    "summary",
+    "requirements",
+    "ux",
+    "design",
+    "assets",
+    "frontend",
+    "domainContract",
+    "bff",
+    "fixtures",
+    "content",
+    "telemetry",
+    "acceptance",
+    "reuse",
+    "blockers"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0"
+    },
+    "screenId": {
+      "pattern": "^[A-Z]{2}-[0-9]{2}$"
+    },
+    "screenKey": {
+      "type": "string"
+    },
+    "screenName": {
+      "type": "string"
+    },
+    "packageName": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "DRAFT",
+        "UX_REVIEW",
+        "CONTRACT_REVIEW",
+        "READY",
+        "SUPERSEDED",
+        "RETIRED"
+      ]
+    },
+    "domainCode": {
+      "type": "string"
+    },
+    "country": {
+      "pattern": "^[A-Z]{2}$"
+    },
+    "route": {
+      "type": "string"
+    },
+    "summary": {
+      "type": "string"
+    },
+    "requirements": {
+      "type": "object"
+    },
+    "ux": {
+      "type": "object"
+    },
+    "design": {
+      "type": "object"
+    },
+    "assets": {
+      "type": "string"
+    },
+    "frontend": {
+      "type": "object"
+    },
+    "domainContract": {
+      "type": "object"
+    },
+    "bff": {
+      "type": "object"
+    },
+    "fixtures": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "content": {
+      "type": "object"
+    },
+    "telemetry": {
+      "type": "object"
+    },
+    "acceptance": {
+      "type": "object"
+    },
+    "reuse": {
+      "type": "object"
+    },
+    "blockers": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "READY"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "blockers": {
+            "maxItems": 0
+          }
+        }
+      }
+    }
+  ]
+}

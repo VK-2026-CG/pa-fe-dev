@@ -1,0 +1,50 @@
+{
+  "schemaVersion": "1.0",
+  "screenId": "S-P4-07",
+  "decisions": [
+    {
+      "id": "DEC-P4-07-REUSE-01",
+      "requirementId": "UX-P4-07-MEMBER-LIST",
+      "decision": "REUSE_WITH_CONFIGURATION",
+      "reuseId": "component.insights.team-drilldown-member-list"
+    },
+    {
+      "id": "DEC-P4-07-REUSE-02",
+      "requirementId": "UX-P4-07-MEMBER-PREVIEW",
+      "decision": "REUSE_WITH_CONFIGURATION",
+      "reuseId": "component.insights.team-drilldown-member-summary",
+      "status": "SUPERSEDED",
+      "supersededBy": "DEC-P4-07-REUSE-07"
+    },
+    {
+      "id": "DEC-P4-07-REUSE-03",
+      "requirementId": "UX-P4-07-MEMBER-CARD",
+      "decision": "EXTEND",
+      "reuseId": "component.insights.team-drilldown-member-list"
+    },
+    {
+      "id": "DEC-P4-07-REUSE-04",
+      "requirementId": "UX-P4-07-KPI-TILES",
+      "decision": "CREATE",
+      "reuseId": "w.team-drilldown.summary-tile"
+    },
+    {
+      "id": "DEC-P4-07-REUSE-05",
+      "requirementId": "UX-P4-07-FILTERS",
+      "decision": "REUSE_WITH_CONFIGURATION",
+      "reuseId": "w.sheet.filter"
+    },
+    {
+      "id": "DEC-P4-07-REUSE-06",
+      "requirementId": "UX-P4-07-SUBTEAM",
+      "decision": "REUSE_WITH_CONFIGURATION",
+      "reuseId": "w.sheet.filter"
+    },
+    {
+      "id": "DEC-P4-07-REUSE-07",
+      "requirementId": "UX-P4-01-VIEWING",
+      "decision": "CREATE",
+      "reuseId": "w.dashboard.viewing-banner"
+    }
+  ]
+}

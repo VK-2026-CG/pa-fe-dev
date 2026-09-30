@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "1.0",
+  "reuseId": "component.global.async-state",
+  "kind": "FRONTEND_COMPONENT",
+  "scope": "GLOBAL",
+  "status": "CANDIDATE_EXISTING",
+  "name": "Async State Container",
+  "spec": "common/frontend/components/AsyncStateContainer_async-state/component.json",
+  "implementation": {
+    "repository": "PruactionWeb",
+    "path": "src/cdk/contest-admin/ContestAdminMY.tsx",
+    "export": "State"
+  },
+  "consumers": [],
+  "whenToUse": [
+    "Use when the semantic behavior and visual contract match"
+  ],
+  "whenNotToUse": [
+    "Do not add screen-specific business semantics to the common props"
+  ],
+  "extensionPolicy": "Prefer typed configuration; assess all existing consumers before extension"
+}

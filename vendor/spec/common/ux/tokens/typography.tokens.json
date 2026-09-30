@@ -1,0 +1,46 @@
+{
+  "schemaVersion": "1.0",
+  "tokens": [
+    {
+      "token": "typography.body.default",
+      "type": "TYPOGRAPHY",
+      "value": {
+        "fontFamily": "System fallback",
+        "fallback": [
+          "-apple-system",
+          "Segoe UI",
+          "Roboto",
+          "Helvetica Neue",
+          "Arial",
+          "sans-serif"
+        ],
+        "fontStyle": "normal",
+        "fontWeight": 400,
+        "fontSize": "14px",
+        "lineHeight": "20px",
+        "letterSpacing": "0px",
+        "fontVariantNumeric": "proportional-nums"
+      },
+      "sourceStatus": "BLOCKED",
+      "source": {
+        "reason": "Approved Prudential/DLS font package unavailable"
+      }
+    },
+    {
+      "token": "typography.heading.page",
+      "type": "TYPOGRAPHY",
+      "value": {
+        "fontFamily": "System fallback",
+        "fontWeight": 700,
+        "fontSize": "28px",
+        "lineHeight": "36px",
+        "letterSpacing": "0px",
+        "maxLines": 2
+      },
+      "sourceStatus": "BLOCKED",
+      "source": {
+        "reason": "Figma text style and licensed font pending"
+      }
+    }
+  ]
+}

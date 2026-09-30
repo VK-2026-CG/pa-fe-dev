@@ -1,0 +1,59 @@
+{
+  "schemaVersion": "1.0",
+  "items": [
+    {
+      "reuseId": "component.contests.shell",
+      "kind": "FRONTEND_COMPONENT",
+      "scope": "DOMAIN",
+      "status": "CANDIDATE_EXISTING",
+      "implementation": {
+        "repository": "PruactionWeb",
+        "path": "src/cdk/contest-admin/ContestAdminMY.tsx",
+        "export": "Shell"
+      }
+    },
+    {
+      "reuseId": "component.contests.status-adapter",
+      "kind": "FRONTEND_COMPONENT",
+      "scope": "DOMAIN",
+      "status": "CANDIDATE_EXISTING",
+      "implementation": {
+        "repository": "PruactionWeb",
+        "path": "src/cdk/contest-admin/ContestAdminMY.tsx",
+        "export": "Status"
+      }
+    },
+    {
+      "reuseId": "component.contests.rule-expression-editor",
+      "kind": "FRONTEND_COMPONENT",
+      "scope": "DOMAIN",
+      "status": "CANDIDATE_EXISTING",
+      "implementation": {
+        "repository": "PruactionWeb",
+        "path": "src/cdk/contest-admin/parts/RuleExpressionEditor.tsx",
+        "export": "RuleExpressionEditor"
+      }
+    },
+    {
+      "reuseId": "component.contests.rule-logic-preview",
+      "kind": "FRONTEND_COMPONENT",
+      "scope": "DOMAIN",
+      "status": "CANDIDATE_EXISTING",
+      "implementation": {
+        "repository": "PruactionWeb",
+        "path": "src/cdk/contest-admin/parts/RuleLogicPreview.tsx",
+        "export": "RuleLogicPreview"
+      }
+    },
+    {
+      "reuseId": "bff.contests.service",
+      "kind": "BFF_PATTERN",
+      "scope": "DOMAIN",
+      "status": "CANDIDATE_EXISTING",
+      "implementation": {
+        "repository": "PruactionWeb",
+        "path": "src/lib/contest-admin/contest-service.ts"
+      }
+    }
+  ]
+}

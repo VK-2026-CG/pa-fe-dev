@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "1.0",
+  "allowedForReady": [
+    "FIGMA_EXPORTED",
+    "FIGMA_MEASURED",
+    "DLS_APPROVED",
+    "UX_APPROVED_INFERENCE"
+  ],
+  "current": [
+    "SUBSTITUTE_PENDING_UX_APPROVAL",
+    "BLOCKED"
+  ],
+  "ready": false
+}

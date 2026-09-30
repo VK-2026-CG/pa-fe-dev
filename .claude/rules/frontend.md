@@ -44,8 +44,9 @@ Never let a lower layer import an upper one. `components`, `dls-stub`,
 
 ## Content and data
 
-- Every user-visible string goes through `t('insights.…')`. New copy needs the
-  key in `vendor/spec/en.json` and the spec repo, in lockstep.
+- Every user-visible string goes through `t('insights.…')`. Add new or changed
+  copy to `src/i18n/en.local.json` (app-owned, overlays the vendored bundle);
+  mirroring it into the spec is optional.
 - Import view-models from `@spec/performance-vm`; never redeclare them.
 - Money is a decimal string; format with `src/lib/format.ts`. No `parseFloat`.
 - Render sections in BFF order; skip unknown section types rather than throwing.

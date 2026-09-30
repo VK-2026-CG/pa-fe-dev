@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "1.0",
+  "packageProfile": "MIGRATED_LEGACY",
+  "screenId": "CA-05",
+  "legacyIds": [
+    "CA-DRAFT-05"
+  ],
+  "screenKey": "contest-simulation",
+  "screenName": "Contest Simulation",
+  "packageName": "ContestSimulation_CA-05",
+  "version": "0.1.0",
+  "status": "DRAFT",
+  "domainCode": "contests",
+  "country": "MY",
+  "route": "/contest-admin/contests/:contestId/versions/:versionId/simulations",
+  "summary": "README.md",
+  "legacyContract": "requirements/legacy-contract.md",
+  "blockers": [
+    "Approved Figma frames and extraction are missing",
+    "Detailed UX, responsive and accessibility contracts are missing",
+    "Reuse discovery and visual baselines are incomplete"
+  ]
+}

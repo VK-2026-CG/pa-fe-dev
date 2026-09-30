@@ -1,0 +1,34 @@
+{
+  "meta": { "screenId": "S-P4-03", "specVersion": "1.2.0", "configVersion": "2.1.0", "country": "MY", "asOfDate": "2026-07-27", "generatedAt": "2026-07-27T06:00:00Z", "traceId": "fx-hist-tpc-cy-001", "partial": false },
+  "tabs": [ { "metricCode": "TPC", "selected": true }, { "metricCode": "CASE_COUNT", "selected": false }, { "metricCode": "FYP", "selected": false }, { "metricCode": "FYC", "selected": false } ],
+  "moreTabs": [],
+  "metricCode": "TPC",
+  "valueType": "MONEY",
+  "context": { "businessLine": "ALL", "basis": "STANDARD", "scope": "SELF" },
+  "comparison": { "window": "CURRENT_YEAR", "windowOptions": ["CURRENT_YEAR", "VS_LAST_YEAR", "VS_LAST_2_YEARS"], "anchorYear": 2026, "yearsBack": 0, "canGoOlder": true, "canGoNewer": false },
+  "years": [2026],
+  "rows": [
+    { "month": 1, "values": [ { "kind": "MONEY", "amount": "25246.00", "currency": "MYR" } ] },
+    { "month": 2, "values": [ { "kind": "MONEY", "amount": "15876.00", "currency": "MYR" } ] },
+    { "month": 3, "values": [ { "kind": "MONEY", "amount": "15007.00", "currency": "MYR" } ] },
+    { "month": 4, "values": [ { "kind": "MONEY", "amount": "22876.00", "currency": "MYR" } ] },
+    { "month": 5, "values": [ { "kind": "MONEY", "amount": "22876.00", "currency": "MYR" } ] },
+    { "month": 6, "values": [ { "kind": "MONEY", "amount": "15007.00", "currency": "MYR" } ] },
+    { "month": 7, "values": [ { "kind": "MONEY", "amount": "11007.00", "currency": "MYR" } ] },
+    { "month": 8, "values": [ null ] },
+    { "month": 9, "values": [ null ] },
+    { "month": 10, "values": [ null ] },
+    { "month": 11, "values": [ null ] },
+    { "month": 12, "values": [ null ] }
+  ],
+  "momDeltas": [
+    null,
+    { "comparisonBasis": "LAST_MONTH", "direction": "DOWN", "sentiment": "NEGATIVE", "display": "PCT", "pct": -37.1 },
+    { "comparisonBasis": "LAST_MONTH", "direction": "DOWN", "sentiment": "NEGATIVE", "display": "PCT", "pct": -5.5 },
+    { "comparisonBasis": "LAST_MONTH", "direction": "UP", "sentiment": "POSITIVE", "display": "PCT", "pct": 52.4 },
+    { "comparisonBasis": "LAST_MONTH", "direction": "FLAT", "sentiment": "NEUTRAL", "display": "PCT", "pct": 0 },
+    { "comparisonBasis": "LAST_MONTH", "direction": "DOWN", "sentiment": "NEGATIVE", "display": "PCT", "pct": -34.4 },
+    { "comparisonBasis": "LAST_MONTH", "direction": "DOWN", "sentiment": "NEGATIVE", "display": "PCT", "pct": -26.7 },
+    null, null, null, null, null
+  ]
+}

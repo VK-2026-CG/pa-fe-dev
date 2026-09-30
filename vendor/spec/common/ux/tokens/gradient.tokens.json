@@ -1,0 +1,45 @@
+{
+  "schemaVersion": "1.0",
+  "tokens": [
+    {
+      "token": "gradient.recommendation.banner",
+      "type": "GRADIENT",
+      "value": {
+        "model": "LINEAR",
+        "angleDegrees": 135,
+        "geometry": {
+          "start": {
+            "x": 0,
+            "y": 0
+          },
+          "end": {
+            "x": 1,
+            "y": 1
+          }
+        },
+        "stops": [
+          {
+            "position": 0,
+            "color": {
+              "hex": "#7B2FF7",
+              "alpha": 1
+            }
+          },
+          {
+            "position": 1,
+            "color": {
+              "hex": "#9F5CFF",
+              "alpha": 1
+            }
+          }
+        ],
+        "interpolation": "srgb",
+        "cssValue": "linear-gradient(135deg, #7B2FF7 0%, #9F5CFF 100%)"
+      },
+      "sourceStatus": "SUBSTITUTE_PENDING_UX_APPROVAL",
+      "source": {
+        "origin": "Web DLS stub; exact Figma paint extraction pending"
+      }
+    }
+  ]
+}

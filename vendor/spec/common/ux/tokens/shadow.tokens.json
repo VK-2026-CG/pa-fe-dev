@@ -1,0 +1,49 @@
+{
+  "schemaVersion": "1.0",
+  "tokens": [
+    {
+      "token": "elevation.card.rest",
+      "type": "SHADOW",
+      "value": {
+        "cssValue": "0 1px 3px rgba(16, 24, 40, 0.08)",
+        "layers": [
+          {
+            "x": "0px",
+            "y": "1px",
+            "blur": "3px",
+            "spread": "0px",
+            "color": "#101828",
+            "alpha": 0.08,
+            "inset": false
+          }
+        ]
+      },
+      "sourceStatus": "SUBSTITUTE_PENDING_UX_APPROVAL",
+      "source": {
+        "origin": "Web DLS stub"
+      }
+    },
+    {
+      "token": "elevation.menu",
+      "type": "SHADOW",
+      "value": {
+        "cssValue": "0 8px 24px rgba(16, 24, 40, 0.16)",
+        "layers": [
+          {
+            "x": "0px",
+            "y": "8px",
+            "blur": "24px",
+            "spread": "0px",
+            "color": "#101828",
+            "alpha": 0.16,
+            "inset": false
+          }
+        ]
+      },
+      "sourceStatus": "SUBSTITUTE_PENDING_UX_APPROVAL",
+      "source": {
+        "origin": "Web DLS stub"
+      }
+    }
+  ]
+}

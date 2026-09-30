@@ -1,0 +1,45 @@
+{
+  "schemaVersion": "1.0",
+  "tokens": [
+    {
+      "token": "breakpoint.mobile",
+      "type": "BREAKPOINT",
+      "value": {
+        "maxWidth": "767px"
+      },
+      "sourceStatus": "UX_APPROVED_INFERENCE",
+      "source": {
+        "origin": "Current responsive implementation",
+        "approval": "PENDING"
+      },
+      "notes": "Range 0–767px. Design canvas width 375px."
+    },
+    {
+      "token": "breakpoint.tablet",
+      "type": "BREAKPOINT",
+      "value": {
+        "minWidth": "768px",
+        "maxWidth": "1023px"
+      },
+      "sourceStatus": "UX_APPROVED_INFERENCE",
+      "source": {
+        "origin": "Confirmed responsive breakpoint range",
+        "approval": "APPROVED"
+      },
+      "notes": "Range 768–1023px. Design canvas width 1024px."
+    },
+    {
+      "token": "breakpoint.desktop",
+      "type": "BREAKPOINT",
+      "value": {
+        "minWidth": "1024px"
+      },
+      "sourceStatus": "UX_APPROVED_INFERENCE",
+      "source": {
+        "origin": "Confirmed responsive breakpoint range",
+        "approval": "APPROVED"
+      },
+      "notes": "Range 1024px+. Design canvas width 1440px."
+    }
+  ]
+}

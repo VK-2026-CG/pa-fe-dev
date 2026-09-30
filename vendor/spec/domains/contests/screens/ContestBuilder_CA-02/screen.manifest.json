@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "1.0",
+  "packageProfile": "MIGRATED_LEGACY",
+  "screenId": "CA-02",
+  "legacyIds": [
+    "CA-DRAFT-02"
+  ],
+  "screenKey": "contest-builder",
+  "screenName": "Contest Builder",
+  "packageName": "ContestBuilder_CA-02",
+  "version": "0.1.0",
+  "status": "DRAFT",
+  "domainCode": "contests",
+  "country": "MY",
+  "route": "/contest-admin/contests/:contestId/versions/:versionId/edit/:step",
+  "summary": "README.md",
+  "legacyContract": "requirements/legacy-contract.md",
+  "blockers": [
+    "Approved Figma frames and extraction are missing",
+    "Detailed UX, responsive and accessibility contracts are missing",
+    "Reuse discovery and visual baselines are incomplete"
+  ]
+}

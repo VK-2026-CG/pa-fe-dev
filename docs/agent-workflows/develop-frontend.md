@@ -11,12 +11,13 @@ Invocation: `/develop-frontend <spec-id-or-jira-id> [context]`
    architecture, code and tests. Inventory reusable components, DLS primitives,
    assets, BFF helpers, composers and fixtures before planning edits.
 4. Run `npm run sync:specs` when vendored artifacts need refresh. Never ask the
-   user to type orchestration commands or hand-edit generated vendored files.
-5. Implement the requested UI behavior against the canonical spec. Missing
-   fields, copy, tokens, assets, states or behavior should be clarified in the
-   spec rather than invented.
+   user to type orchestration commands; prefer sync over hand-editing generated
+   vendored files.
+5. Implement the requested UI behavior, using the spec as reference. Where
+   fields, copy, tokens, assets, states or behavior are missing or differ,
+   decide on the merits and update the spec afterwards if it helps others.
 6. Preserve VM imports, i18n-only visible copy, DLS boundaries, country
-   isolation, entitlement, accessibility and Spec-owned asset checksums.
+   isolation, entitlement and accessibility.
 7. Add AC-named unit/API/E2E coverage as required. Run focused checks, then
    typecheck, all applicable Playwright suites, asset/design validation and
    build. Update `CHANGELOG.md` with meaningful changes and checks.

@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:pruaction:ux:asset-manifest:1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "country",
+    "assetPackVersion",
+    "assets"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0"
+    },
+    "country": {
+      "pattern": "^[A-Z]{2}$"
+    },
+    "assetPackVersion": {
+      "type": "string"
+    },
+    "assets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "assetId",
+          "type",
+          "file",
+          "mediaType",
+          "sha256",
+          "sourceStatus",
+          "source",
+          "intrinsic",
+          "rendering",
+          "accessibility"
+        ],
+        "properties": {
+          "assetId": {
+            "type": "string"
+          },
+          "type": {
+            "enum": [
+              "SVG_ICON",
+              "RASTER_IMAGE",
+              "ILLUSTRATION",
+              "LOGO",
+              "TEXTURE",
+              "FONT"
+            ]
+          },
+          "file": {
+            "type": "string"
+          },
+          "mediaType": {
+            "type": "string"
+          },
+          "sha256": {
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "bytes": {
+            "type": "integer"
+          },
+          "sourceStatus": {
+            "enum": [
+              "FIGMA_EXPORTED",
+              "FIGMA_MEASURED",
+              "DLS_APPROVED",
+              "CATALOG_MATCH",
+              "IMAGE_MEASURED",
+              "IMAGE_INFERRED",
+              "UX_APPROVED_INFERENCE",
+              "SUBSTITUTE_PENDING_UX_APPROVAL",
+              "PLACEHOLDER",
+              "BLOCKED"
+            ]
+          },
+          "source": {
+            "type": "object"
+          },
+          "intrinsic": {
+            "type": "object"
+          },
+          "rendering": {
+            "type": "object"
+          },
+          "accessibility": {
+            "type": "object"
+          },
+          "approval": {
+            "type": "object"
+          }
+        }
+      }
+    }
+  }
+}

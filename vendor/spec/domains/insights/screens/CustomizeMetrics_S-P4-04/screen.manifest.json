@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "1.0",
+  "packageProfile": "MIGRATED_LEGACY",
+  "screenId": "S-P4-04",
+  "legacyIds": [],
+  "screenKey": "customize-metrics",
+  "screenName": "Customize Metrics",
+  "packageName": "CustomizeMetrics_S-P4-04",
+  "version": "2.0.0",
+  "status": "DRAFT",
+  "domainCode": "insights",
+  "country": "MY",
+  "route": "insights/customize-metrics",
+  "summary": "README.md",
+  "legacyContract": "requirements/legacy-contract.md",
+  "blockers": [
+    "Strict UX source approval is incomplete",
+    "Responsive/state visual baselines are incomplete",
+    "Existing build-ready claim requires migration to new readiness evidence",
+    "v1.4.0/v1.4.1/v1.5.0 overlay geometry (Sidesheet.png, Sheet (Mobile) - B.png, Tablet (3).png) is screenshot-derived, not a Figma export"
+  ]
+}

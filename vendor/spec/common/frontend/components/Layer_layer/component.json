@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "1.0",
+  "reuseId": "behavior.global.layer",
+  "kind": "HEADLESS_BEHAVIOR",
+  "scope": "GLOBAL",
+  "status": "CANDIDATE_EXISTING",
+  "name": "Layer",
+  "spec": "common/frontend/components/Layer_layer/component.json",
+  "implementation": {
+    "repository": "PruactionWeb",
+    "path": "src/headless/index.tsx",
+    "export": "Layer"
+  },
+  "consumers": [],
+  "whenToUse": [
+    "Use when the semantic behavior and visual contract match"
+  ],
+  "whenNotToUse": [
+    "Do not add screen-specific business semantics to the common props"
+  ],
+  "extensionPolicy": "Prefer typed configuration; assess all existing consumers before extension"
+}

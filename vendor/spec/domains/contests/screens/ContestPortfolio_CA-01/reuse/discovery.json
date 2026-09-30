@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "1.0",
+  "screenId": "CA-01",
+  "searchedRegistries": [
+    "common/registry.json",
+    "domains/contests/common/registry.json",
+    "common/bff/registry.json",
+    "common/domain/operations/registry.json",
+    "common/assets/MY/manifest.json"
+  ],
+  "requirements": [
+    {
+      "requirementId": "UX-CA-01-SHELL",
+      "neededCapability": "Contest workspace shell",
+      "matches": [
+        "component.contests.shell"
+      ],
+      "decision": "REUSE_AS_IS"
+    },
+    {
+      "requirementId": "UX-CA-01-HEADER",
+      "neededCapability": "Page heading and primary action",
+      "matches": [
+        "component.global.page-header"
+      ],
+      "decision": "EXTEND_COMMON"
+    },
+    {
+      "requirementId": "UX-CA-01-ROW",
+      "neededCapability": "Semantic table row and mobile card",
+      "matches": [],
+      "decision": "CREATE_SCREEN_LOCAL"
+    }
+  ]
+}

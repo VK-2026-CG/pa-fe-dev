@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "1.0",
+  "screenId": "CA-01",
+  "styles": [
+    {
+      "element": "page-title",
+      "token": "typography.heading.page",
+      "maxLines": 2
+    },
+    {
+      "element": "body",
+      "token": "typography.body.default"
+    },
+    {
+      "element": "numeric-values",
+      "fontVariantNumeric": "tabular-nums"
+    }
+  ]
+}

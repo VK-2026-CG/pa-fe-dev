@@ -1,0 +1,22 @@
+{
+  "meta": { "screenId": "S-P4-04", "specVersion": "2.0.0", "configVersion": "3.0.0", "country": "MY", "asOfDate": "2026-07-27", "generatedAt": "2026-07-27T06:00:00Z", "traceId": "fx-cust-team-001", "partial": false },
+  "scope": "TEAM",
+  "priority": [
+    { "metricCode": "TPC", "variant": "WITHOUT_REPRICING", "selected": true, "locked": true, "reorderable": true, "order": 1 },
+    { "metricCode": "PTPC", "variant": "WITHOUT_REPRICING", "selected": true, "locked": true, "reorderable": true, "order": 2 },
+    { "metricCode": "CASE_COUNT", "selected": true, "locked": true, "reorderable": true, "order": 3 },
+    { "metricCode": "FYP", "selected": true, "locked": true, "reorderable": true, "order": 4 },
+    { "metricCode": "MANPOWER", "selected": true, "locked": true, "reorderable": true, "order": 5 },
+    { "metricCode": "ACTIVITY_RATIO", "selected": true, "locked": true, "reorderable": true, "order": 6 },
+    { "metricCode": "PRODUCTIVITY", "selected": true, "locked": true, "reorderable": true, "order": 7 },
+    { "metricCode": "AVERAGE_CASE_SIZE", "selected": true, "locked": true, "reorderable": true, "order": 8 }
+  ],
+  "focus": [
+    { "metricCode": "FYC", "selected": true, "locked": false, "reorderable": true, "order": 1 },
+    { "metricCode": "PERSISTENCY_CY", "selected": true, "locked": false, "reorderable": true, "order": 2 },
+    { "metricCode": "PERSISTENCY_Y1", "selected": false, "locked": false, "reorderable": true, "order": 3 },
+    { "metricCode": "PERSISTENCY_Y2", "selected": false, "locked": false, "reorderable": true, "order": 4 },
+    { "metricCode": "NEW_RECRUIT_CONTRACTED", "selected": false, "locked": false, "reorderable": true, "order": 5 }
+  ],
+  "constraints": { "priority": { "min": 8, "max": 8, "editable": false }, "focus": { "min": 0, "max": 6 } }
+}

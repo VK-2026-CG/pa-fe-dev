@@ -1,0 +1,30 @@
+{
+  "schemaVersion": "1.0",
+  "openapi": "domains/contests/api/contests.v1.yaml",
+  "operations": [
+    {
+      "operationId": "listContests",
+      "method": "GET",
+      "path": "/contests",
+      "purpose": "List authorized contests with filters and cursor paging"
+    },
+    {
+      "operationId": "getContestOverview",
+      "method": "GET",
+      "path": "/contests/overview",
+      "purpose": "Return portfolio-wide metrics and attention"
+    },
+    {
+      "operationId": "createContest",
+      "method": "POST",
+      "path": "/contests",
+      "purpose": "Create a blank contest draft in the deployment country"
+    },
+    {
+      "operationId": "startContestBrochureImport",
+      "method": "POST",
+      "path": "/contest-imports",
+      "purpose": "Start governed brochure-to-draft processing"
+    }
+  ]
+}

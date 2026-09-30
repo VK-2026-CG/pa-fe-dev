@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "1.0",
+  "screenId": "CA-01",
+  "rows": [
+    {
+      "region": "navigation",
+      "desktop": "fixed side rail",
+      "tablet": "BLOCKED",
+      "mobile": "drawer or alternate shell BLOCKED"
+    },
+    {
+      "region": "results",
+      "desktop": "semantic table",
+      "tablet": "horizontal table BLOCKED",
+      "mobile": "semantic cards"
+    },
+    {
+      "region": "primary action",
+      "desktop": "page-header trailing action",
+      "tablet": "BLOCKED",
+      "mobile": "sticky action BLOCKED"
+    }
+  ]
+}

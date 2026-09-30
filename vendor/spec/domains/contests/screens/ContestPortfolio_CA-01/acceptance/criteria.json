@@ -1,0 +1,46 @@
+{
+  "schemaVersion": "1.0",
+  "screenId": "CA-01",
+  "criteria": [
+    {
+      "id": "AC-CA-01-01",
+      "requirement": "URL/search/filter round-trip"
+    },
+    {
+      "id": "AC-CA-01-02",
+      "requirement": "Row-owned navigation IDs"
+    },
+    {
+      "id": "AC-CA-01-03",
+      "requirement": "API metrics drive summaries"
+    },
+    {
+      "id": "AC-CA-01-04",
+      "requirement": "Partial attention preserves results"
+    },
+    {
+      "id": "AC-CA-01-05",
+      "requirement": "Unknown status safe"
+    },
+    {
+      "id": "AC-CA-01-06",
+      "requirement": "Authorized search behavior"
+    },
+    {
+      "id": "AC-CA-01-07",
+      "requirement": "Distinct create origins"
+    },
+    {
+      "id": "AC-CA-UX-PORTFOLIO-01",
+      "requirement": "Approved visual baselines"
+    },
+    {
+      "id": "AC-CA-UX-PORTFOLIO-02",
+      "requirement": "Responsive table/card behavior"
+    },
+    {
+      "id": "AC-CA-UX-PORTFOLIO-03",
+      "requirement": "No raw/unapproved visual values"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "1.0",
+  "prefix": "contest.",
+  "required": [
+    "contest.portfolio.title",
+    "contest.action.create",
+    "contest.state.loading",
+    "contest.error.generic"
+  ],
+  "rule": "All visible copy must resolve from the Spec i18n bundle"
+}

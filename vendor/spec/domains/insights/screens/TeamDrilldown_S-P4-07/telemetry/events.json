@@ -1,0 +1,47 @@
+{
+  "schemaVersion": "1.0",
+  "screenId": "S-P4-07",
+  "events": [
+    {
+      "event": "insights_team_drilldown_viewed",
+      "properties": [
+        "teamView",
+        "basis"
+      ]
+    },
+    {
+      "event": "insights_team_drilldown_member_selected",
+      "properties": [
+        "memberAgentId",
+        "teamView",
+        "basis"
+      ]
+    },
+    {
+      "event": "insights_team_drilldown_search_changed",
+      "properties": [
+        "queryLength"
+      ]
+    },
+    {
+      "event": "insights_team_drilldown_filters_applied",
+      "properties": [
+        "sortBy",
+        "badgeCount"
+      ],
+      "since": "0.2.0"
+    },
+    {
+      "event": "insights_team_drilldown_subteam_opened",
+      "properties": [
+        "directReportCount"
+      ],
+      "since": "0.2.0"
+    },
+    {
+      "event": "insights_viewing_exited",
+      "properties": [],
+      "since": "0.2.0"
+    }
+  ]
+}

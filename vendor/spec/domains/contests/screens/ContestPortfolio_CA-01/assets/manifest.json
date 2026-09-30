@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "1.0",
+  "screenId": "CA-01",
+  "assets": [
+    {
+      "assetId": "icon.add",
+      "decision": "REUSE",
+      "sourceManifest": "common/assets/MY/manifest.json"
+    },
+    {
+      "assetId": "icon.close",
+      "decision": "REUSE",
+      "sourceManifest": "common/assets/MY/manifest.json"
+    },
+    {
+      "assetId": "illustration.contest.empty",
+      "decision": "BLOCKED",
+      "reason": "Approved Figma export unavailable"
+    }
+  ]
+}

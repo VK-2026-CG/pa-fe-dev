@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "1.0",
+  "rows": [
+    {
+      "id": "TRACE-CA-01-STATUS",
+      "requirement": "Safe lifecycle status",
+      "uxElement": "contest-row.status",
+      "component": "component.global.status-tag",
+      "vm": "ContestSummaryVM.status",
+      "operationId": "listContests",
+      "apiField": "ContestSummary.status",
+      "fixture": "fixtures/unknown-status.json",
+      "acceptanceCriterion": "AC-CA-01-05"
+    }
+  ]
+}

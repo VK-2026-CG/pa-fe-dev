@@ -1,0 +1,117 @@
+{
+  "schemaVersion": "1.0",
+  "items": [
+    {
+      "reuseId": "component.global.icon",
+      "kind": "FRONTEND_COMPONENT",
+      "scope": "GLOBAL",
+      "status": "CANDIDATE_EXISTING",
+      "name": "Icon",
+      "spec": "common/frontend/components/Icon_icon/component.json",
+      "implementation": {
+        "repository": "PruactionWeb",
+        "path": "src/dls-stub/index.tsx",
+        "export": "Icon"
+      },
+      "consumers": []
+    },
+    {
+      "reuseId": "component.global.status-tag",
+      "kind": "FRONTEND_COMPONENT",
+      "scope": "GLOBAL",
+      "status": "CANDIDATE_EXISTING",
+      "name": "Tag",
+      "spec": "common/frontend/components/Tag_status-tag/component.json",
+      "implementation": {
+        "repository": "PruactionWeb",
+        "path": "src/dls-stub/index.tsx",
+        "export": "Tag"
+      },
+      "consumers": []
+    },
+    {
+      "reuseId": "component.global.progress",
+      "kind": "FRONTEND_COMPONENT",
+      "scope": "GLOBAL",
+      "status": "CANDIDATE_EXISTING",
+      "name": "ProgressBar",
+      "spec": "common/frontend/components/ProgressBar_progress/component.json",
+      "implementation": {
+        "repository": "PruactionWeb",
+        "path": "src/dls-stub/index.tsx",
+        "export": "ProgressBar"
+      },
+      "consumers": []
+    },
+    {
+      "reuseId": "component.global.bottom-sheet",
+      "kind": "FRONTEND_COMPONENT",
+      "scope": "GLOBAL",
+      "status": "CANDIDATE_EXISTING",
+      "name": "BottomSheet",
+      "spec": "common/frontend/components/BottomSheet_bottom-sheet/component.json",
+      "implementation": {
+        "repository": "PruactionWeb",
+        "path": "src/dls-stub/index.tsx",
+        "export": "BottomSheet"
+      },
+      "consumers": []
+    },
+    {
+      "reuseId": "behavior.global.layer",
+      "kind": "HEADLESS_BEHAVIOR",
+      "scope": "GLOBAL",
+      "status": "CANDIDATE_EXISTING",
+      "name": "Layer",
+      "spec": "common/frontend/components/Layer_layer/component.json",
+      "implementation": {
+        "repository": "PruactionWeb",
+        "path": "src/headless/index.tsx",
+        "export": "Layer"
+      },
+      "consumers": []
+    },
+    {
+      "reuseId": "behavior.global.radio-group",
+      "kind": "HEADLESS_BEHAVIOR",
+      "scope": "GLOBAL",
+      "status": "CANDIDATE_EXISTING",
+      "name": "RadioGroup",
+      "spec": "common/frontend/components/RadioGroup_radio-group/component.json",
+      "implementation": {
+        "repository": "PruactionWeb",
+        "path": "src/headless/index.tsx",
+        "export": "RadioGroup"
+      },
+      "consumers": []
+    },
+    {
+      "reuseId": "component.global.page-header",
+      "kind": "FRONTEND_COMPONENT",
+      "scope": "GLOBAL",
+      "status": "CANDIDATE_EXISTING",
+      "name": "Page Header",
+      "spec": "common/frontend/components/PageHeader_page-header/component.json",
+      "implementation": {
+        "repository": "PruactionWeb",
+        "path": "src/cdk/contest-admin/ContestAdminMY.tsx",
+        "export": "PageHeader"
+      },
+      "consumers": []
+    },
+    {
+      "reuseId": "component.global.async-state",
+      "kind": "FRONTEND_COMPONENT",
+      "scope": "GLOBAL",
+      "status": "CANDIDATE_EXISTING",
+      "name": "Async State Container",
+      "spec": "common/frontend/components/AsyncStateContainer_async-state/component.json",
+      "implementation": {
+        "repository": "PruactionWeb",
+        "path": "src/cdk/contest-admin/ContestAdminMY.tsx",
+        "export": "State"
+      },
+      "consumers": []
+    }
+  ]
+}

@@ -12,11 +12,12 @@ function walk(dir: string, out: string[] = []): string[] {
   return out;
 }
 
-test.describe('i18n discipline (AGENTS.md hard rules: no invented copy)', () => {
+test.describe('i18n discipline (AGENTS.md hard rules: no literal UI strings)', () => {
   test('interpolates params', () => {
     expect(t('insights.dashboard.otherFocusMetrics', { n: 2 })).toBe('Other Focus Metrics (2)');
   });
-  test("every t('literal') key used in src exists in the vendored bundle", () => {
+  // The resolved bundle = vendored spec copy + app-owned src/i18n/en.local.json.
+  test("every t('literal') key used in src exists in the resolved bundle", () => {
     const files = walk(path.resolve(__dirname, '../../src'));
     const used = new Set<string>();
     for (const f of files) {

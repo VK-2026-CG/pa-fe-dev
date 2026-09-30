@@ -1,10 +1,11 @@
 ---
 name: develop-frontend
-description: Implement an approved PRUAction frontend and BFF specification by Spec ID or Jira ID.
+description: Implement PRUAction frontend and BFF behavior by Spec ID or Jira ID, using the spec as reference.
 argument-hint: "<spec-id-or-jira-id> [context]"
 ---
 
 Execute `docs/agent-workflows/develop-frontend.md`; obey `AGENTS.md` and
-path-scoped `.claude/rules/`. The request is `$ARGUMENTS`. Resolve the exact
-READY Spec, implement its frontend actions, run internal synchronization and all
-validation, and update evidence. Do not stop at a plan when edits are allowed.
+path-scoped `.claude/rules/`. The request is `$ARGUMENTS`. Consult the relevant
+Spec as reference (no READY/approval status needed), implement the behavior, run
+internal synchronization and all validation, and report evidence. Do not stop at
+a plan when edits are allowed.

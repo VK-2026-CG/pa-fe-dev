@@ -1,0 +1,6 @@
+{
+  "schemaVersion": "1.0",
+  "route": "/contest-admin/contests",
+  "appRouterResponsibility": "Read route inputs and resolve Contest Admin CDK only",
+  "cdkResponsibility": "Data loading, page state, composition, layout"
+}

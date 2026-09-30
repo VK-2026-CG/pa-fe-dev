@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "1.0",
+  "reuseId": "bff.contests.domain-call",
+  "safeFields": [
+    "status",
+    "code",
+    "title",
+    "traceId"
+  ],
+  "prohibited": [
+    "raw upstream body",
+    "credentials",
+    "cross-tenant details"
+  ]
+}

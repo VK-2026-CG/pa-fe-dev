@@ -237,7 +237,7 @@ export interface QuickLinkVM {
   iconToken: string; // DLS icon token from config
   nav: RouteRef;
   order: number;
-    /** True when the tile remains visible but is not interactive for the current scope. */
+  /** True when the tile stays visible but is not interactive for the current scope (AC-P4-01-88). */
   disabled?: boolean;
   badgeCount?: number;
 }

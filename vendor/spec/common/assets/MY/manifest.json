@@ -1,0 +1,907 @@
+{
+  "schemaVersion": "1.0",
+  "country": "MY",
+  "assetPackVersion": "0.1.0-draft",
+  "assets": [
+    {
+      "assetId": "icon.activity",
+      "type": "SVG_ICON",
+      "file": "icons/activity.svg",
+      "mediaType": "image/svg+xml",
+      "sha256": "4a7a3db4660199f7a28f5ce04071a3c13e729feb57e5d3e3984e32f0552c463a",
+      "bytes": 198,
+      "sourceStatus": "CATALOG_MATCH",
+      "source": {
+        "type": "FIGMA_LAYER_CATALOG_MATCH",
+        "fileKey": "od7f65KVKBKaettyAhNU2Z",
+        "nodeId": "6588:17637",
+        "description": "remixicon pulse-line ('Activity')"
+      },
+      "intrinsic": {
+        "viewBox": "0 0 24 24"
+      },
+      "rendering": {
+        "colorMode": "CURRENT_COLOR_OR_ORIGINAL",
+        "defaultSize": "20px",
+        "rtlMirror": false
+      },
+      "accessibility": {
+        "decorative": true,
+        "altKey": null
+      },
+      "approval": {
+        "status": "REVIEW_REQUIRED"
+      }
+    },
+    {
+      "assetId": "icon.add",
+      "type": "SVG_ICON",
+      "file": "icons/add.svg",
+      "mediaType": "image/svg+xml",
+      "sha256": "4dc5547840d699651cf7d3059a91d575cddaf80451ab85a7c41ed1d7c7998b24",
+      "bytes": 136,
+      "sourceStatus": "CATALOG_MATCH",
+      "source": {
+        "type": "FIGMA_LAYER_CATALOG_MATCH",
+        "fileKey": "od7f65KVKBKaettyAhNU2Z",
+        "nodeId": "6588:16769",
+        "description": "material add"
+      },
+      "intrinsic": {
+        "viewBox": "0 0 24 24"
+      },
+      "rendering": {
+        "colorMode": "CURRENT_COLOR_OR_ORIGINAL",
+        "defaultSize": "20px",
+        "rtlMirror": false
+      },
+      "accessibility": {
+        "decorative": true,
+        "altKey": null
+      },
+      "approval": {
+        "status": "REVIEW_REQUIRED"
+      }
+    },
+    {
+      "assetId": "icon.arrow-down-s",
+      "type": "SVG_ICON",
+      "file": "icons/arrow-down-s.svg",
+      "mediaType": "image/svg+xml",
+      "sha256": "4b0bf8a45d554ba97d8115ef2713010f196ad49d57eeecb8a42d4839a5ba8f9e",
+      "bytes": 210,
+      "sourceStatus": "CATALOG_MATCH",
+      "source": {
+        "type": "FIGMA_LAYER_CATALOG_MATCH",
+        "fileKey": "od7f65KVKBKaettyAhNU2Z",
+        "nodeId": "6588:16648",
+        "description": "remixicon arrow-down-s-line ('Arrow Down')"
+      },
+      "intrinsic": {
+        "viewBox": "0 0 24 24"
+      },
+      "rendering": {
+        "colorMode": "CURRENT_COLOR_OR_ORIGINAL",
+        "defaultSize": "20px",
+        "rtlMirror": false
+      },
+      "accessibility": {
+        "decorative": true,
+        "altKey": null
+      },
+      "approval": {
+        "status": "REVIEW_REQUIRED"
+      }
+    },
+    {
+      "assetId": "icon.arrow-left-s",
+      "type": "SVG_ICON",
+      "file": "icons/arrow-left-s.svg",
+      "mediaType": "image/svg+xml",
+      "sha256": "7d0407d47b59e7d69446ef81b79e95c5d5a4085e7fa7ba30770556b67197407e",
+      "bytes": 203,
+      "sourceStatus": "CATALOG_MATCH",
+      "source": {
+        "type": "FIGMA_LAYER_CATALOG_MATCH",
+        "fileKey": "od7f65KVKBKaettyAhNU2Z",
+        "nodeId": "6588:17280",
+        "description": "remixicon arrow-left-s-line ('Arrow Left')"
+      },
+      "intrinsic": {
+        "viewBox": "0 0 24 24"
+      },
+      "rendering": {
+        "colorMode": "CURRENT_COLOR_OR_ORIGINAL",
+        "defaultSize": "20px",
+        "rtlMirror": false
+      },
+      "accessibility": {
+        "decorative": true,
+        "altKey": null
+      },
+      "approval": {
+        "status": "REVIEW_REQUIRED"
+      }
+    },
+    {
+      "assetId": "icon.arrow-right-s",
+      "type": "SVG_ICON",
+      "file": "icons/arrow-right-s.svg",
+      "mediaType": "image/svg+xml",
+      "sha256": "2c579a4dbaf25e19a128d71e04f4cf43b19ad2487a0076ff7e7e5a94c9b3e013",
+      "bytes": 211,
+      "sourceStatus": "CATALOG_MATCH",
+      "source": {
+        "type": "FIGMA_LAYER_CATALOG_MATCH",
+        "fileKey": "od7f65KVKBKaettyAhNU2Z",
+        "nodeId": "6588:16610",
+        "description": "remixicon arrow-right-s-line ('Arrow forward ios')"
+      },
+      "intrinsic": {
+        "viewBox": "0 0 24 24"
+      },
+      "rendering": {
+        "colorMode": "CURRENT_COLOR_OR_ORIGINAL",
+        "defaultSize": "20px",
+        "rtlMirror": false
+      },
+      "accessibility": {
+        "decorative": true,
+        "altKey": null
+      },
+      "approval": {
+        "status": "REVIEW_REQUIRED"
+      }
+    },
+    {
+      "assetId": "icon.arrow-right-up-line",
+      "type": "SVG_ICON",
+      "file": "icons/arrow-right-up-line.svg",
+      "mediaType": "image/svg+xml",
+      "sha256": "4cda2791f28ca17397cada507f1b53e82cf3683a81e08e722342efe310b4f707",
+      "bytes": 194,
+      "sourceStatus": "CATALOG_MATCH",
+      "source": {
+        "type": "FIGMA_LAYER_CATALOG_MATCH",
+        "fileKey": "od7f65KVKBKaettyAhNU2Z",
+        "nodeId": "6588:17652",
+        "description": "remixicon arrow-right-up-line (layer name verbatim)"
+      },
+      "intrinsic": {
+        "viewBox": "0 0 24 24"
+      },
+      "rendering": {
+        "colorMode": "CURRENT_COLOR_OR_ORIGINAL",
+        "defaultSize": "20px",
+        "rtlMirror": false
+      },
+      "accessibility": {
+        "decorative": true,
+        "altKey": null
+      },
+      "approval": {
+        "status": "REVIEW_REQUIRED"
+      }
+    },
+    {
+      "assetId": "icon.arrow-up-s",
+      "type": "SVG_ICON",
+      "file": "icons/arrow-up-s.svg",
+      "mediaType": "image/svg+xml",
+      "sha256": "16a65c8f89983508e145c681e40889825d6f8f45faa30f895a3faed65cb7072e",
+      "bytes": 202,
+      "sourceStatus": "CATALOG_MATCH",
+      "source": {
+        "type": "FIGMA_LAYER_CATALOG_MATCH",
+        "fileKey": "od7f65KVKBKaettyAhNU2Z",
+        "nodeId": "6588:16586",
+        "description": "remixicon arrow-up-s-line ('Arrow Up')"
+      },
+      "intrinsic": {
+        "viewBox": "0 0 24 24"
+      },
+      "rendering": {
+        "colorMode": "CURRENT_COLOR_OR_ORIGINAL",
+        "defaultSize": "20px",
+        "rtlMirror": false
+      },
+      "accessibility": {
+        "decorative": true,
+        "altKey": null
+      },
+      "approval": {
+        "status": "REVIEW_REQUIRED"
+      }
+    },
+    {
+      "assetId": "icon.arrow-upward",
+      "type": "SVG_ICON",
+      "file": "icons/arrow-upward.svg",
+      "mediaType": "image/svg+xml",
+      "sha256": "936eed6a2efad930c4c2bd7069435f0f40dcee584f06a06ab08d387732a01bca",
+      "bytes": 160,
+      "sourceStatus": "CATALOG_MATCH",
+      "source": {
+        "type": "FIGMA_LAYER_CATALOG_MATCH",
+        "fileKey": "od7f65KVKBKaettyAhNU2Z",
+        "nodeId": "6588:16608",
+        "description": "material arrow_upward"
+      },
+      "intrinsic": {
+        "viewBox": "0 0 24 24"
+      },
+      "rendering": {
+        "colorMode": "CURRENT_COLOR_OR_ORIGINAL",
+        "defaultSize": "20px",
+        "rtlMirror": false
+      },
+      "accessibility": {
+        "decorative": true,
+        "altKey": null
+      },
+      "approval": {
+        "status": "REVIEW_REQUIRED"
+      }
+    },
+    {
+      "assetId": "icon.check",
+      "type": "SVG_ICON",
+      "file": "icons/check.svg",
+      "mediaType": "image/svg+xml",
+      "sha256": "3bc11eab2195b729cdca1351a71a187ea2e44ebc40c927786958ece45c734ec7",
+      "bytes": 150,
+      "sourceStatus": "SUBSTITUTE_PENDING_UX_APPROVAL",
+      "source": {
+        "type": "OPEN_SOURCE_SUBSTITUTE",
+        "fileKey": "od7f65KVKBKaettyAhNU2Z",
+        "nodeId": null,
+        "description": "material check (Customize selection tick — screenshot-derived)"
+      },
+      "intrinsic": {
+        "viewBox": "0 0 24 24"
+      },
+      "rendering": {
+        "colorMode": "CURRENT_COLOR_OR_ORIGINAL",
+        "defaultSize": "20px",
+        "rtlMirror": false
+      },
+      "accessibility": {
+        "decorative": true,
+        "altKey": null
+      },
+      "approval": {
+        "status": "PENDING"
+      }
+    },
+    {
+      "assetId": "icon.close",
+      "type": "SVG_ICON",
+      "file": "icons/close.svg",
+      "mediaType": "image/svg+xml",
+      "sha256": "1abf0e0aa201160b9c6d6decca211d6b6ae67d73165fc7c57581db42ef274cf9",
+      "bytes": 202,
+      "sourceStatus": "CATALOG_MATCH",
+      "source": {
+        "type": "FIGMA_LAYER_CATALOG_MATCH",
+        "fileKey": "od7f65KVKBKaettyAhNU2Z",
+        "nodeId": "6588:16666",
+        "description": "material close ('Cancel')"
+      },
+      "intrinsic": {
+        "viewBox": "0 0 24 24"
+      },
+      "rendering": {
+        "colorMode": "CURRENT_COLOR_OR_ORIGINAL",
+        "defaultSize": "20px",
+        "rtlMirror": false
+      },
+      "accessibility": {
+        "decorative": true,
+        "altKey": null
+      },
+      "approval": {
+        "status": "REVIEW_REQUIRED"
+      }
+    },
+    {
+      "assetId": "icon.external-link-line",
+      "type": "SVG_ICON",
+      "file": "icons/external-link-line.svg",
+      "mediaType": "image/svg+xml",
+      "sha256": "b1fc63ac9ade56c6ecdbad85d712e39cdf1957be1a097a15471ab8dc319e0d63",
+      "bytes": 284,
+      "sourceStatus": "SUBSTITUTE_PENDING_UX_APPROVAL",
+      "source": {
+        "type": "OPEN_SOURCE_SUBSTITUTE",
+        "fileKey": "od7f65KVKBKaettyAhNU2Z",
+        "nodeId": null,
+        "description": "remixicon 4.9.1 external-link-line (S-P4-02 v1.19.0 Penders card link glyph, screenshot-derived; Figma node pending)"
+      },
+      "intrinsic": {
+        "viewBox": "0 0 24 24"
+      },
+      "rendering": {
+        "colorMode": "CURRENT_COLOR_OR_ORIGINAL",
+        "defaultSize": "20px",
+        "rtlMirror": false
+      },
+      "accessibility": {
+        "decorative": true,
+        "altKey": null
+      },
+      "approval": {
+        "status": "REVIEW_REQUIRED"
+      }
+    },
+    {
+      "assetId": "icon.flag",
+      "type": "SVG_ICON",
+      "file": "icons/flag.svg",
+      "mediaType": "image/svg+xml",
+      "sha256": "035e2175fc7ecde2926de0b7596e5546925719419074ad8234d381c724c58498",
+      "bytes": 179,
+      "sourceStatus": "CATALOG_MATCH",
+      "source": {
+        "type": "FIGMA_LAYER_CATALOG_MATCH",
+        "fileKey": "od7f65KVKBKaettyAhNU2Z",
+        "nodeId": "6588:16901",
+        "description": "material flag"
+      },
+      "intrinsic": {
+        "viewBox": "0 0 24 24"
+      },
+      "rendering": {
+        "colorMode": "CURRENT_COLOR_OR_ORIGINAL",
+        "defaultSize": "20px",
+        "rtlMirror": false
+      },
+      "accessibility": {
+        "decorative": true,
+        "altKey": null
+      },
+      "approval": {
+        "status": "REVIEW_REQUIRED"
+      }
+    },
+    {
+      "assetId": "icon.hourglass-2-line",
+      "type": "SVG_ICON",
+      "file": "icons/hourglass-2-line.svg",
+      "mediaType": "image/svg+xml",
+      "sha256": "29f48c4a8628ca728567ee026ca92b0362cd9da17fae0df04db3acea1cc63632",
+      "bytes": 265,
+      "sourceStatus": "CATALOG_MATCH",
+      "source": {
+        "type": "FIGMA_LAYER_CATALOG_MATCH",
+        "fileKey": "od7f65KVKBKaettyAhNU2Z",
+        "nodeId": "6588:17639",
+        "description": "remixicon hourglass-2-line (layer name verbatim)"
+      },
+      "intrinsic": {
+        "viewBox": "0 0 24 24"
+      },
+      "rendering": {
+        "colorMode": "CURRENT_COLOR_OR_ORIGINAL",
+        "defaultSize": "20px",
+        "rtlMirror": false
+      },
+      "accessibility": {
+        "decorative": true,
+        "altKey": null
+      },
+      "approval": {
+        "status": "REVIEW_REQUIRED"
+      }
+    },
+    {
+      "assetId": "icon.info",
+      "type": "SVG_ICON",
+      "file": "icons/info.svg",
+      "mediaType": "image/svg+xml",
+      "sha256": "2e1a5c0fc47b41204eccc4b45a4cb73e147d8e6f1c4dbbdebbe675b09a4eb82d",
+      "bytes": 197,
+      "sourceStatus": "CATALOG_MATCH",
+      "source": {
+        "type": "FIGMA_LAYER_CATALOG_MATCH",
+        "fileKey": "od7f65KVKBKaettyAhNU2Z",
+        "nodeId": "6588:16654",
+        "description": "material info ('Info Filled')"
+      },
+      "intrinsic": {
+        "viewBox": "0 0 24 24"
+      },
+      "rendering": {
+        "colorMode": "CURRENT_COLOR_OR_ORIGINAL",
+        "defaultSize": "20px",
+        "rtlMirror": false
+      },
+      "accessibility": {
+        "decorative": true,
+        "altKey": null
+      },
+      "approval": {
+        "status": "REVIEW_REQUIRED"
+      }
+    },
+    {
+      "assetId": "icon.more-horiz",
+      "type": "SVG_ICON",
+      "file": "icons/more-horiz.svg",
+      "mediaType": "image/svg+xml",
+      "sha256": "02f1d5a094ca801a1894b768a61fea2294bdb00e3c9770939b141d42cbd5c40d",
+      "bytes": 248,
+      "sourceStatus": "CATALOG_MATCH",
+      "source": {
+        "type": "FIGMA_LAYER_CATALOG_MATCH",
+        "fileKey": "od7f65KVKBKaettyAhNU2Z",
+        "nodeId": "6588:16669",
+        "description": "material more_horiz"
+      },
+      "intrinsic": {
+        "viewBox": "0 0 24 24"
+      },
+      "rendering": {
+        "colorMode": "CURRENT_COLOR_OR_ORIGINAL",
+        "defaultSize": "20px",
+        "rtlMirror": false
+      },
+      "accessibility": {
+        "decorative": true,
+        "altKey": null
+      },
+      "approval": {
+        "status": "REVIEW_REQUIRED"
+      }
+    },
+    {
+      "assetId": "icon.filter",
+      "type": "SVG_ICON",
+      "file": "icons/filter.svg",
+      "mediaType": "image/svg+xml",
+      "sha256": "c7fd25e4c211880778c96ea32e9a3faffb54dff8d5edf6e236ab2d2ffe9adf05",
+      "bytes": 579,
+      "sourceStatus": "PROVIDED_ASSET",
+      "source": {
+        "type": "PROVIDED_ASSET",
+        "fileKey": null,
+        "nodeId": null,
+        "description": "Final filter icon supplied directly by requester for S-P4-01 metric tracking chrome (no Figma node id given)."
+      },
+      "intrinsic": {
+        "viewBox": "0 0 17 16"
+      },
+      "rendering": {
+        "colorMode": "CURRENT_COLOR_OR_ORIGINAL",
+        "defaultSize": "16px",
+        "rtlMirror": false
+      },
+      "accessibility": {
+        "decorative": true,
+        "altKey": null
+      },
+      "approval": {
+        "status": "APPROVED"
+      }
+    },
+    {
+      "assetId": "icon.more-vert",
+      "type": "SVG_ICON",
+      "file": "icons/more_vert.svg",
+      "mediaType": "image/svg+xml",
+      "sha256": "d0ac33b4858fcf6e853fe93c88b25928480d9bd3af4b0dd3dff91302dc62109b",
+      "bytes": 949,
+      "sourceStatus": "PROVIDED_ASSET",
+      "source": {
+        "type": "PROVIDED_ASSET",
+        "fileKey": null,
+        "nodeId": null,
+        "description": "Final vertical more icon supplied directly by requester for S-P4-01 metric tracking chrome (no Figma node id given)."
+      },
+      "intrinsic": {
+        "viewBox": "0 0 4 16"
+      },
+      "rendering": {
+        "colorMode": "CURRENT_COLOR_OR_ORIGINAL",
+        "defaultSize": "16px",
+        "rtlMirror": false
+      },
+      "accessibility": {
+        "decorative": true,
+        "altKey": null
+      },
+      "approval": {
+        "status": "APPROVED"
+      }
+    },
+    {
+      "assetId": "icon.quick.COMP_BEN",
+      "type": "SVG_ICON",
+      "file": "icons/Subtract.svg",
+      "mediaType": "image/svg+xml",
+      "sha256": "7bdad15c25f80dfd8b1e61e496794e53e5e6d998762ddfeb75a26260bedbcb60",
+      "bytes": 579,
+      "sourceStatus": "DLS_APPROVED",
+      "source": {
+        "type": "PROVIDED_ASSET",
+        "fileKey": null,
+        "nodeId": null,
+        "description": "Final icon supplied directly by requester for S-P4-01 quick-link rail update (no Figma node id given); see README decision D-16"
+      },
+      "intrinsic": {
+        "viewBox": "0 0 24 24"
+      },
+      "rendering": {
+        "colorMode": "CURRENT_COLOR_OR_ORIGINAL",
+        "defaultSize": "20px",
+        "rtlMirror": false
+      },
+      "accessibility": {
+        "decorative": true,
+        "altKey": null
+      },
+      "approval": {
+        "status": "APPROVED"
+      }
+    },
+    {
+      "assetId": "icon.quick.INTRODUCER_DRILLDOWN",
+      "type": "SVG_ICON",
+      "file": "icons/Introducer.svg",
+      "mediaType": "image/svg+xml",
+      "sha256": "c7e91156943c9144543e0619b58ebf1a89396fb6d99a1b7f89efab9472a72001",
+      "bytes": 926,
+      "sourceStatus": "DLS_APPROVED",
+      "source": {
+        "type": "PROVIDED_ASSET",
+        "fileKey": null,
+        "nodeId": null,
+        "description": "Final icon supplied directly by requester for S-P4-01 quick-link rail update (no Figma node id given); see README decision D-16"
+      },
+      "intrinsic": {
+        "viewBox": "0 0 24 24"
+      },
+      "rendering": {
+        "colorMode": "CURRENT_COLOR_OR_ORIGINAL",
+        "defaultSize": "20px",
+        "rtlMirror": false
+      },
+      "accessibility": {
+        "decorative": true,
+        "altKey": null
+      },
+      "approval": {
+        "status": "APPROVED"
+      }
+    },
+    {
+      "assetId": "icon.quick.LEADERBOARD",
+      "type": "SVG_ICON",
+      "file": "icons/Union.svg",
+      "mediaType": "image/svg+xml",
+      "sha256": "3d9e5160081d158321cc51a0ae6e6de4339a23681c332600b70dc767e414fbcf",
+      "bytes": 2224,
+      "sourceStatus": "DLS_APPROVED",
+      "source": {
+        "type": "PROVIDED_ASSET",
+        "fileKey": null,
+        "nodeId": null,
+        "description": "Final icon supplied directly by requester for S-P4-01 quick-link rail update (no Figma node id given); see README decision D-16"
+      },
+      "intrinsic": {
+        "viewBox": "0 0 24 24"
+      },
+      "rendering": {
+        "colorMode": "CURRENT_COLOR_OR_ORIGINAL",
+        "defaultSize": "20px",
+        "rtlMirror": false
+      },
+      "accessibility": {
+        "decorative": true,
+        "altKey": null
+      },
+      "approval": {
+        "status": "APPROVED"
+      }
+    },
+    {
+      "assetId": "icon.quick.MILESTONES",
+      "type": "SVG_ICON",
+      "file": "icons/Milestone.svg",
+      "mediaType": "image/svg+xml",
+      "sha256": "f1b133b0c26f42f167385650e3e3bf97ea3e2dbd957457df64529401f2d91afd",
+      "bytes": 460,
+      "sourceStatus": "DLS_APPROVED",
+      "source": {
+        "type": "PROVIDED_ASSET",
+        "fileKey": null,
+        "nodeId": null,
+        "description": "Final icon supplied directly by requester for S-P4-01 quick-link rail update (originally saved as Milestoen.svg, renamed to fix a filename typo); see README decision D-16"
+      },
+      "intrinsic": {
+        "viewBox": "0 0 24 24"
+      },
+      "rendering": {
+        "colorMode": "CURRENT_COLOR_OR_ORIGINAL",
+        "defaultSize": "20px",
+        "rtlMirror": false
+      },
+      "accessibility": {
+        "decorative": true,
+        "altKey": null
+      },
+      "approval": {
+        "status": "APPROVED"
+      }
+    },
+    {
+      "assetId": "icon.quick.TEAM_DRILLDOWN",
+      "type": "SVG_ICON",
+      "file": "icons/quick.TEAM_DRILLDOWN.svg",
+      "mediaType": "image/svg+xml",
+      "sha256": "50c7d05dca9be031bc5fdc1ff0281465782b77d799216d342a2d05e92a6baaa0",
+      "bytes": 1462,
+      "sourceStatus": "SUBSTITUTE_PENDING_UX_APPROVAL",
+      "source": {
+        "type": "OPEN_SOURCE_SUBSTITUTE",
+        "fileKey": "od7f65KVKBKaettyAhNU2Z",
+        "nodeId": null,
+        "description": "remixicon team-line"
+      },
+      "intrinsic": {
+        "viewBox": "0 0 24 24"
+      },
+      "rendering": {
+        "colorMode": "CURRENT_COLOR_OR_ORIGINAL",
+        "defaultSize": "20px",
+        "rtlMirror": false
+      },
+      "accessibility": {
+        "decorative": true,
+        "altKey": null
+      },
+      "approval": {
+        "status": "PENDING"
+      }
+    },
+    {
+      "assetId": "icon.quick.VIEW_MOC",
+      "type": "SVG_ICON",
+      "file": "icons/quick.VIEW_MOC.svg",
+      "mediaType": "image/svg+xml",
+      "sha256": "eeaac17c289e84307fa465cfce5d0d65c5f4b70091b23c62b2b58715f3b60069",
+      "bytes": 526,
+      "sourceStatus": "SUBSTITUTE_PENDING_UX_APPROVAL",
+      "source": {
+        "type": "OPEN_SOURCE_SUBSTITUTE",
+        "fileKey": "od7f65KVKBKaettyAhNU2Z",
+        "nodeId": null,
+        "description": "remixicon trophy-line"
+      },
+      "intrinsic": {
+        "viewBox": "0 0 24 24"
+      },
+      "rendering": {
+        "colorMode": "CURRENT_COLOR_OR_ORIGINAL",
+        "defaultSize": "20px",
+        "rtlMirror": false
+      },
+      "accessibility": {
+        "decorative": true,
+        "altKey": null
+      },
+      "approval": {
+        "status": "PENDING"
+      }
+    },
+    {
+      "assetId": "icon.refresh",
+      "type": "SVG_ICON",
+      "file": "icons/refresh.svg",
+      "mediaType": "image/svg+xml",
+      "sha256": "a906759f4fedd4d27021e75d69a1daff05518f4c9e91400ad31297cd987188e6",
+      "bytes": 303,
+      "sourceStatus": "CATALOG_MATCH",
+      "source": {
+        "type": "FIGMA_LAYER_CATALOG_MATCH",
+        "fileKey": "od7f65KVKBKaettyAhNU2Z",
+        "nodeId": "6588:16630",
+        "description": "material refresh"
+      },
+      "intrinsic": {
+        "viewBox": "0 0 24 24"
+      },
+      "rendering": {
+        "colorMode": "CURRENT_COLOR_OR_ORIGINAL",
+        "defaultSize": "20px",
+        "rtlMirror": false
+      },
+      "accessibility": {
+        "decorative": true,
+        "altKey": null
+      },
+      "approval": {
+        "status": "REVIEW_REQUIRED"
+      }
+    },
+    {
+      "assetId": "icon.sheet.CUSTOMIZE_METRICS",
+      "type": "SVG_ICON",
+      "file": "icons/sheet.CUSTOMIZE_METRICS.svg",
+      "mediaType": "image/svg+xml",
+      "sha256": "0745629d4f97b2ad679e1bc1405f2e85a830f37ccbc40b1580231df55d47426c",
+      "bytes": 319,
+      "sourceStatus": "CATALOG_MATCH",
+      "source": {
+        "type": "FIGMA_LAYER_CATALOG_MATCH",
+        "fileKey": "od7f65KVKBKaettyAhNU2Z",
+        "nodeId": "6588:16908",
+        "description": "material cached ('Cached')"
+      },
+      "intrinsic": {
+        "viewBox": "0 0 24 24"
+      },
+      "rendering": {
+        "colorMode": "CURRENT_COLOR_OR_ORIGINAL",
+        "defaultSize": "20px",
+        "rtlMirror": false
+      },
+      "accessibility": {
+        "decorative": true,
+        "altKey": null
+      },
+      "approval": {
+        "status": "REVIEW_REQUIRED"
+      }
+    },
+    {
+      "assetId": "icon.sheet.HISTORICAL_DATA",
+      "type": "SVG_ICON",
+      "file": "icons/sheet.HISTORICAL_DATA.svg",
+      "mediaType": "image/svg+xml",
+      "sha256": "172d6f0b1b51ee751a6ea2f922d08c39c7a01416f7dc9bc8bf22b77e76fd80c7",
+      "bytes": 565,
+      "sourceStatus": "CATALOG_MATCH",
+      "source": {
+        "type": "FIGMA_LAYER_CATALOG_MATCH",
+        "fileKey": "od7f65KVKBKaettyAhNU2Z",
+        "nodeId": "6588:16915",
+        "description": "material insights (stand-in for Symbols 'Monitoring')"
+      },
+      "intrinsic": {
+        "viewBox": "0 0 24 24"
+      },
+      "rendering": {
+        "colorMode": "CURRENT_COLOR_OR_ORIGINAL",
+        "defaultSize": "20px",
+        "rtlMirror": false
+      },
+      "accessibility": {
+        "decorative": true,
+        "altKey": null
+      },
+      "approval": {
+        "status": "REVIEW_REQUIRED"
+      }
+    },
+    {
+      "assetId": "icon.sheet.SET_GOALS",
+      "type": "SVG_ICON",
+      "file": "icons/sheet.SET_GOALS.svg",
+      "mediaType": "image/svg+xml",
+      "sha256": "035e2175fc7ecde2926de0b7596e5546925719419074ad8234d381c724c58498",
+      "bytes": 179,
+      "sourceStatus": "CATALOG_MATCH",
+      "source": {
+        "type": "FIGMA_LAYER_CATALOG_MATCH",
+        "fileKey": "od7f65KVKBKaettyAhNU2Z",
+        "nodeId": "6588:16901",
+        "description": "material flag ('Flag')"
+      },
+      "intrinsic": {
+        "viewBox": "0 0 24 24"
+      },
+      "rendering": {
+        "colorMode": "CURRENT_COLOR_OR_ORIGINAL",
+        "defaultSize": "20px",
+        "rtlMirror": false
+      },
+      "accessibility": {
+        "decorative": true,
+        "altKey": null
+      },
+      "approval": {
+        "status": "REVIEW_REQUIRED"
+      }
+    },
+    {
+      "assetId": "icon.sparkle",
+      "type": "SVG_ICON",
+      "file": "icons/sparkle.svg",
+      "mediaType": "image/svg+xml",
+      "sha256": "e1aeb769c87d5bcae55a4063b940ad5c675cddd91b8a44bde2dc92cef0aa4dcf",
+      "bytes": 528,
+      "sourceStatus": "CATALOG_MATCH",
+      "source": {
+        "type": "FIGMA_LAYER_CATALOG_MATCH",
+        "fileKey": "od7f65KVKBKaettyAhNU2Z",
+        "nodeId": "6588:16584",
+        "description": "remixicon sparkling-2-fill"
+      },
+      "intrinsic": {
+        "viewBox": "0 0 24 24"
+      },
+      "rendering": {
+        "colorMode": "CURRENT_COLOR_OR_ORIGINAL",
+        "defaultSize": "20px",
+        "rtlMirror": false
+      },
+      "accessibility": {
+        "decorative": true,
+        "altKey": null
+      },
+      "approval": {
+        "status": "REVIEW_REQUIRED"
+      }
+    },
+    {
+      "assetId": "icon.thumb-down",
+      "type": "SVG_ICON",
+      "file": "icons/thumb-down.svg",
+      "mediaType": "image/svg+xml",
+      "sha256": "ebc4ca0d6b9c7d90aaa2cc0e8e47c89b62985320aaebd8f190e77f37f869b9f8",
+      "bytes": 332,
+      "sourceStatus": "CATALOG_MATCH",
+      "source": {
+        "type": "FIGMA_LAYER_CATALOG_MATCH",
+        "fileKey": "od7f65KVKBKaettyAhNU2Z",
+        "nodeId": "6588:16634",
+        "description": "material thumb_down"
+      },
+      "intrinsic": {
+        "viewBox": "0 0 24 24"
+      },
+      "rendering": {
+        "colorMode": "CURRENT_COLOR_OR_ORIGINAL",
+        "defaultSize": "20px",
+        "rtlMirror": false
+      },
+      "accessibility": {
+        "decorative": true,
+        "altKey": null
+      },
+      "approval": {
+        "status": "REVIEW_REQUIRED"
+      }
+    },
+    {
+      "assetId": "icon.thumb-up",
+      "type": "SVG_ICON",
+      "file": "icons/thumb-up.svg",
+      "mediaType": "image/svg+xml",
+      "sha256": "75f74f36ec419de1975c700a7714e624a735d774e05506431f521b4eac99bdb4",
+      "bytes": 330,
+      "sourceStatus": "CATALOG_MATCH",
+      "source": {
+        "type": "FIGMA_LAYER_CATALOG_MATCH",
+        "fileKey": "od7f65KVKBKaettyAhNU2Z",
+        "nodeId": "6588:16633",
+        "description": "material thumb_up"
+      },
+      "intrinsic": {
+        "viewBox": "0 0 24 24"
+      },
+      "rendering": {
+        "colorMode": "CURRENT_COLOR_OR_ORIGINAL",
+        "defaultSize": "20px",
+        "rtlMirror": false
+      },
+      "accessibility": {
+        "decorative": true,
+        "altKey": null
+      },
+      "approval": {
+        "status": "REVIEW_REQUIRED"
+      }
+    }
+  ]
+}

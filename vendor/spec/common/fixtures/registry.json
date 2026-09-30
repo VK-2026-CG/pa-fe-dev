@@ -1,0 +1,26 @@
+{
+  "schemaVersion": "1.0",
+  "items": [
+    {
+      "fixtureId": "fixture.insights.dashboard.self",
+      "scope": "SCREEN_EXISTING",
+      "path": "domains/insights/screens/PerformanceDashboard_S-P4-01/fixtures/dashboard-self.json"
+    },
+    {
+      "fixtureId": "fixture.insights.dashboard.mixed-availability",
+      "scope": "SCREEN_EXISTING",
+      "path": "domains/insights/screens/PerformanceDashboard_S-P4-01/fixtures/dashboard-mixed-availability.json"
+    },
+    {
+      "fixtureId": "fixture.contests.portfolio.ready",
+      "scope": "SCREEN_EXISTING",
+      "path": "domains/contests/common/fixtures/portfolio.json"
+    },
+    {
+      "fixtureId": "fixture.contests.problem.denied",
+      "scope": "COMMON_CANDIDATE",
+      "path": null,
+      "status": "MISSING"
+    }
+  ]
+}

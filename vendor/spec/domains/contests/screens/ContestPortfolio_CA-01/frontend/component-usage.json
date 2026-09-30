@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "1.0",
+  "items": [
+    {
+      "requirement": "Application shell",
+      "reuseId": "component.contests.shell",
+      "decision": "REUSE_AS_IS"
+    },
+    {
+      "requirement": "Page header",
+      "reuseId": "component.global.page-header",
+      "decision": "EXTEND_COMMON"
+    },
+    {
+      "requirement": "Status",
+      "reuseId": "component.global.status-tag",
+      "decision": "REUSE_WITH_CONFIGURATION"
+    },
+    {
+      "requirement": "Result table/card",
+      "reuseId": null,
+      "decision": "CREATE_SCREEN_LOCAL"
+    }
+  ]
+}

@@ -24,8 +24,8 @@ smoke script. Never suggest converting a pure module test into a browser test.
 - `import { expect, test } from '@playwright/test';` and group with
   `test.describe`.
 - Include the AC id in the test title: `(AC-P4-03-09)`, `(D-11)`, `(D-14)`.
-- Assert i18n **values from `vendor/spec/en.json`** — period chips are `MTD`,
-  `QTD`, `YTD`. Never invent copy to make an assertion pass.
+- Assert i18n **values from the resolved bundle** (`t()` output) — period chips
+  are `MTD`, `QTD`, `YTD`. Never invent copy to make an assertion pass.
 - Use `getByRole` / `getByText` first; `data-testid` only when repeated cards
   cannot be addressed by role or name.
 - Scope locators inside overlays (`page.locator('.sheet').getByRole(...)`) — a

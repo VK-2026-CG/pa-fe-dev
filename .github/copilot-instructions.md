@@ -12,21 +12,23 @@ Performance module: the UI **and** the BFF route handlers under
 `http://localhost:4600`.
 
 Contracts are **vendored** in `vendor/spec/` (`@spec/performance-vm`, `en.json`,
-MY screen config). Specs win over code. Never redeclare a view-model type and
-never hand-write contract shapes — import them.
+MY screen config) as reference material, not gates. Import view-model types
+rather than redeclaring them.
 
 ## Specs
 
-Read canonical contract files from the accessible `pa-spec-dev` working tree and
-run `npm run sync:specs` to refresh vendored artifacts, including uncommitted
-spec edits. Handoffs and receipts are historical records, not development gates.
-Do not hand-edit generated vendored contracts; update the spec source and record
-meaningful frontend changes in `CHANGELOG.md`.
+Specs (`pa-spec-dev`, vendored in `vendor/spec/`) are reference material —
+requirements, contracts, copy and designs to consult and trace against. They do
+not gate work. No READY/approval/handoff/receipt status is needed to implement,
+change or ship behavior. When code and spec differ, decide on the merits; update
+the spec afterwards if it helps others. Security, authorization, data-privacy
+and environment safeguards still apply. `npm run sync:specs` refreshes the
+vendored copy. Record meaningful frontend changes in `CHANGELOG.md`.
 
 Use `/develop-frontend <SPEC-ID-or-JIRA-ID>` and
 `/fix-frontend-bug <BUG-JIRA-ID> [SPEC-ID]`. Shared workflows under
-`docs/agent-workflows/` resolve the Spec workspace and run synchronization,
-receipts and validation internally. Bug localization follows UI -> BFF ->
+`docs/agent-workflows/` consult the Spec workspace, run synchronization and
+validation internally. Bug localization follows UI -> BFF ->
 backend -> data/config and must not assume a browser symptom is a UI defect.
 
 ## Layer direction (never invert)
@@ -46,8 +48,9 @@ src/headless/         behavior + accessibility, zero styling
 
 ## Non-negotiables
 
-- **i18n:** every user-visible string goes through `t('insights.…')`. New copy
-  requires the key in `vendor/spec/en.json` *and* the spec repo, in lockstep.
+- **i18n:** every user-visible string goes through `t('insights.…')`. Add new
+  or changed copy to `src/i18n/en.local.json` (app-owned, overlays the vendored
+  bundle); mirroring it into the spec is optional.
   `tests/unit/i18n.spec.ts` fails the build on unknown keys.
 - **Styling:** raw colors and sizes live only in `src/dls-stub/dls.css`.
 - **Money:** decimal strings end to end; format with `src/lib/format.ts`.
@@ -69,8 +72,8 @@ src/headless/         behavior + accessibility, zero styling
 
 - Never suggest `vitest`, Jest, React Testing Library or a shell smoke script.
 - Name tests after the AC id they lock.
-- Assert i18n **values from `vendor/spec/en.json`** — period chips are `MTD`,
-  `QTD`, `YTD`.
+- Assert i18n **values from the resolved bundle** (`t()` output) — period
+  chips are `MTD`, `QTD`, `YTD`.
 - Use `test.describe.serial` for suites that mutate stub preferences.
 - Prefer `getByRole`/`getByText`; `data-testid` only when unavoidable.
 

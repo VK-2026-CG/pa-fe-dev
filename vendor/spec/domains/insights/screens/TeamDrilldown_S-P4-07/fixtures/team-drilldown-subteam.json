@@ -1,0 +1,253 @@
+{
+  "meta": {
+    "screenId": "S-P4-07",
+    "specVersion": "0.2.0",
+    "configVersion": "0.2.0",
+    "country": "MY",
+    "asOfDate": "2026-09-03",
+    "generatedAt": "2026-09-03T06:00:00Z",
+    "traceId": "fx-team-drilldown-subteam-001",
+    "partial": false
+  },
+  "filters": {
+    "scope": "TEAM",
+    "teamView": "DIRECT",
+    "basis": "AGENT",
+    "search": "",
+    "sortBy": "TPC",
+    "parentAgentId": "KCM00101"
+  },
+  "members": [
+    {
+      "agentId": "KCM00201",
+      "displayName": "Omar Hassan",
+      "hierarchyBasis": "AGENT",
+      "roleCode": "AGENT",
+      "badges": [
+        "PV",
+        "ROOKIE",
+        "VIOLET",
+        "PWP"
+      ],
+      "goalStatus": "SET",
+      "tpc": {
+        "kind": "MONEY",
+        "amount": "165000.00",
+        "currency": "MYR"
+      },
+      "ptpc": {
+        "kind": "MONEY",
+        "amount": "198000.00",
+        "currency": "MYR"
+      },
+      "nav": {
+        "route": "insights/performance",
+        "params": {
+          "subjectAgentId": "KCM00201"
+        }
+      }
+    },
+    {
+      "agentId": "KCM00202",
+      "displayName": "Isabel Nguyen",
+      "hierarchyBasis": "AGENT",
+      "roleCode": "AGENT",
+      "badges": [
+        "PV",
+        "ROOKIE",
+        "VIOLET",
+        "PWP"
+      ],
+      "goalStatus": "SET",
+      "tpc": {
+        "kind": "MONEY",
+        "amount": "164000.00",
+        "currency": "MYR"
+      },
+      "ptpc": {
+        "kind": "MONEY",
+        "amount": "198000.00",
+        "currency": "MYR"
+      },
+      "nav": {
+        "route": "insights/performance",
+        "params": {
+          "subjectAgentId": "KCM00202"
+        }
+      }
+    },
+    {
+      "agentId": "KCM00203",
+      "displayName": "David Müller",
+      "hierarchyBasis": "AGENT",
+      "roleCode": "AGENT",
+      "badges": [
+        "PV",
+        "ROOKIE",
+        "VIOLET",
+        "PWP"
+      ],
+      "goalStatus": "SET",
+      "tpc": {
+        "kind": "MONEY",
+        "amount": "162000.00",
+        "currency": "MYR"
+      },
+      "ptpc": {
+        "kind": "MONEY",
+        "amount": "198000.00",
+        "currency": "MYR"
+      },
+      "nav": {
+        "route": "insights/performance",
+        "params": {
+          "subjectAgentId": "KCM00203"
+        }
+      }
+    },
+    {
+      "agentId": "KCM00204",
+      "displayName": "Aiko Tanaka",
+      "hierarchyBasis": "AGENT",
+      "roleCode": "AGENT",
+      "badges": [
+        "PV",
+        "ROOKIE",
+        "VIOLET",
+        "PWP"
+      ],
+      "goalStatus": "SET",
+      "tpc": {
+        "kind": "MONEY",
+        "amount": "161000.00",
+        "currency": "MYR"
+      },
+      "ptpc": {
+        "kind": "MONEY",
+        "amount": "198000.00",
+        "currency": "MYR"
+      },
+      "nav": {
+        "route": "insights/performance",
+        "params": {
+          "subjectAgentId": "KCM00204"
+        }
+      }
+    },
+    {
+      "agentId": "KCM00205",
+      "displayName": "Liam O'Connor",
+      "hierarchyBasis": "AGENT",
+      "roleCode": "AGENT",
+      "badges": [
+        "PV",
+        "ROOKIE",
+        "VIOLET",
+        "PWP"
+      ],
+      "goalStatus": "SET",
+      "tpc": {
+        "kind": "MONEY",
+        "amount": "150000.00",
+        "currency": "MYR"
+      },
+      "ptpc": {
+        "kind": "MONEY",
+        "amount": "198000.00",
+        "currency": "MYR"
+      },
+      "nav": {
+        "route": "insights/performance",
+        "params": {
+          "subjectAgentId": "KCM00205"
+        }
+      }
+    },
+    {
+      "agentId": "KCM00206",
+      "displayName": "Isabella Martinez",
+      "hierarchyBasis": "AGENT",
+      "roleCode": "AGENT",
+      "badges": [
+        "PV",
+        "ROOKIE",
+        "VIOLET",
+        "PWP"
+      ],
+      "goalStatus": "SET",
+      "tpc": {
+        "kind": "MONEY",
+        "amount": "148000.00",
+        "currency": "MYR"
+      },
+      "ptpc": {
+        "kind": "MONEY",
+        "amount": "198000.00",
+        "currency": "MYR"
+      },
+      "nav": {
+        "route": "insights/performance",
+        "params": {
+          "subjectAgentId": "KCM00206"
+        }
+      }
+    },
+    {
+      "agentId": "KCM00207",
+      "displayName": "Noah Patel",
+      "hierarchyBasis": "AGENT",
+      "roleCode": "AGENT",
+      "badges": [
+        "PV",
+        "ROOKIE",
+        "VIOLET",
+        "PWP"
+      ],
+      "goalStatus": "SET",
+      "tpc": {
+        "kind": "MONEY",
+        "amount": "147000.00",
+        "currency": "MYR"
+      },
+      "ptpc": {
+        "kind": "MONEY",
+        "amount": "198000.00",
+        "currency": "MYR"
+      },
+      "nav": {
+        "route": "insights/performance",
+        "params": {
+          "subjectAgentId": "KCM00207"
+        }
+      }
+    }
+  ],
+  "parent": {
+    "agentId": "KCM00101",
+    "displayName": "Marcus Lee",
+    "hierarchyBasis": "UM",
+    "roleCode": "UM",
+    "badges": [
+      "VIOLET",
+      "PWP"
+    ],
+    "goalStatus": "SET",
+    "tpc": {
+      "kind": "MONEY",
+      "amount": "172000.00",
+      "currency": "MYR"
+    },
+    "ptpc": {
+      "kind": "MONEY",
+      "amount": "198000.00",
+      "currency": "MYR"
+    },
+    "nav": {
+      "route": "insights/performance",
+      "params": {
+        "subjectAgentId": "KCM00101"
+      }
+    },
+    "directReportCount": 24
+  }
+}

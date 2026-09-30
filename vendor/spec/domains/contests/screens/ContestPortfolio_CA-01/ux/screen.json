@@ -1,0 +1,30 @@
+{
+  "schemaVersion": "1.0",
+  "screenId": "CA-01",
+  "purpose": "Find, assess, open, and start governed contests",
+  "informationHierarchy": [
+    "Contest shell",
+    "Page title and create action",
+    "Portfolio metrics",
+    "Attention",
+    "Search and filters",
+    "Contest results",
+    "Pagination"
+  ],
+  "viewports": [
+    {
+      "id": "desktop-large",
+      "width": 1440,
+      "height": 1000,
+      "dpr": 1,
+      "status": "BLOCKED_BASELINE"
+    },
+    {
+      "id": "mobile",
+      "width": 375,
+      "height": 812,
+      "dpr": 1,
+      "status": "BLOCKED_BASELINE"
+    }
+  ]
+}

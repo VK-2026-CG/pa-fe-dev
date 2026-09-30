@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "1.0",
+  "packageProfile": "MIGRATED_LEGACY",
+  "screenId": "S-P4-01",
+  "legacyIds": [],
+  "screenKey": "performance-dashboard",
+  "screenName": "Performance Dashboard",
+  "packageName": "PerformanceDashboard_S-P4-01",
+  "version": "2.1.0",
+  "status": "DRAFT",
+  "domainCode": "insights",
+  "country": "MY",
+  "route": "insights/performance",
+  "summary": "README.md",
+  "legacyContract": "requirements/legacy-contract.md",
+  "blockers": [
+    "Strict UX source approval is incomplete",
+    "Desktop chrome (v1.4.0) is screenshot-derived, not a Figma export; Priority Metrics'/Other Focus Metrics' below-1024px single-column layout (v1.5.10/v1.5.12) is also screenshot-derived, not a Figma export; the priority card's v1.5.12 spacing tightening (AC-P4-01-46) is an unmeasured direct-instruction estimate; tablet (768-1023px) still has no control-layout spec of its own beyond matching mobile",
+    "Existing build-ready claim requires migration to new readiness evidence",
+    "SPEC-2026-001: source mapping, units, identity, period and cross-source freshness approvals remain open (C0 OQ-PA-01-17)",
+    "Priority metric value abbreviation (RM 80,000 -> 800K) is blocked pending product/design resolution of a naming-convention contradiction across two requester mockups (OQ-25); AC-P4-01-44's card-layout change is unaffected and not blocked by this",
+    "SPEC-2026-004 viewing mode (v2.1.0) is screenshot-derived; S-P4-02 drill-through while viewing is unspecified (OQ-84)"
+  ]
+}

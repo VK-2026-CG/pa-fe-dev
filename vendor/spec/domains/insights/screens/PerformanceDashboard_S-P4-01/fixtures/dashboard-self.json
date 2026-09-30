@@ -1,0 +1,74 @@
+{
+  "meta": { "screenId": "S-P4-01", "specVersion": "1.2.0", "configVersion": "2.1.0", "country": "MY", "asOfDate": "2026-07-27", "generatedAt": "2026-07-27T06:00:00Z", "traceId": "fx-dash-self-001", "partial": false },
+  "filters": {
+    "period": "YTD",
+    "periodOptions": ["MTD", "QTD", "YTD"],
+    "periodOptionsMeta": [
+      { "period": "MTD", "startDate": "2026-07-01" },
+      { "period": "QTD", "startDate": "2026-07-01" },
+      { "period": "YTD", "startDate": "2026-01-01" }
+    ],
+    "businessLine": "ALL",
+    "businessLineOptions": ["ALL", "INSURANCE", "TAKAFUL"],
+    "basis": "STANDARD",
+    "basisToggleVisible": false,
+    "scope": "SELF",
+    "teamViewToggleVisible": false
+  },
+  "quickLinks": [
+    { "id": "MILESTONES", "iconToken": "icon.insights.milestones", "nav": { "route": "insights/milestones" }, "order": 1 },
+    { "id": "COMP_BEN", "iconToken": "icon.insights.compben", "nav": { "route": "insights/comp-ben" }, "order": 2 },
+    { "id": "LEADERBOARD", "iconToken": "icon.insights.leaderboard", "nav": { "route": "insights/leaderboard" }, "order": 3 }
+  ],
+  "recommendations": {
+    "visible": true,
+    "count": 3,
+    "nav": { "route": "insights/recommendations" },
+    "panel": {
+      "recommendationId": "reco-2026-07-13-0206",
+      "flags": [
+        { "code": "PERFORMANCE_DROPS", "severity": "CRITICAL" },
+        { "code": "HISTORIC_PACE_EXCEEDED", "severity": "INFO" }
+      ],
+      "highlight": {
+        "metricCode": "TPC",
+        "achieved": { "kind": "MONEY", "amount": "152000.00", "currency": "MYR" },
+        "goal": { "state": "SET", "target": { "kind": "MONEY", "amount": "200000.00", "currency": "MYR" }, "progressPct": 76 },
+        "runRateDeltaPct": 8
+      },
+      "insights": [
+        { "code": "acs-up-5", "titleCode": "AVERAGE_CASE_SIZE_MOVER", "metricCode": "AVERAGE_CASE_SIZE", "trend": { "direction": "UP", "sentiment": "POSITIVE", "text": "5 spots this month" }, "nav": { "route": "insights/metric-detail", "params": { "metricCode": "AVERAGE_CASE_SIZE" } } },
+        { "code": "anom-tpc-80", "titleCode": "CRITICAL_ANOMALIES", "trend": { "direction": "UP", "sentiment": "NEGATIVE", "text": "5 spots this month" }, "narrative": "4 agents in your unit have hit critical performance drops this week, logging an 80% drop in TPC." }
+      ],
+      "cta": { "labelCode": "VIEW_TEAM_DRILLDOWN", "nav": { "route": "insights/team-drilldown" } },
+      "generatedAt": "2026-07-13T02:06:00Z"
+    }
+  },
+  "priorityMetrics": [
+    { "metricCode": "TPC", "valueType": "MONEY", "variant": "WITHOUT_REPRICING", "value": { "kind": "MONEY", "amount": "100000.00", "currency": "MYR" }, "showGoal": true, "goal": { "state": "NOT_SET" }, "delta": { "comparisonBasis": "LAST_YEAR", "direction": "UP", "sentiment": "POSITIVE", "display": "PCT", "pct": 27 }, "nav": { "route": "insights/metric-detail", "params": { "metricCode": "TPC" } } },
+    { "metricCode": "PTPC", "valueType": "MONEY", "variant": "WITHOUT_REPRICING", "value": { "kind": "MONEY", "amount": "70000.00", "currency": "MYR" }, "showGoal": false, "delta": { "comparisonBasis": "LAST_YEAR", "direction": "DOWN", "sentiment": "NEGATIVE", "display": "PCT", "pct": -27 }, "nav": { "route": "insights/metric-detail", "params": { "metricCode": "PTPC" } } },
+    { "metricCode": "CASE_COUNT", "valueType": "COUNT", "value": { "kind": "COUNT", "value": 12 }, "showGoal": true, "goal": { "state": "NOT_SET" }, "delta": { "comparisonBasis": "LAST_YEAR", "direction": "DOWN", "sentiment": "NEGATIVE", "display": "PCT", "pct": -5 }, "nav": { "route": "insights/metric-detail", "params": { "metricCode": "CASE_COUNT" } } },
+    { "metricCode": "FYP", "valueType": "MONEY", "value": { "kind": "MONEY", "amount": "360000.00", "currency": "MYR" }, "showGoal": true, "goal": { "state": "NOT_SET" }, "delta": { "comparisonBasis": "LAST_YEAR", "direction": "UP", "sentiment": "POSITIVE", "display": "PCT", "pct": 27 }, "nav": { "route": "insights/metric-detail", "params": { "metricCode": "FYP" } } }
+  ],
+  "focusMetrics": { "visible": true, "addEnabled": true, "items": [
+    { "metricCode": "FYC", "valueType": "MONEY", "value": { "kind": "MONEY", "amount": "180000.00", "currency": "MYR" }, "showGoal": false, "delta": { "comparisonBasis": "LAST_YEAR", "direction": "UP", "sentiment": "POSITIVE", "display": "PCT", "pct": 27 }, "nav": { "route": "insights/metric-detail", "params": { "metricCode": "FYC" } } },
+    { "metricCode": "PERSISTENCY_CY", "valueType": "PERCENT", "value": { "kind": "PERCENT", "value": 98 }, "showGoal": false, "nav": { "route": "insights/metric-detail", "params": { "metricCode": "PERSISTENCY_CY" } } }
+  ] },
+  "milestones": {
+    "visible": true,
+    "addEnabled": true,
+    "setGoalEnabled": true,
+    "items": [
+      { "programCode": "MDRT_SERIES", "variant": "WITHOUT_REPRICING", "cycleYear": 2026, "currentTierCode": "MDRT", "nextTierCode": "COT", "progressPct": 60, "measures": [ { "measureCode": "FYP", "achieved": { "kind": "MONEY", "amount": "600000.00", "currency": "MYR" }, "target": { "kind": "MONEY", "amount": "798400.00", "currency": "MYR" } }, { "measureCode": "FYC", "achieved": { "kind": "MONEY", "amount": "200000.00", "currency": "MYR" }, "target": { "kind": "MONEY", "amount": "332800.00", "currency": "MYR" } }, { "measureCode": "ANNUAL_PREMIUM", "achieved": { "kind": "MONEY", "amount": "200000.00", "currency": "MYR" }, "target": { "kind": "MONEY", "amount": "332800.00", "currency": "MYR" } } ], "nav": { "route": "insights/milestones" } },
+      { "programCode": "STAR_CLUB", "variant": "WITHOUT_REPRICING", "cycleYear": 2026, "currentTierCode": "MDRT", "nextTierCode": "COT", "progressPct": 60, "measures": [ { "measureCode": "FYP", "achieved": { "kind": "MONEY", "amount": "600000.00", "currency": "MYR" }, "target": { "kind": "MONEY", "amount": "798400.00", "currency": "MYR" } }, { "measureCode": "FYC", "achieved": { "kind": "MONEY", "amount": "200000.00", "currency": "MYR" }, "target": { "kind": "MONEY", "amount": "332800.00", "currency": "MYR" } }, { "measureCode": "ANNUAL_PREMIUM", "achieved": { "kind": "MONEY", "amount": "200000.00", "currency": "MYR" }, "target": { "kind": "MONEY", "amount": "332800.00", "currency": "MYR" } } ], "nav": { "route": "insights/milestones" } }
+    ]
+  },
+  "moreActions": [
+    { "id": "SET_GOALS", "iconToken": "icon.insights.flag", "nav": { "route": "insights/set-goals" }, "order": 1 },
+    { "id": "CUSTOMIZE_METRICS", "iconToken": "icon.insights.customize", "nav": { "route": "insights/customize-metrics" }, "order": 2 },
+    { "id": "HISTORICAL_DATA", "iconToken": "icon.insights.history", "nav": { "route": "insights/history" }, "order": 3 }
+  ],
+  "footerLinks": [
+    { "id": "VIEW_MOC", "iconToken": "icon.insights.moc", "nav": { "route": "insights/moc" }, "order": 1 }
+  ]
+}

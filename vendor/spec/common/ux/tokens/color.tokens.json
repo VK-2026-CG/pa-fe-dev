@@ -1,0 +1,71 @@
+{
+  "schemaVersion": "1.0",
+  "tokens": [
+    {
+      "token": "color.brand.primary",
+      "type": "COLOR",
+      "value": {
+        "colorSpace": "srgb",
+        "hex": "#ED1B2E",
+        "alpha": 1
+      },
+      "sourceStatus": "SUBSTITUTE_PENDING_UX_APPROVAL",
+      "source": {
+        "origin": "PruactionWeb/src/dls-stub/dls.css",
+        "note": "Screenshot-derived"
+      }
+    },
+    {
+      "token": "surface.canvas",
+      "type": "COLOR",
+      "value": {
+        "colorSpace": "srgb",
+        "hex": "#F4F5F7",
+        "alpha": 1
+      },
+      "sourceStatus": "SUBSTITUTE_PENDING_UX_APPROVAL",
+      "source": {
+        "origin": "Web DLS stub"
+      }
+    },
+    {
+      "token": "surface.default",
+      "type": "COLOR",
+      "value": {
+        "colorSpace": "srgb",
+        "hex": "#FFFFFF",
+        "alpha": 1
+      },
+      "sourceStatus": "SUBSTITUTE_PENDING_UX_APPROVAL",
+      "source": {
+        "origin": "Web DLS stub"
+      }
+    },
+    {
+      "token": "text.primary",
+      "type": "COLOR",
+      "value": {
+        "colorSpace": "srgb",
+        "hex": "#1F2733",
+        "alpha": 1
+      },
+      "sourceStatus": "SUBSTITUTE_PENDING_UX_APPROVAL",
+      "source": {
+        "origin": "Web DLS stub"
+      }
+    },
+    {
+      "token": "text.secondary",
+      "type": "COLOR",
+      "value": {
+        "colorSpace": "srgb",
+        "hex": "#6B7480",
+        "alpha": 1
+      },
+      "sourceStatus": "SUBSTITUTE_PENDING_UX_APPROVAL",
+      "source": {
+        "origin": "Web DLS stub"
+      }
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "schemaVersion": "1.0",
+  "primary": "listContests",
+  "supporting": [
+    "getContestOverview"
+  ],
+  "rule": "Supporting failure must not remove primary results; meta.partial and failedSections must identify failure"
+}

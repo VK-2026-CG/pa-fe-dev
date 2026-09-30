@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "1.0",
+  "identityPolicy": "Stable S-P4 IDs are preserved; lifecycle status is separate from identity.",
+  "screens": [
+    {
+      "screenId": "S-P4-01",
+      "legacyIds": [],
+      "screenKey": "performance-dashboard",
+      "name": "Performance Dashboard",
+      "package": "PerformanceDashboard_S-P4-01",
+      "status": "DRAFT",
+      "version": "2.1.0",
+      "route": "insights/performance"
+    },
+    {
+      "screenId": "S-P4-02",
+      "legacyIds": [],
+      "screenKey": "metric-detail",
+      "name": "Metric Detail",
+      "package": "MetricDetail_S-P4-02",
+      "status": "DRAFT",
+      "version": "1.3.0",
+      "route": "insights/metric-detail"
+    },
+    {
+      "screenId": "S-P4-03",
+      "legacyIds": [],
+      "screenKey": "historical-data",
+      "name": "Historical Data",
+      "package": "HistoricalData_S-P4-03",
+      "status": "DRAFT",
+      "version": "1.3.0",
+      "route": "insights/history"
+    },
+    {
+      "screenId": "S-P4-04",
+      "legacyIds": [],
+      "screenKey": "customize-metrics",
+      "name": "Customize Metrics",
+      "package": "CustomizeMetrics_S-P4-04",
+      "status": "DRAFT",
+      "version": "1.3.1",
+      "route": "insights/customize-metrics"
+    },
+    {
+      "screenId": "S-P4-05",
+      "legacyIds": [],
+      "screenKey": "milestones-and-benefits",
+      "name": "Milestones and Benefits",
+      "package": "MilestonesAndBenefits_S-P4-05",
+      "status": "DRAFT",
+      "version": "1.3.1",
+      "route": "insights/milestones"
+    },
+    {
+      "screenId": "S-P4-06",
+      "legacyIds": [],
+      "screenKey": "compensation-and-benefits",
+      "name": "Compensation and Benefits",
+      "package": "CompensationAndBenefits_S-P4-06",
+      "status": "DRAFT",
+      "version": "1.3.0",
+      "route": "insights/comp-ben"
+    },
+    {
+      "screenId": "S-P4-07",
+      "legacyIds": [],
+      "screenKey": "team-drilldown",
+      "name": "Team Drilldown",
+      "package": "TeamDrilldown_S-P4-07",
+      "status": "DRAFT",
+      "version": "0.2.0",
+      "route": "insights/team-drilldown"
+    }
+  ]
+}

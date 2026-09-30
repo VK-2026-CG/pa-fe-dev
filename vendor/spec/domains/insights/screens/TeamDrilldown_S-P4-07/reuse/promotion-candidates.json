@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "1.0",
+  "screenId": "S-P4-07",
+  "candidates": [
+    {
+      "candidateId": "PROMOTE-P4-07-01",
+      "reuseId": "component.insights.team-drilldown-member-list",
+      "reason": "Can be promoted to shared insights list pattern after two-screen adoption"
+    },
+    {
+      "candidateId": "PROMOTE-P4-07-02",
+      "reuseId": "w.team-drilldown.member-card",
+      "reason": "Same face renders in the main list and the subteam drawer; promote if a second screen adopts it"
+    }
+  ]
+}

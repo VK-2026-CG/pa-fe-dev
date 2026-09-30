@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "1.0",
+  "packageProfile": "MIGRATED_LEGACY",
+  "screenId": "S-P4-07",
+  "legacyIds": [],
+  "screenKey": "team-drilldown",
+  "screenName": "Team Drilldown",
+  "packageName": "TeamDrilldown_S-P4-07",
+  "version": "0.2.0",
+  "status": "DRAFT",
+  "domainCode": "insights",
+  "country": "MY",
+  "route": "insights/team-drilldown",
+  "summary": "README.md",
+  "legacyContract": "requirements/legacy-contract.md",
+  "blockers": [
+    "Strict UX source approval is incomplete (0.2.0 frames are screenshot-derived, 1.3x export scale; no Figma node ids)",
+    "Responsive/state visual baselines are incomplete: tablet 768-1023 and the mobile subteam drawer are unevidenced (OQ-81)",
+    "Hierarchy source evidence is schema-level only; row-level my_agent_hierarchy mapping proof is pending",
+    "Badges, goal status, subteam counts and photos have no approved upstream source; stub data only (OQ-79)",
+    "VIOLET badge meaning is unowned (OQ-80); frame inconsistencies recorded in OQ-82; mobile AI Recommendations bar unspecified (OQ-83)"
+  ]
+}

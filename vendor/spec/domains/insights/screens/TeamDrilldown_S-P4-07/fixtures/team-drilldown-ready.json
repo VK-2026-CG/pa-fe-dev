@@ -1,0 +1,96 @@
+{
+  "meta": {
+    "screenId": "S-P4-07",
+    "specVersion": "0.1.0",
+    "configVersion": "0.1.0",
+    "country": "MY",
+    "asOfDate": "2026-09-23",
+    "generatedAt": "2026-09-23T06:00:00Z",
+    "traceId": "fx-team-drilldown-001",
+    "partial": false
+  },
+  "filters": {
+    "scope": "TEAM",
+    "teamView": "DIRECT",
+    "basis": "AGENT",
+    "search": ""
+  },
+  "members": [
+    {
+      "agentId": "A1001",
+      "displayName": "Tan Wei Ming",
+      "hierarchyBasis": "AGENT",
+      "roleCode": "AGENT"
+    },
+    {
+      "agentId": "A1002",
+      "displayName": "Nur Aisyah",
+      "hierarchyBasis": "AGENT",
+      "roleCode": "AGENT"
+    }
+  ],
+  "selectedMember": {
+    "member": {
+      "agentId": "A1001",
+      "displayName": "Tan Wei Ming",
+      "hierarchyBasis": "AGENT",
+      "roleCode": "AGENT"
+    },
+    "context": {
+      "period": "QTD",
+      "businessLine": "ALL",
+      "basis": "STANDARD",
+      "scope": "SELF",
+      "teamView": "DIRECT",
+      "asOfDate": "2026-09-23"
+    },
+    "metrics": [
+      {
+        "metricCode": "TPC",
+        "valueType": "MONEY",
+        "value": {
+          "kind": "MONEY",
+          "amount": "100000.00",
+          "currency": "MYR"
+        },
+        "showGoal": false,
+        "delta": {
+          "comparisonBasis": "LAST_YEAR",
+          "direction": "UP",
+          "sentiment": "POSITIVE",
+          "display": "PCT",
+          "pct": 12
+        },
+        "nav": {
+          "route": "insights/metric-detail",
+          "params": {
+            "metricCode": "TPC"
+          }
+        }
+      },
+      {
+        "metricCode": "PTPC",
+        "valueType": "MONEY",
+        "value": {
+          "kind": "MONEY",
+          "amount": "72000.00",
+          "currency": "MYR"
+        },
+        "showGoal": false,
+        "delta": {
+          "comparisonBasis": "LAST_YEAR",
+          "direction": "DOWN",
+          "sentiment": "NEGATIVE",
+          "display": "PCT",
+          "pct": -3
+        },
+        "nav": {
+          "route": "insights/metric-detail",
+          "params": {
+            "metricCode": "PTPC"
+          }
+        }
+      }
+    ]
+  }
+}

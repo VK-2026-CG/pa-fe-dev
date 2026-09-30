@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "1.0",
+  "screenId": "CA-01",
+  "cdk": "ContestAdminMY",
+  "page": "portfolio",
+  "commonDependencies": [
+    "component.contests.shell",
+    "component.global.page-header",
+    "component.global.async-state",
+    "component.global.status-tag",
+    "component.contests.status-adapter"
+  ],
+  "screenLocal": [
+    "contest-portfolio-composition",
+    "contest-result-row",
+    "mobile-contest-card"
+  ]
+}

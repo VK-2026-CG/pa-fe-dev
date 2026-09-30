@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "1.0",
+  "packageProfile": "MIGRATED_LEGACY",
+  "screenId": "CA-07",
+  "legacyIds": [
+    "CA-DRAFT-07"
+  ],
+  "screenKey": "approval-inbox",
+  "screenName": "Approval Inbox",
+  "packageName": "ApprovalInbox_CA-07",
+  "version": "0.1.0",
+  "status": "DRAFT",
+  "domainCode": "contests",
+  "country": "MY",
+  "route": "/contest-admin/approvals",
+  "summary": "README.md",
+  "legacyContract": "requirements/legacy-contract.md",
+  "blockers": [
+    "Approved Figma frames and extraction are missing",
+    "Detailed UX, responsive and accessibility contracts are missing",
+    "Reuse discovery and visual baselines are incomplete"
+  ]
+}

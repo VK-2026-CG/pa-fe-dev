@@ -1,6 +1,12 @@
 import en from '@spec/en.json';
+import local from '@/i18n/en.local.json';
 
-const bundle: Record<string, string> = en as Record<string, string>;
+/**
+ * Copy bundle: the vendored spec bundle, overlaid by the app-owned
+ * `src/i18n/en.local.json`. New or changed copy goes in the local file; mirroring
+ * it into the spec is optional (specs are reference material, not a gate).
+ */
+const bundle: Record<string, string> = { ...(en as Record<string, string>), ...(local as Record<string, string>) };
 
 /** Resolve an i18n key with {param} interpolation. Missing key → the key itself (AGENTS.md hard rules: never inline copy). */
 export function t(key: string, params?: Record<string, string | number>): string {

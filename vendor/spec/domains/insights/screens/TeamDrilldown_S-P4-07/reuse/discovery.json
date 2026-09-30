@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "1.0",
+  "screenId": "S-P4-07",
+  "searchedRegistries": [
+    "common/registry.json",
+    "domains/insights/common/registry.json",
+    "common/bff/registry.json",
+    "common/domain/operations/registry.json",
+    "common/assets/MY/manifest.json"
+  ],
+  "requirements": [
+    {
+      "requirementId": "UX-P4-07-MEMBER-LIST",
+      "neededCapability": "Hierarchy member list with search",
+      "matches": [
+        "component.insights.team-drilldown-member-list"
+      ],
+      "decision": "REUSE_WITH_CONFIGURATION"
+    },
+    {
+      "requirementId": "UX-P4-07-MEMBER-PREVIEW",
+      "neededCapability": "Selected-member summary card rail",
+      "matches": [
+        "component.insights.team-drilldown-member-summary",
+        "w.metric.card"
+      ],
+      "decision": "REUSE_WITH_CONFIGURATION"
+    },
+    {
+      "requirementId": "UX-P4-07-MEMBER-CARD",
+      "neededCapability": "Member card with badges, goal status, TPC/PTPC and subteam button",
+      "matches": [
+        "component.insights.team-drilldown-member-list",
+        "dls Tag",
+        "dls Icon"
+      ],
+      "decision": "EXTEND"
+    },
+    {
+      "requirementId": "UX-P4-07-KPI-TILES",
+      "neededCapability": "Team KPI tiles",
+      "matches": [
+        "w.metric.card"
+      ],
+      "decision": "CREATE",
+      "justification": "w.metric.card carries delta/goal/nav semantics the label+value tile does not have"
+    },
+    {
+      "requirementId": "UX-P4-07-FILTERS",
+      "neededCapability": "Staged Sort By + grouped checkbox filter sheet/drawer",
+      "matches": [
+        "w.sheet.filter (S-P4-01 Filter & Selection)",
+        "headless Checkbox",
+        "headless RadioGroup",
+        "dls BottomSheet"
+      ],
+      "decision": "REUSE_WITH_CONFIGURATION"
+    },
+    {
+      "requirementId": "UX-P4-07-SUBTEAM",
+      "neededCapability": "Subteam drawer",
+      "matches": [
+        "w.sheet.filter responsive drawer chrome",
+        "component.insights.team-drilldown-member-list"
+      ],
+      "decision": "REUSE_WITH_CONFIGURATION"
+    },
+    {
+      "requirementId": "UX-P4-01-VIEWING",
+      "neededCapability": "Viewing-member banner on S-P4-01",
+      "matches": [],
+      "decision": "CREATE",
+      "justification": "No existing banner/identity-strip component"
+    }
+  ]
+}

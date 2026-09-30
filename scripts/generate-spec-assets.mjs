@@ -2,8 +2,10 @@ import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 const manifestPath = resolve('public/spec-assets/MY/manifest.json');
-if (!existsSync(manifestPath)) throw new Error('public/spec-assets/MY/manifest.json is missing; run immutable Spec sync');
-const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
+// Specs are reference material, not gates: a missing manifest yields an empty registry.
+const manifest = existsSync(manifestPath)
+  ? JSON.parse(readFileSync(manifestPath, 'utf8'))
+  : (console.warn('Warning: public/spec-assets/MY/manifest.json is missing; emitting an empty registry. Run `npm run sync:specs` to refresh.'), { assets: [] });
 const entries = manifest.assets.map((asset) => [asset.assetId, {
   src: `/spec-assets/MY/${asset.file}`,
   type: asset.type,

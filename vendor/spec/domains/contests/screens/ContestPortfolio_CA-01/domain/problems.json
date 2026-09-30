@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "1.0",
+  "handling": [
+    {
+      "status": 401,
+      "state": "UNAUTHORIZED"
+    },
+    {
+      "status": 403,
+      "state": "DENIED"
+    },
+    {
+      "status": 409,
+      "state": "CONFLICT"
+    },
+    {
+      "status": 503,
+      "state": "ERROR_WITH_TRACE"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "schemaVersion": "1.0",
+  "screenId": "CA-01",
+  "baselines": [
+    {
+      "baselineId": "CA-01.desktop.ready",
+      "status": "MISSING",
+      "viewport": "desktop-large",
+      "fixture": "fixtures/ready.json"
+    },
+    {
+      "baselineId": "CA-01.mobile.ready",
+      "status": "MISSING",
+      "viewport": "mobile",
+      "fixture": "fixtures/ready.json"
+    },
+    {
+      "baselineId": "CA-01.desktop.loading",
+      "status": "MISSING",
+      "viewport": "desktop-large",
+      "fixture": "fixtures/loading.json"
+    }
+  ],
+  "policy": {
+    "browser": "chromium",
+    "animations": "disabled",
+    "maxDifferentPixelRatio": 0.001,
+    "perPixelThreshold": 0.1
+  }
+}

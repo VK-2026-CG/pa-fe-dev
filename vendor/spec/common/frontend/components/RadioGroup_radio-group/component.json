@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "1.0",
+  "reuseId": "behavior.global.radio-group",
+  "kind": "HEADLESS_BEHAVIOR",
+  "scope": "GLOBAL",
+  "status": "CANDIDATE_EXISTING",
+  "name": "RadioGroup",
+  "spec": "common/frontend/components/RadioGroup_radio-group/component.json",
+  "implementation": {
+    "repository": "PruactionWeb",
+    "path": "src/headless/index.tsx",
+    "export": "RadioGroup"
+  },
+  "consumers": [],
+  "whenToUse": [
+    "Use when the semantic behavior and visual contract match"
+  ],
+  "whenNotToUse": [
+    "Do not add screen-specific business semantics to the common props"
+  ],
+  "extensionPolicy": "Prefer typed configuration; assess all existing consumers before extension"
+}

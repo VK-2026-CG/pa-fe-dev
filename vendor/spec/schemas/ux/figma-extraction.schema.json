@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:pruaction:ux:figma-extraction:1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "sourceType",
+    "fileKey",
+    "frameNodeIds",
+    "operations",
+    "status",
+    "extractedAt"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0"
+    },
+    "sourceType": {
+      "const": "FIGMA_MCP"
+    },
+    "fileKey": {
+      "type": "string"
+    },
+    "figmaRevision": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "pageNodeId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "frameNodeIds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "operations": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "get_metadata",
+          "get_variables",
+          "get_styles",
+          "get_screenshot",
+          "download_assets"
+        ]
+      }
+    },
+    "status": {
+      "enum": [
+        "COMPLETE",
+        "PARTIAL",
+        "BLOCKED"
+      ]
+    },
+    "extractedAt": {
+      "format": "date-time"
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

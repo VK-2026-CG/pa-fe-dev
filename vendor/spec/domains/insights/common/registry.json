@@ -1,0 +1,30 @@
+{
+  "schemaVersion": "1.0",
+  "items": [
+    {
+      "reuseId": "component.insights.ai-recommendations-panel",
+      "kind": "FRONTEND_COMPONENT",
+      "scope": "DOMAIN",
+      "status": "MIGRATED_EXISTING",
+      "name": "AI Performance Recommendations Panel",
+      "spec": "domains/insights/common/frontend/AIRecommendationsPanel_S-P23-01/contract.md",
+      "legacyId": "S-P23-01"
+    },
+    {
+      "reuseId": "component.insights.team-drilldown-member-list",
+      "kind": "FRONTEND_COMPONENT",
+      "scope": "DOMAIN",
+      "status": "CANDIDATE_EXISTING",
+      "name": "Team Drilldown Member List",
+      "spec": "domains/insights/screens/TeamDrilldown_S-P4-07/frontend/component-usage.md"
+    },
+    {
+      "reuseId": "component.insights.team-drilldown-member-summary",
+      "kind": "FRONTEND_COMPONENT",
+      "scope": "DOMAIN",
+      "status": "CANDIDATE_EXISTING",
+      "name": "Team Drilldown Member Summary",
+      "spec": "domains/insights/screens/TeamDrilldown_S-P4-07/frontend/component-usage.md"
+    }
+  ]
+}

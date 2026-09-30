@@ -1,4 +1,10 @@
-# Agent handoff protocol
+# Agent handoff protocol (retired)
+
+> **Retired — historical only and non-blocking.** Specs (`pa-spec-dev`,
+> vendored in `vendor/spec/`) are reference material, not gates. No
+> READY/approval/handoff/receipt status is needed to implement, change or ship
+> behavior, and nothing below is a prerequisite for development. The protocol is
+> kept for history; existing files here are records, not instructions.
 
 Agents communicate through committed JSON artifacts, not ephemeral chat or
 concurrent cross-repository edits. `handoffId` is the correlation key across all

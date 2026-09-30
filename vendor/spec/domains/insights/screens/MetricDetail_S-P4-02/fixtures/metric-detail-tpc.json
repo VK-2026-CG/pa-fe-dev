@@ -1,0 +1,17 @@
+{
+  "meta": { "screenId": "S-P4-02", "specVersion": "1.2.0", "configVersion": "2.1.0", "country": "MY", "asOfDate": "2026-07-27", "generatedAt": "2026-07-27T06:00:00Z", "traceId": "fx-detail-tpc-001", "partial": false },
+  "context": { "metricCode": "TPC", "scope": "SELF", "businessLine": "ALL", "period": "YTD", "basis": "STANDARD", "asOfDate": "2026-07-27" },
+  "dataState": "OK",
+  "sections": [
+    { "type": "GAUGE", "id": "gauge.primary", "variant": "WITHOUT_REPRICING", "collected": { "kind": "MONEY", "amount": "100000.00", "currency": "MYR" }, "penders": { "kind": "MONEY", "amount": "30000.00", "currency": "MYR" } },
+    { "type": "COMPARISON", "id": "comparison.primary", "variant": "WITHOUT_REPRICING", "currentYear": 2026, "current": { "kind": "MONEY", "amount": "100000.00", "currency": "MYR" }, "priorYear": 2025, "prior": { "kind": "MONEY", "amount": "78740.00", "currency": "MYR" }, "change": { "comparisonBasis": "LAST_YEAR", "direction": "UP", "sentiment": "POSITIVE", "display": "PCT", "pct": 27 } },
+    { "type": "VARIANT_VALUE", "id": "variant.with-repricing", "variant": "WITH_REPRICING", "periodLabelYear": 2026, "value": { "kind": "MONEY", "amount": "120000.00", "currency": "MYR" } },
+    { "type": "BREAKDOWN", "id": "breakdown.without-repricing", "variant": "WITHOUT_REPRICING", "columns": ["ALL"], "rows": [
+      { "productCode": "LINKED_PREMIUM", "cells": [ { "businessLine": "ALL", "value": { "kind": "MONEY", "amount": "15345.00", "currency": "MYR" } } ] },
+      { "productCode": "REGULAR_PREMIUM", "cells": [ { "businessLine": "ALL", "value": { "kind": "MONEY", "amount": "18000.00", "currency": "MYR" } } ] },
+      { "productCode": "PSA", "weightPct": 10, "cells": [ { "businessLine": "ALL", "value": { "kind": "MONEY", "amount": "17507.00", "currency": "MYR" } } ] },
+      { "productCode": "SINGLE_PREMIUM", "weightPct": 10, "cells": [ { "businessLine": "ALL", "value": { "kind": "MONEY", "amount": "25000.00", "currency": "MYR" } } ] },
+      { "productCode": "CREDIT_POINTS", "weightPct": 10, "cells": [ { "businessLine": "ALL", "value": { "kind": "MONEY", "amount": "4250.70", "currency": "MYR" } } ] }
+    ], "totals": [ { "businessLine": "ALL", "value": { "kind": "MONEY", "amount": "80102.70", "currency": "MYR" } } ] }
+  ]
+}

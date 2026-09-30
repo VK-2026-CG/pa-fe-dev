@@ -1,0 +1,41 @@
+{
+  "schemaVersion": "1.0",
+  "required": [
+    {
+      "type": "UNIT",
+      "covers": [
+        "mapping",
+        "reuse",
+        "i18n"
+      ]
+    },
+    {
+      "type": "API",
+      "covers": [
+        "operations",
+        "partial failure",
+        "authorization"
+      ]
+    },
+    {
+      "type": "E2E",
+      "covers": [
+        "interaction",
+        "keyboard",
+        "responsive"
+      ]
+    },
+    {
+      "type": "VISUAL",
+      "covers": [
+        "all required baselines"
+      ]
+    },
+    {
+      "type": "ACCESSIBILITY",
+      "covers": [
+        "WCAG contract"
+      ]
+    }
+  ]
+}

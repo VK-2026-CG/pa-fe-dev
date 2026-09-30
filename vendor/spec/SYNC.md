@@ -1,3 +1,3 @@
 # Vendored spec artifacts
 
-Copied from `PruactionSpec` at immutable revisions. `SPEC_COMMIT` is the contract revision and `HANDOFF_COMMIT` is the later commit publishing the READY instruction. Never edit vendored files directly. Run `SPEC_REF=<handoff.spec.commit> HANDOFF_REF=<publication-commit> npm run sync:specs`, review the diff, run `npm run handoff:validate`, and update the correlated frontend receipt.
+A reference copy of `pa-spec-dev`, refreshed by `npm run sync:specs` (which copies the spec working tree, including uncommitted edits). `SPEC_COMMIT` records the spec HEAD at sync time for traceability only. These files are reference material, not gates: no READY/handoff/receipt status is needed, and app-owned copy lives in `src/i18n/en.local.json`. Prefer refreshing via sync over hand-editing so the copy stays comparable with the spec.

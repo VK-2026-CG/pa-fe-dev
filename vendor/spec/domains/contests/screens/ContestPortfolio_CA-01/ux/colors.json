@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "1.0",
+  "screenId": "CA-01",
+  "tokens": [
+    "surface.canvas",
+    "surface.default",
+    "text.primary",
+    "text.secondary",
+    "color.brand.primary"
+  ],
+  "rawValuesAllowed": false
+}

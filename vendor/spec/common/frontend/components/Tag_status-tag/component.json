@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "1.0",
+  "reuseId": "component.global.status-tag",
+  "kind": "FRONTEND_COMPONENT",
+  "scope": "GLOBAL",
+  "status": "CANDIDATE_EXISTING",
+  "name": "Tag",
+  "spec": "common/frontend/components/Tag_status-tag/component.json",
+  "implementation": {
+    "repository": "PruactionWeb",
+    "path": "src/dls-stub/index.tsx",
+    "export": "Tag"
+  },
+  "consumers": [],
+  "whenToUse": [
+    "Use when the semantic behavior and visual contract match"
+  ],
+  "whenNotToUse": [
+    "Do not add screen-specific business semantics to the common props"
+  ],
+  "extensionPolicy": "Prefer typed configuration; assess all existing consumers before extension"
+}

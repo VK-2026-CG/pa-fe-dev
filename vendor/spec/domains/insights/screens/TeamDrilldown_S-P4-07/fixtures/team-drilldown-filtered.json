@@ -1,0 +1,184 @@
+{
+  "meta": {
+    "screenId": "S-P4-07",
+    "specVersion": "0.2.0",
+    "configVersion": "0.2.0",
+    "country": "MY",
+    "asOfDate": "2026-09-03",
+    "generatedAt": "2026-09-03T06:00:00Z",
+    "traceId": "fx-team-drilldown-filtered-001",
+    "partial": false
+  },
+  "filters": {
+    "scope": "TEAM",
+    "teamView": "DIRECT",
+    "basis": "AGENT",
+    "search": "",
+    "sortBy": "TPC",
+    "badges": [
+      "MDRT",
+      "TOT",
+      "PV"
+    ]
+  },
+  "members": [
+    {
+      "agentId": "KCM00103",
+      "displayName": "Omar Hassan",
+      "hierarchyBasis": "AGENT",
+      "roleCode": "AGENT",
+      "badges": [
+        "PV",
+        "VIOLET",
+        "PWP"
+      ],
+      "goalStatus": "SET",
+      "tpc": {
+        "kind": "MONEY",
+        "amount": "165000.00",
+        "currency": "MYR"
+      },
+      "ptpc": {
+        "kind": "MONEY",
+        "amount": "198000.00",
+        "currency": "MYR"
+      },
+      "nav": {
+        "route": "insights/performance",
+        "params": {
+          "subjectAgentId": "KCM00103"
+        }
+      }
+    },
+    {
+      "agentId": "KCM00105",
+      "displayName": "Liam O'Connor",
+      "hierarchyBasis": "AGENT",
+      "roleCode": "AGENT",
+      "badges": [
+        "PV",
+        "ROOKIE",
+        "MDRT",
+        "PWP"
+      ],
+      "goalStatus": "SET",
+      "tpc": {
+        "kind": "MONEY",
+        "amount": "164000.00",
+        "currency": "MYR"
+      },
+      "ptpc": {
+        "kind": "MONEY",
+        "amount": "198000.00",
+        "currency": "MYR"
+      },
+      "nav": {
+        "route": "insights/performance",
+        "params": {
+          "subjectAgentId": "KCM00105"
+        }
+      }
+    },
+    {
+      "agentId": "KCM00106",
+      "displayName": "David Müller",
+      "hierarchyBasis": "AGENT",
+      "roleCode": "AGENT",
+      "badges": [
+        "PV",
+        "ROOKIE"
+      ],
+      "goalStatus": "NOT_SET",
+      "tpc": {
+        "kind": "MONEY",
+        "amount": "162000.00",
+        "currency": "MYR"
+      },
+      "ptpc": {
+        "kind": "MONEY",
+        "amount": "198000.00",
+        "currency": "MYR"
+      },
+      "nav": {
+        "route": "insights/performance",
+        "params": {
+          "subjectAgentId": "KCM00106"
+        }
+      }
+    }
+  ],
+  "summary": [
+    {
+      "metricCode": "MANPOWER",
+      "valueType": "COUNT",
+      "value": {
+        "kind": "COUNT",
+        "value": 40
+      }
+    },
+    {
+      "metricCode": "ACTIVITY_RATIO",
+      "valueType": "PERCENT",
+      "value": {
+        "kind": "PERCENT",
+        "value": 98
+      }
+    },
+    {
+      "metricCode": "PRODUCTIVITY",
+      "valueType": "DECIMAL",
+      "value": {
+        "kind": "DECIMAL",
+        "value": 8.9,
+        "precision": 1
+      }
+    },
+    {
+      "metricCode": "AVERAGE_CASE_SIZE",
+      "valueType": "MONEY",
+      "value": {
+        "kind": "MONEY",
+        "amount": "560000.00",
+        "currency": "MYR"
+      }
+    }
+  ],
+  "filterOptions": {
+    "sortBy": [
+      "TPC",
+      "PTPC"
+    ],
+    "badgeGroups": [
+      {
+        "groupCode": "MDRT",
+        "badges": [
+          "MDRT",
+          "COT",
+          "TOT"
+        ]
+      },
+      {
+        "groupCode": "PRUWEALTH_PLANNER",
+        "badges": [
+          "WP",
+          "EWP",
+          "SWP",
+          "PWP",
+          "MWP"
+        ]
+      },
+      {
+        "groupCode": "PV",
+        "badges": [
+          "PV"
+        ]
+      },
+      {
+        "groupCode": "ROOKIE",
+        "badges": [
+          "ROOKIE"
+        ]
+      }
+    ]
+  }
+}

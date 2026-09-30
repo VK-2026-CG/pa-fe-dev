@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:pruaction:ux:image-analysis:1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "referenceId",
+    "source",
+    "coordinateModel",
+    "properties",
+    "approval"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0"
+    },
+    "referenceId": {
+      "type": "string"
+    },
+    "source": {
+      "type": "object"
+    },
+    "coordinateModel": {
+      "type": "object"
+    },
+    "properties": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "property",
+          "value",
+          "method",
+          "confidence",
+          "sourceStatus"
+        ],
+        "properties": {
+          "property": {
+            "type": "string"
+          },
+          "value": {},
+          "method": {
+            "type": "string"
+          },
+          "confidence": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "sourceStatus": {
+            "enum": [
+              "FIGMA_EXPORTED",
+              "FIGMA_MEASURED",
+              "DLS_APPROVED",
+              "CATALOG_MATCH",
+              "IMAGE_MEASURED",
+              "IMAGE_INFERRED",
+              "UX_APPROVED_INFERENCE",
+              "SUBSTITUTE_PENDING_UX_APPROVAL",
+              "PLACEHOLDER",
+              "BLOCKED"
+            ]
+          },
+          "assumptions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "approval": {
+      "type": "object",
+      "required": [
+        "status"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "PENDING",
+            "APPROVED",
+            "REJECTED"
+          ]
+        },
+        "approvedBy": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "approvedAt": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    }
+  }
+}

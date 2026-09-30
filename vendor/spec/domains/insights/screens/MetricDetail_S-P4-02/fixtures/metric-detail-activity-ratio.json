@@ -1,0 +1,9 @@
+{
+  "meta": { "screenId": "S-P4-02", "specVersion": "1.14.0", "configVersion": "2.1.0", "country": "MY", "asOfDate": "2026-07-27", "generatedAt": "2026-07-27T06:00:00Z", "traceId": "fx-detail-activity-ratio-001", "partial": false },
+  "context": { "metricCode": "ACTIVITY_RATIO", "scope": "TEAM", "teamView": "DIRECT", "businessLine": "ALL", "period": "YTD", "basis": "STANDARD", "asOfDate": "2026-07-27" },
+  "dataState": "OK",
+  "sections": [
+    { "type": "THRESHOLD_GAUGE", "id": "threshold.primary", "current": { "kind": "PERCENT", "value": 72.4 }, "threshold": { "value": 90, "comparator": "GTE" }, "sentiment": "NEGATIVE" },
+    { "type": "COMPARISON", "id": "comparison.primary", "currentYear": 2026, "current": { "kind": "PERCENT", "value": 72.4 }, "priorYear": 2025, "prior": { "kind": "PERCENT", "value": 61.8 }, "change": { "comparisonBasis": "LAST_YEAR", "direction": "UP", "sentiment": "POSITIVE", "display": "PCT", "pct": 18 } }
+  ]
+}

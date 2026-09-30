@@ -1,0 +1,84 @@
+{
+  "meta": {
+    "screenId": "S-P4-01",
+    "specVersion": "1.5.0",
+    "configVersion": "2.2.0",
+    "country": "MY",
+    "asOfDate": "2026-07-27",
+    "generatedAt": "2026-07-28T06:00:00Z",
+    "traceId": "fx-dash-mixed-001",
+    "partial": false
+  },
+  "filters": {
+    "period": "YTD",
+    "periodOptions": ["MTD", "QTD", "YTD"],
+    "businessLine": "ALL",
+    "businessLineOptions": ["ALL", "INSURANCE", "TAKAFUL"],
+    "basis": "STANDARD",
+    "basisToggleVisible": false,
+    "scope": "SELF",
+    "teamViewToggleVisible": false
+  },
+  "quickLinks": [],
+  "recommendations": { "visible": false, "count": 0, "nav": { "route": "insights/recommendations" } },
+  "priorityMetrics": [
+    {
+      "metricCode": "TPC",
+      "valueType": "MONEY",
+      "variant": "WITHOUT_REPRICING",
+      "dataState": "OK",
+      "value": { "kind": "MONEY", "amount": "100000.00", "currency": "MYR" },
+      "showGoal": true,
+      "goal": { "state": "NOT_SET" },
+      "nav": { "route": "insights/metric-detail", "params": { "metricCode": "TPC", "period": "YTD", "businessLine": "ALL", "basis": "STANDARD", "scope": "SELF" } }
+    },
+    {
+      "metricCode": "PTPC",
+      "valueType": "MONEY",
+      "variant": "WITHOUT_REPRICING",
+      "dataState": "OK",
+      "value": { "kind": "MONEY", "amount": "70000.00", "currency": "MYR" },
+      "showGoal": false,
+      "nav": { "route": "insights/metric-detail", "params": { "metricCode": "PTPC", "period": "YTD", "businessLine": "ALL", "basis": "STANDARD", "scope": "SELF" } }
+    },
+    {
+      "metricCode": "CASE_COUNT",
+      "valueType": "COUNT",
+      "dataState": "PROCESSING",
+      "showGoal": true,
+      "nav": { "route": "insights/metric-detail", "params": { "metricCode": "CASE_COUNT", "period": "YTD", "businessLine": "ALL", "basis": "STANDARD", "scope": "SELF" } }
+    },
+    {
+      "metricCode": "FYP",
+      "valueType": "MONEY",
+      "dataState": "OK",
+      "value": { "kind": "MONEY", "amount": "360000.00", "currency": "MYR" },
+      "showGoal": true,
+      "goal": { "state": "NOT_SET" },
+      "nav": { "route": "insights/metric-detail", "params": { "metricCode": "FYP", "period": "YTD", "businessLine": "ALL", "basis": "STANDARD", "scope": "SELF" } }
+    }
+  ],
+  "focusMetrics": {
+    "visible": true,
+    "addEnabled": true,
+    "items": [
+      {
+        "metricCode": "FYC",
+        "valueType": "MONEY",
+        "dataState": "EMPTY",
+        "showGoal": false,
+        "nav": { "route": "insights/metric-detail", "params": { "metricCode": "FYC", "period": "YTD", "businessLine": "ALL", "basis": "STANDARD", "scope": "SELF" } }
+      },
+      {
+        "metricCode": "PERSISTENCY_CY",
+        "valueType": "PERCENT",
+        "dataState": "EMPTY",
+        "showGoal": false,
+        "nav": { "route": "insights/metric-detail", "params": { "metricCode": "PERSISTENCY_CY", "period": "YTD", "businessLine": "ALL", "basis": "STANDARD", "scope": "SELF" } }
+      }
+    ]
+  },
+  "milestones": { "visible": true, "addEnabled": true, "setGoalEnabled": true, "items": [] },
+  "moreActions": [],
+  "footerLinks": []
+}

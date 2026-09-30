@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "1.0",
+  "events": [
+    {
+      "name": "contest_portfolio_viewed",
+      "properties": [
+        "resultCount"
+      ]
+    },
+    {
+      "name": "contest_row_opened",
+      "properties": [
+        "status"
+      ]
+    },
+    {
+      "name": "contest_create_started",
+      "properties": [
+        "origin"
+      ]
+    }
+  ]
+}

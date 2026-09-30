@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "1.0",
+  "screenId": "CA-01",
+  "state": "EMPTY_PORTFOLIO",
+  "fixtureStatus": "DESIGN_FIXTURE_REQUIRED",
+  "data": {
+    "contests": []
+  }
+}

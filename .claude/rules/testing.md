@@ -24,8 +24,9 @@ Never reintroduce `vitest`, Jest, React Testing Library or `scripts/smoke.sh`.
 
 - Import from `@playwright/test`; group with `test.describe`.
 - Put the AC id in the title: `(AC-P4-01-16)`, `(D-11)`, `(D-14)`.
-- Assert i18n **values from `vendor/spec/en.json`** — period chips are `MTD`,
-  `QTD`, `YTD`, never "Month to Date". Do not invent copy to make a test pass.
+- Assert i18n **values from the resolved bundle** (`t()` output) — period chips
+  are `MTD`, `QTD`, `YTD`, never "Month to Date". Do not invent copy to make a
+  test pass.
 - Prefer `getByRole` / `getByText`; add `data-testid` only when repeated cards
   cannot be addressed by role or name.
 - Scope locators inside overlays: a sheet backdrop intercepts clicks, so query

@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "1.0",
+  "screenId": "CA-01",
+  "shadows": [
+    "elevation.card.rest",
+    "elevation.menu"
+  ],
+  "gradients": [],
+  "filters": [],
+  "rule": "Every layer, alpha, blur, spread, blend and state variant must be defined before READY"
+}

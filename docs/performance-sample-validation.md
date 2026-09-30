@@ -77,8 +77,8 @@ The backend allowlist and tier guards remain authoritative. The production,
 MAPA and persistency inputs belong to different agents; a combined complete
 dashboard is not implied. Unsupported filters legitimately show EMPTY.
 
-Spec and implementation remain uncommitted; the outbound handoff remains DRAFT
-and the frontend receipt IN_PROGRESS. No production readiness or pixel-perfect
-claim is made. The Spec structure validator still has its pre-existing hardcoded
+Spec and implementation remain uncommitted (informational only; handoff/receipt
+status does not gate this work). No production readiness or pixel-perfect claim
+is made. The Spec structure validator still has its pre-existing hardcoded
 content-count and Windows path-exclusion failures; the five new copy keys do not
 resolve those checks. API/VM versions and schemas are unchanged in this task.

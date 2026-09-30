@@ -1,0 +1,39 @@
+{
+  "schemaVersion": "1.0",
+  "screenId": "CA-01",
+  "operations": [
+    {
+      "operationId": "listContests",
+      "usage": "PRIMARY_DATA",
+      "triggers": [
+        "ENTRY",
+        "SEARCH",
+        "FILTER",
+        "PAGE"
+      ],
+      "failureMode": "SCREEN_SECTION_ERROR"
+    },
+    {
+      "operationId": "getContestOverview",
+      "usage": "SUPPORTING_DATA",
+      "triggers": [
+        "ENTRY"
+      ],
+      "failureMode": "PARTIAL"
+    },
+    {
+      "operationId": "createContest",
+      "usage": "BLANK_CREATE",
+      "triggers": [
+        "CREATE_SUBMIT"
+      ]
+    },
+    {
+      "operationId": "startContestBrochureImport",
+      "usage": "BROCHURE_CREATE",
+      "triggers": [
+        "UPLOAD_SUBMIT"
+      ]
+    }
+  ]
+}

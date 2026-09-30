@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "1.0",
+  "packageProfile": "MIGRATED_LEGACY",
+  "screenId": "CA-10",
+  "legacyIds": [
+    "CA-DRAFT-10"
+  ],
+  "screenKey": "brochure-import",
+  "screenName": "Brochure Import",
+  "packageName": "BrochureImport_CA-10",
+  "version": "0.1.0",
+  "status": "DRAFT",
+  "domainCode": "contests",
+  "country": "MY",
+  "route": "/contest-admin/contest-imports/:importId",
+  "summary": "README.md",
+  "legacyContract": "requirements/legacy-contract.md",
+  "blockers": [
+    "Approved Figma frames and extraction are missing",
+    "Detailed UX, responsive and accessibility contracts are missing",
+    "Reuse discovery and visual baselines are incomplete"
+  ]
+}

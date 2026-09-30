@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:pruaction:ux:design-token:1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "tokens"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0"
+    },
+    "tokens": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "token",
+          "type",
+          "value",
+          "sourceStatus",
+          "source"
+        ],
+        "properties": {
+          "token": {
+            "type": "string",
+            "pattern": "^[a-z][a-zA-Z0-9.-]+$"
+          },
+          "type": {
+            "enum": [
+              "COLOR",
+              "GRADIENT",
+              "TYPOGRAPHY",
+              "SPACING",
+              "SIZING",
+              "RADIUS",
+              "BORDER",
+              "SHADOW",
+              "OPACITY",
+              "FILTER",
+              "MOTION",
+              "BREAKPOINT",
+              "LAYER"
+            ]
+          },
+          "value": {},
+          "sourceStatus": {
+            "enum": [
+              "FIGMA_EXPORTED",
+              "FIGMA_MEASURED",
+              "DLS_APPROVED",
+              "CATALOG_MATCH",
+              "IMAGE_MEASURED",
+              "IMAGE_INFERRED",
+              "UX_APPROVED_INFERENCE",
+              "SUBSTITUTE_PENDING_UX_APPROVAL",
+              "PLACEHOLDER",
+              "BLOCKED"
+            ]
+          },
+          "source": {
+            "type": "object"
+          },
+          "notes": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

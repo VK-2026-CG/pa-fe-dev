@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "1.0",
+  "packageProfile": "MIGRATED_LEGACY",
+  "screenId": "CA-06",
+  "legacyIds": [
+    "CA-DRAFT-06"
+  ],
+  "screenKey": "contest-rule-library",
+  "screenName": "Contest Rule Library",
+  "packageName": "ContestRuleLibrary_CA-06",
+  "version": "0.1.0",
+  "status": "DRAFT",
+  "domainCode": "contests",
+  "country": "MY",
+  "route": "/contest-admin/rules",
+  "summary": "README.md",
+  "legacyContract": "requirements/legacy-contract.md",
+  "blockers": [
+    "Approved Figma frames and extraction are missing",
+    "Detailed UX, responsive and accessibility contracts are missing",
+    "Reuse discovery and visual baselines are incomplete"
+  ]
+}

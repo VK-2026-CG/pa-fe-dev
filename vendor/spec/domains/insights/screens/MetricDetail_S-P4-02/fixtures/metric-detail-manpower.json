@@ -1,0 +1,15 @@
+{
+  "meta": { "screenId": "S-P4-02", "specVersion": "1.13.0", "configVersion": "2.1.0", "country": "MY", "asOfDate": "2026-07-27", "generatedAt": "2026-07-27T06:00:00Z", "traceId": "fx-detail-manpower-001", "partial": false },
+  "context": { "metricCode": "MANPOWER", "scope": "TEAM", "teamView": "DIRECT", "businessLine": "ALL", "period": "YTD", "basis": "STANDARD", "asOfDate": "2026-07-27" },
+  "dataState": "OK",
+  "sections": [
+    { "type": "BAR_COMPARISON", "id": "bars.primary", "years": [2025, 2026], "axisUnitCode": "AGENTS", "layout": "STACKED", "measures": [
+      { "measureCode": "EXISTING_AGENTS", "points": [ { "year": 2025, "value": { "kind": "COUNT", "value": 14 } }, { "year": 2026, "value": { "kind": "COUNT", "value": 17 } } ] },
+      { "measureCode": "NEW_RECRUITS", "points": [ { "year": 2025, "value": { "kind": "COUNT", "value": 4 } }, { "year": 2026, "value": { "kind": "COUNT", "value": 8 } } ] }
+    ], "totals": [
+      { "year": 2025, "value": { "kind": "COUNT", "value": 18 } },
+      { "year": 2026, "value": { "kind": "COUNT", "value": 25 }, "change": { "comparisonBasis": "LAST_YEAR", "direction": "UP", "sentiment": "POSITIVE", "display": "PCT", "pct": 39 } }
+    ] },
+    { "type": "COMPARISON", "id": "comparison.primary", "currentYear": 2026, "current": { "kind": "COUNT", "value": 25 }, "priorYear": 2025, "prior": { "kind": "COUNT", "value": 18 }, "change": { "comparisonBasis": "LAST_YEAR", "direction": "UP", "sentiment": "POSITIVE", "display": "PCT", "pct": 39 } }
+  ]
+}

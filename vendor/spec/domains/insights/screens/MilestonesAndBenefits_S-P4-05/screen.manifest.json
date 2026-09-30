@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "1.0",
+  "packageProfile": "MIGRATED_LEGACY",
+  "screenId": "S-P4-05",
+  "legacyIds": [],
+  "screenKey": "milestones-and-benefits",
+  "screenName": "Milestones and Benefits",
+  "packageName": "MilestonesAndBenefits_S-P4-05",
+  "version": "1.3.1",
+  "status": "DRAFT",
+  "domainCode": "insights",
+  "country": "MY",
+  "route": "insights/milestones",
+  "summary": "README.md",
+  "legacyContract": "requirements/legacy-contract.md",
+  "blockers": [
+    "Strict UX source approval is incomplete",
+    "Responsive/state visual baselines are incomplete",
+    "Existing build-ready claim requires migration to new readiness evidence"
+  ]
+}

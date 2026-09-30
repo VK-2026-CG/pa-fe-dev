@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "1.0",
+  "reuseId": "component.global.progress",
+  "kind": "FRONTEND_COMPONENT",
+  "scope": "GLOBAL",
+  "status": "CANDIDATE_EXISTING",
+  "name": "ProgressBar",
+  "spec": "common/frontend/components/ProgressBar_progress/component.json",
+  "implementation": {
+    "repository": "PruactionWeb",
+    "path": "src/dls-stub/index.tsx",
+    "export": "ProgressBar"
+  },
+  "consumers": [],
+  "whenToUse": [
+    "Use when the semantic behavior and visual contract match"
+  ],
+  "whenNotToUse": [
+    "Do not add screen-specific business semantics to the common props"
+  ],
+  "extensionPolicy": "Prefer typed configuration; assess all existing consumers before extension"
+}

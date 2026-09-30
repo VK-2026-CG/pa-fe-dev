@@ -1,0 +1,60 @@
+{
+  "meta": {
+    "screenId": "S-P4-02",
+    "specVersion": "1.2.0",
+    "configVersion": "2.1.0",
+    "country": "MY",
+    "asOfDate": "2026-09-09",
+    "generatedAt": "2026-09-09T06:00:00Z",
+    "traceId": "fx-detail-new-recruit-contracted-001",
+    "partial": false
+  },
+  "context": {
+    "metricCode": "NEW_RECRUIT_CONTRACTED",
+    "scope": "SELF",
+    "businessLine": "ALL",
+    "period": "YTD",
+    "basis": "STANDARD",
+    "asOfDate": "2026-09-09"
+  },
+  "dataState": "OK",
+  "sections": [
+    {
+      "type": "BAR_COMPARISON",
+      "id": "bars.primary",
+      "years": [2025, 2026],
+      "axisUnitCode": "AGENTS",
+      "measures": [
+        {
+          "measureCode": "NON_PV",
+          "points": [
+            { "year": 2025, "value": { "kind": "COUNT", "value": 6 } },
+            { "year": 2026, "value": { "kind": "COUNT", "value": 8 }, "change": { "comparisonBasis": "LAST_YEAR", "direction": "UP", "sentiment": "POSITIVE", "display": "ABS", "abs": { "kind": "COUNT", "value": 2 } } }
+          ]
+        },
+        {
+          "measureCode": "PV",
+          "points": [
+            { "year": 2025, "value": { "kind": "COUNT", "value": 0 } },
+            { "year": 2026, "value": { "kind": "COUNT", "value": 0 }, "change": { "comparisonBasis": "LAST_YEAR", "direction": "FLAT", "sentiment": "NEUTRAL", "display": "ABS", "abs": { "kind": "COUNT", "value": 0 } } }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "COMPARISON",
+      "id": "comparison.primary",
+      "currentYear": 2026,
+      "current": { "kind": "COUNT", "value": 8 },
+      "priorYear": 2025,
+      "prior": { "kind": "COUNT", "value": 6 },
+      "change": {
+        "comparisonBasis": "LAST_YEAR",
+        "direction": "UP",
+        "sentiment": "POSITIVE",
+        "display": "PCT",
+        "pct": 25
+      }
+    }
+  ]
+}

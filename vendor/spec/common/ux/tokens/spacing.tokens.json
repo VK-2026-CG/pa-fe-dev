@@ -1,0 +1,36 @@
+{
+  "schemaVersion": "1.0",
+  "tokens": [
+    {
+      "token": "space.page.gutter",
+      "type": "SPACING",
+      "value": "16px",
+      "sourceStatus": "FIGMA_MEASURED",
+      "source": {
+        "fileKey": "od7f65KVKBKaettyAhNU2Z",
+        "nodeId": "6588:16550"
+      }
+    },
+    {
+      "token": "space.section.default",
+      "type": "SPACING",
+      "value": "24px",
+      "sourceStatus": "IMAGE_MEASURED",
+      "source": {
+        "reference": "Customize screenshot",
+        "approval": "PENDING"
+      }
+    },
+    {
+      "token": "space.quicklink.gap",
+      "type": "SPACING",
+      "value": "64px",
+      "sourceStatus": "DLS_APPROVED",
+      "source": {
+        "origin": "Value supplied directly by requester for S-P4-01 R1 quick-link rail at breakpoint.tablet/breakpoint.desktop (no Figma node id); see README decision D-17",
+        "approval": "APPROVED"
+      },
+      "notes": "Applies at breakpoint.tablet (768-1023px) and breakpoint.desktop (>=1024px) only. Mobile (<768px) keeps the existing edge-to-edge distribution (gap: 0, justify-content: space-between) unchanged."
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "1.0",
+  "cases": [
+    {
+      "id": "long-name",
+      "value": "100-character contest name"
+    },
+    {
+      "id": "max-rows",
+      "value": "100 rows"
+    },
+    {
+      "id": "unknown-status",
+      "value": "UNRECOGNIZED_LIFECYCLE_STATE"
+    },
+    {
+      "id": "large-count",
+      "value": "999999"
+    }
+  ]
+}

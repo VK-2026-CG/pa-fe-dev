@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "1.0",
+  "screenId": "CA-01",
+  "states": [
+    "LOADING",
+    "READY",
+    "EMPTY_PORTFOLIO",
+    "EMPTY_FILTERED",
+    "PARTIAL_ATTENTION",
+    "DENIED",
+    "ERROR",
+    "OVERFLOW",
+    "UNKNOWN_STATUS"
+  ],
+  "requiredInteractionStates": [
+    "DEFAULT",
+    "HOVER",
+    "FOCUS_VISIBLE",
+    "PRESSED",
+    "DISABLED",
+    "BUSY"
+  ]
+}

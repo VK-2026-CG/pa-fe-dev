@@ -1,0 +1,6 @@
+{
+  "meta": { "screenId": "S-P4-02", "specVersion": "1.2.0", "configVersion": "2.1.0", "country": "MY", "asOfDate": "2026-07-27", "generatedAt": "2026-07-27T06:00:00Z", "traceId": "fx-detail-empty-001", "partial": false },
+  "context": { "metricCode": "CASE_COUNT", "scope": "SELF", "businessLine": "ALL", "period": "YTD", "basis": "STANDARD", "asOfDate": "2026-07-27" },
+  "dataState": "EMPTY",
+  "sections": []
+}

@@ -14,9 +14,9 @@ the separate `pa-be-dev` repo (`pruaction-insights-service`, Fastify)
 expected on **http://localhost:4600** (`VITE_BFF_URL` to point this app
 elsewhere — see [ADR 0004](docs/architecture/decisions/0004-vite-spa-and-bff-extraction.md)).
 
-**Specs win over code.** Contracts are vendored under `vendor/spec/` from the
-separate `pruaction-spec` repo — VM types (`@spec/performance-vm`), i18n
-bundle, MY screen config.
+**Specs are reference, not gates.** Contracts are vendored under
+`vendor/spec/` from the separate `pa-spec-dev` repo — VM types
+(`@spec/performance-vm`), i18n bundle, MY screen config — see the policy below.
 
 Stack (fixed): no state library (page-local fetch), no Tailwind — one global
 stylesheet that imports the DLS stub, **Playwright for all testing** (unit +
@@ -71,9 +71,15 @@ To see mock data for every persona / scope / period with no Mongo or local
 (`.env.mock` blanks `VITE_PERSONA`/`VITE_PERFORMANCE_AGENT_ID` so the dropdown
 drives persona).
 
-## Spec handoff workflow
+## Specs policy
 
-Read `handoffs/README.md` and the matching inbound handoff before contract work. Sync its exact commit, validate it, implement only frontend actions, and update the frontend receipt. Never edit an inbound handoff or vendored contract directly.
+Specs (`pa-spec-dev`, vendored in `vendor/spec/`) are reference material —
+requirements, contracts, copy and designs to consult and trace against. They do
+not gate work. No READY/approval/handoff/receipt status is needed to implement,
+change or ship behavior. When code and spec differ, decide on the merits; update
+the spec afterwards if it helps others. Security, authorization, data-privacy
+and environment safeguards are engineering rules independent of the spec and
+still apply. `handoffs/` is a retired, historical protocol.
 
 Use `/develop-frontend <SPEC-ID-or-JIRA-ID>` and `/fix-frontend-bug
 <BUG-JIRA-ID> [SPEC-ID]` in Claude Code. Skills under `.claude/skills/` execute

@@ -1,0 +1,40 @@
+{
+  "schemaVersion": "1.0",
+  "screenId": "CA-01",
+  "layout": {
+    "shell": {
+      "reuseId": "component.contests.shell"
+    },
+    "content": {
+      "maxWidth": "UNRESOLVED",
+      "padding": {
+        "top": "32px",
+        "right": "32px",
+        "bottom": "48px",
+        "left": "32px"
+      },
+      "sourceStatus": "IMAGE_INFERRED",
+      "approval": "PENDING"
+    },
+    "summaryGrid": {
+      "desktop": {
+        "columns": 4,
+        "gap": "16px"
+      },
+      "compact": {
+        "columns": 2,
+        "gap": "16px"
+      },
+      "mobile": {
+        "columns": 1,
+        "gap": "12px"
+      },
+      "sourceStatus": "BLOCKED"
+    },
+    "table": {
+      "minWidth": "960px",
+      "mobileTransformation": "SEMANTIC_CARDS",
+      "sourceStatus": "BLOCKED"
+    }
+  }
+}

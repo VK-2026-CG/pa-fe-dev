@@ -20,8 +20,8 @@ Code, then use:
 /fix-frontend-bug PRU-5682 PRU-1234-SP02
 ```
 
-The same commands work in Copilot and Claude. Agents resolve canonical Spec
-Markdown/contracts, sync directly from the spec working tree, and report AC plus
+The same commands work in Copilot and Claude. Agents consult Spec
+Markdown/contracts as reference, sync directly from the spec working tree, and report AC plus
 visual/accessibility evidence. Bug commands trace UI, BFF, backend, data
 and configuration and redirect ownership rather than hiding upstream defects.
 See `docs/agent-workflows/`.
@@ -195,10 +195,18 @@ Each country is deployed independently with its own frontend, backend, MongoDB i
 
 Detailed frontend requirements are vendored from Spec under
 `vendor/spec/domains/<domain>/screens/`, with reusable catalogs under `vendor/spec/common/`.
-Physical approved assets are synced to `public/spec-assets/` and exposed by
-`src/generated/spec-assets.ts`. Run `npm run assets:validate`; never edit
-these generated assets locally.
+Spec assets are synced to `public/spec-assets/` and exposed by
+`src/generated/spec-assets.ts`. Prefer refreshing them with `npm run sync:specs`;
+local overrides are allowed when needed. `npm run assets:validate` warns on
+checksum drift and fails on unsafe SVGs.
 
-## Agent handoffs
+Specs are reference material, not gates: no READY/approval/handoff/receipt
+status is needed to implement, change or ship behavior. When code and spec
+differ, decide on the merits; update the spec afterwards if it helps others.
+Security, authorization, data-privacy and environment safeguards still apply.
 
-Spec and application agents communicate through [`handoffs/`](handoffs/README.md). Use `SPEC_REF=<contract-commit> HANDOFF_REF=<handoff-commit> npm run sync:specs`, then `npm run handoff:validate`. The Web agent owns only `handoffs/outbox/receipts/`; inbound handoffs are immutable. Production builds require explicit country-specific server URLs.
+## Agent handoffs (retired)
+
+The [`handoffs/`](handoffs/README.md) protocol is retired and kept for history
+only; it does not gate development. Refresh the vendored reference copy with
+`npm run sync:specs`. Production builds require explicit country-specific server URLs.

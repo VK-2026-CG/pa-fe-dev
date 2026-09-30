@@ -1,0 +1,96 @@
+{
+  "schemaVersion": "1.0",
+  "screenId": "CA-01",
+  "screenKey": "contest-portfolio",
+  "screenName": "Contest Portfolio",
+  "packageName": "ContestPortfolio_CA-01",
+  "version": "0.2.0",
+  "status": "DRAFT",
+  "domainCode": "contests",
+  "country": "MY",
+  "route": "/contest-admin/contests",
+  "summary": "README.md",
+  "requirements": {
+    "business": "requirements/business.md",
+    "functional": "requirements/functional.md",
+    "nonFunctional": "requirements/non-functional.md",
+    "roles": "requirements/roles-permissions.md",
+    "openQuestions": "requirements/open-questions.md"
+  },
+  "ux": {
+    "screen": "ux/screen.json",
+    "layout": "ux/layout.json",
+    "typography": "ux/typography.json",
+    "colors": "ux/colors.json",
+    "effects": "ux/effects.json",
+    "interactions": "ux/interaction-matrix.json",
+    "responsive": "ux/responsive-matrix.json",
+    "states": "ux/state-matrix.json",
+    "accessibility": "ux/accessibility.json",
+    "contentStress": "ux/content-stress.json",
+    "baselines": "ux/visual-baselines.json"
+  },
+  "design": {
+    "figma": "design/figma.json",
+    "extraction": "design/extraction.json",
+    "sourceStatus": "design/source-status.json"
+  },
+  "assets": "assets/manifest.json",
+  "frontend": {
+    "composition": "frontend/composition.json",
+    "componentUsage": "frontend/component-usage.json",
+    "decisions": "frontend/component-decisions.json",
+    "routes": "frontend/routes.json"
+  },
+  "domainContract": {
+    "operations": "domain/operations.json",
+    "problems": "domain/problems.json",
+    "authorization": "domain/authorization.json",
+    "traceability": "domain/data-traceability.json"
+  },
+  "bff": {
+    "routes": "bff/routes.json",
+    "mapping": "bff/mapping.json",
+    "partialFailure": "bff/partial-failure.json",
+    "errors": "bff/errors.json"
+  },
+  "fixtures": [
+    "fixtures/ready.json",
+    "fixtures/loading.json",
+    "fixtures/empty.json",
+    "fixtures/filtered-empty.json",
+    "fixtures/partial.json",
+    "fixtures/error.json",
+    "fixtures/denied.json",
+    "fixtures/overflow.json",
+    "fixtures/unknown-status.json"
+  ],
+  "content": {
+    "i18n": "content/i18n-keys.json",
+    "review": "content/copy-review.md"
+  },
+  "telemetry": {
+    "events": "telemetry/events.json",
+    "prohibited": "telemetry/prohibited-properties.json"
+  },
+  "acceptance": {
+    "criteria": "acceptance/criteria.json",
+    "traceability": "acceptance/traceability.json",
+    "tests": "acceptance/test-requirements.json"
+  },
+  "reuse": {
+    "discovery": "reuse/discovery.json",
+    "decisions": "reuse/decisions.json",
+    "promotion": "reuse/promotion-candidates.json"
+  },
+  "blockers": [
+    "Approved Contest Portfolio Figma frames are missing",
+    "Approved DLS font package is missing",
+    "Exact Figma icon/image exports are missing",
+    "Desktop/tablet/mobile responsive rulings are incomplete",
+    "Canonical visual baselines are missing"
+  ],
+  "legacyIds": [
+    "CA-DRAFT-01"
+  ]
+}

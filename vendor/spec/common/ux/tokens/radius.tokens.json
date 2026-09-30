@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "1.0",
+  "tokens": [
+    {
+      "token": "radius.card",
+      "type": "RADIUS",
+      "value": {
+        "topLeft": "12px",
+        "topRight": "12px",
+        "bottomRight": "12px",
+        "bottomLeft": "12px",
+        "clipping": true
+      },
+      "sourceStatus": "SUBSTITUTE_PENDING_UX_APPROVAL",
+      "source": {
+        "origin": "Web DLS stub"
+      }
+    }
+  ]
+}

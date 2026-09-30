@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "1.0",
+  "items": [
+    {
+      "localId": "contest-result-row",
+      "targetScope": "SCREEN_FAMILY",
+      "trigger": "A second screen needs equivalent Contest result presentation"
+    }
+  ]
+}

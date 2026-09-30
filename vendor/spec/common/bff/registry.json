@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "1.0",
+  "items": [
+    {
+      "reuseId": "bff.contests.domain-call",
+      "scope": "DOMAIN",
+      "status": "CANDIDATE_EXISTING",
+      "responsibilities": [
+        "country-derived domain URL",
+        "identity propagation",
+        "Problem mapping",
+        "ETag and idempotency headers",
+        "no-store"
+      ],
+      "implementation": {
+        "repository": "PruactionWeb",
+        "path": "src/lib/contest-admin/domain-client.ts",
+        "export": "contestDomain"
+      }
+    }
+  ]
+}

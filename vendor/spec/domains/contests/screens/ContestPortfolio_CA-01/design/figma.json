@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "1.0",
+  "sourceType": "FIGMA_MCP",
+  "fileKey": null,
+  "pageNodeId": null,
+  "frameNodeIds": [],
+  "designStatus": "BLOCKED",
+  "requiredOperations": [
+    "get_metadata",
+    "get_variables",
+    "get_styles",
+    "download_assets",
+    "get_screenshot"
+  ]
+}

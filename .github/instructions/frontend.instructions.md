@@ -39,20 +39,21 @@ app → cdk → components → dls-stub → headless
 - Read the Screen-ID package summary, reuse discovery and component decisions
   before implementation. Reuse mapped DLS/headless/domain components and BFF
   patterns before creating local code.
-- Do not manually copy Figma icons/images into Web. Immutable Spec sync owns
-  `public/spec-assets` and the generated typed registry.
-- Visual details include exact typography, color, alpha, gradients, every shadow
+- Prefer refreshing `public/spec-assets` and the generated typed registry via
+  `npm run sync:specs`; local overrides are allowed when needed.
+- Visual details include typography, color, alpha, gradients, every shadow
   layer, border/radius, spacing, layout, image treatment, motion and all state
-  variants. Missing approval is a Spec blocker, not a license to approximate.
+  variants. Use the spec designs as reference; where they are missing or
+  unclear, decide on the merits and note it for the spec.
 
 ## Content and data rules
 
-- Contract changes require a validated frontend handoff and receipt evidence; never infer a missing field or country behavior.
-
-- All user-visible strings go through `t('insights.…')`; new keys must be added to
-  `vendor/spec/en.json` and the spec repo together.
-- Import view-models from `@spec/performance-vm`; never redeclare or hand-write
-  them.
+- Specs are reference material, not gates: no handoff, receipt or approval is
+  needed to change behavior. Keep country behavior explicit rather than inferred.
+- All user-visible strings go through `t('insights.…')`; add new or changed copy
+  to `src/i18n/en.local.json` (app-owned, overlays the vendored bundle);
+  mirroring it into the spec is optional.
+- Import view-models from `@spec/performance-vm`; never redeclare them.
 - Money is a decimal string — format with `src/lib/format.ts`, never `parseFloat`.
 - Render sections in BFF order; skip unknown types instead of throwing.
 - Read `DeltaVM.display` for units; never infer them.

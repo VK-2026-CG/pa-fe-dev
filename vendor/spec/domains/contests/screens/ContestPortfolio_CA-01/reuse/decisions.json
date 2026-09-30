@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "1.0",
+  "screenId": "CA-01",
+  "decisions": [
+    {
+      "requirementId": "UX-CA-01-SHELL",
+      "decision": "REUSE_AS_IS",
+      "reuseId": "component.contests.shell",
+      "justification": "Current domain shell is used by all Contest screens"
+    },
+    {
+      "requirementId": "UX-CA-01-HEADER",
+      "decision": "EXTEND_COMMON",
+      "reuseId": "component.global.page-header",
+      "justification": "Existing helper should become stable shared component after comparison"
+    },
+    {
+      "requirementId": "UX-CA-01-ROW",
+      "decision": "CREATE_SCREEN_LOCAL",
+      "reuseId": null,
+      "justification": "No registered approved common match; candidate for promotion after second consumer"
+    }
+  ]
+}

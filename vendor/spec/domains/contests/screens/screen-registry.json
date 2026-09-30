@@ -1,0 +1,126 @@
+{
+  "schemaVersion": "1.0",
+  "identityPolicy": "Lifecycle status is separate from stable screen identity; legacy CA-DRAFT aliases resolve to permanent CA IDs.",
+  "screens": [
+    {
+      "screenId": "CA-01",
+      "legacyIds": [
+        "CA-DRAFT-01"
+      ],
+      "screenKey": "contest-portfolio",
+      "name": "Contest Portfolio",
+      "package": "ContestPortfolio_CA-01",
+      "status": "DRAFT",
+      "version": "0.2.0",
+      "route": "/contest-admin/contests"
+    },
+    {
+      "screenId": "CA-02",
+      "legacyIds": [
+        "CA-DRAFT-02"
+      ],
+      "screenKey": "contest-builder",
+      "name": "Contest Builder",
+      "package": "ContestBuilder_CA-02",
+      "status": "DRAFT",
+      "version": "0.1.0",
+      "route": "/contest-admin/contests/:contestId/versions/:versionId/edit/:step"
+    },
+    {
+      "screenId": "CA-03",
+      "legacyIds": [
+        "CA-DRAFT-03"
+      ],
+      "screenKey": "qualification-rule-editor",
+      "name": "Qualification Rule Editor",
+      "package": "QualificationRuleEditor_CA-03",
+      "status": "DRAFT",
+      "version": "0.1.0",
+      "route": "/contest-admin/contests/:contestId/versions/:versionId/rules/:ruleId"
+    },
+    {
+      "screenId": "CA-04",
+      "legacyIds": [
+        "CA-DRAFT-04"
+      ],
+      "screenKey": "contest-review-and-submission",
+      "name": "Contest Review and Submission",
+      "package": "ContestReviewAndSubmission_CA-04",
+      "status": "DRAFT",
+      "version": "0.1.0",
+      "route": "/contest-admin/contests/:contestId/versions/:versionId/review"
+    },
+    {
+      "screenId": "CA-05",
+      "legacyIds": [
+        "CA-DRAFT-05"
+      ],
+      "screenKey": "contest-simulation",
+      "name": "Contest Simulation",
+      "package": "ContestSimulation_CA-05",
+      "status": "DRAFT",
+      "version": "0.1.0",
+      "route": "/contest-admin/contests/:contestId/versions/:versionId/simulations"
+    },
+    {
+      "screenId": "CA-06",
+      "legacyIds": [
+        "CA-DRAFT-06"
+      ],
+      "screenKey": "contest-rule-library",
+      "name": "Contest Rule Library",
+      "package": "ContestRuleLibrary_CA-06",
+      "status": "DRAFT",
+      "version": "0.1.0",
+      "route": "/contest-admin/rules"
+    },
+    {
+      "screenId": "CA-07",
+      "legacyIds": [
+        "CA-DRAFT-07"
+      ],
+      "screenKey": "approval-inbox",
+      "name": "Approval Inbox",
+      "package": "ApprovalInbox_CA-07",
+      "status": "DRAFT",
+      "version": "0.1.0",
+      "route": "/contest-admin/approvals"
+    },
+    {
+      "screenId": "CA-08",
+      "legacyIds": [
+        "CA-DRAFT-08"
+      ],
+      "screenKey": "contest-audit-log",
+      "name": "Contest Audit Log",
+      "package": "ContestAuditLog_CA-08",
+      "status": "DRAFT",
+      "version": "0.1.0",
+      "route": "/contest-admin/audit"
+    },
+    {
+      "screenId": "CA-09",
+      "legacyIds": [
+        "CA-DRAFT-09"
+      ],
+      "screenKey": "historic-contest-library",
+      "name": "Historic Contest Library",
+      "package": "HistoricContestLibrary_CA-09",
+      "status": "DRAFT",
+      "version": "0.1.0",
+      "route": "/contest-admin/historic-contests"
+    },
+    {
+      "screenId": "CA-10",
+      "legacyIds": [
+        "CA-DRAFT-10"
+      ],
+      "screenKey": "brochure-import",
+      "name": "Brochure Import",
+      "package": "BrochureImport_CA-10",
+      "status": "DRAFT",
+      "version": "0.1.0",
+      "route": "/contest-admin/contest-imports/:importId"
+    }
+  ]
+}

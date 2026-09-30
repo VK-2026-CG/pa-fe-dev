@@ -42,7 +42,7 @@ Vite dev server (:3600) itself.
 ## Conventions
 
 - **Name tests after the AC id** they lock: `(AC-P4-01-16)`, `(D-11)`, `(D-14)`.
-- **Assert i18n values from `vendor/spec/en.json`.** Period chips are
+- **Assert i18n values from the resolved bundle** (`t()` output). Period chips are
   `MTD`/`QTD`/`YTD` — not "Month to Date". Inventing copy is how these tests go
   green against the wrong UI.
 - **Semantic locators first:** `getByRole`, `getByText`, `getByRole('tab', …)`.

@@ -28,11 +28,11 @@ export function formatCount(value: number): string { return group(String(Math.tr
 function formatCompactNumber(value: number): string {
   const neg = value < 0;
   const abs = Math.abs(value);
-  const round1 = (n: number) => (Math.round(n * 10) / 10).toString().replace(/\.0$/, '');
+  const roundToOneDecimal = (n: number) => (Math.round(n * 10) / 10).toString().replace(/\.0$/, '');
   const compact = abs >= 1_000_000
-    ? `${round1(abs / 1_000_000)}M`
+    ? `${roundToOneDecimal(abs / 1_000_000)}M`
     : abs >= 1_000
-      ? `${round1(abs / 1_000)}K`
+      ? `${roundToOneDecimal(abs / 1_000)}K`
       : group(String(Math.trunc(abs)));
   return `${neg ? '-' : ''}${compact}`;
 }

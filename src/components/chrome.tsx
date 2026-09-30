@@ -151,9 +151,12 @@ export function FilterSheet({
   const [businessLine, setBusinessLine] = useState<BusinessLine>(
     f.businessLine,
   );
-  const [basis, setBasis] = useState<Basis>(f.basis);
+  const [basis] = useState<Basis>(f.basis);
   const [teamView, setTeamView] = useState<TeamView | undefined>(f.teamView);
-  const showMoreOptions = f.basisToggleVisible || f.teamViewToggleVisible;
+  // Below tablet the View sheet owns Direct/Group (v1.5.18); tablet/desktop keep
+  // the Group toggle here (AC-P4-01-57). The Scheme toggle stays hidden (OQ-20).
+  const isTabletUp = useIsTabletUp();
+  const showGroupToggle = f.teamViewToggleVisible && isTabletUp;
   return (
     <BottomSheet
       className="filter-sheet"
@@ -182,24 +185,15 @@ export function FilterSheet({
           label={(p) => t(`insights.period.${p}`)}
         />
       </div>
-      {/* {showMoreOptions && (
+      {showGroupToggle && (
         <div className="filter-card">
-          {f.basisToggleVisible && (
-            <ToggleRow
-              label={t("insights.basis.SCHEME.toggle")}
-              on={basis === "SCHEME"}
-              onChange={(on) => setBasis(on ? "SCHEME" : "STANDARD")}
-            />
-          )}
-          {f.teamViewToggleVisible && (
-            <ToggleRow
-              label={t("insights.teamView.toggle")}
-              on={teamView === "GROUP"}
-              onChange={(on) => setTeamView(on ? "GROUP" : "DIRECT")}
-            />
-          )}
+          <ToggleRow
+            label={t("insights.teamView.toggle")}
+            on={teamView === "GROUP"}
+            onChange={(on) => setTeamView(on ? "GROUP" : "DIRECT")}
+          />
         </div>
-      )} */}
+      )}
       <button
         className="btn-primary"
         style={{ marginTop: 4 }}

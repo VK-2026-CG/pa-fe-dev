@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "1.0",
+  "packageProfile": "MIGRATED_LEGACY",
+  "screenId": "CA-03",
+  "legacyIds": [
+    "CA-DRAFT-03"
+  ],
+  "screenKey": "qualification-rule-editor",
+  "screenName": "Qualification Rule Editor",
+  "packageName": "QualificationRuleEditor_CA-03",
+  "version": "0.1.0",
+  "status": "DRAFT",
+  "domainCode": "contests",
+  "country": "MY",
+  "route": "/contest-admin/contests/:contestId/versions/:versionId/rules/:ruleId",
+  "summary": "README.md",
+  "legacyContract": "requirements/legacy-contract.md",
+  "blockers": [
+    "Approved Figma frames and extraction are missing",
+    "Detailed UX, responsive and accessibility contracts are missing",
+    "Reuse discovery and visual baselines are incomplete"
+  ]
+}
