@@ -18,6 +18,6 @@ Invocation: `/fix-frontend-bug <bug-jira-id> [spec-id] [context]`
 6. Do not change approved behavior for a spec defect/new requirement. Do not
    patch UI/BFF when the backend or data is the first failing boundary.
 7. Run focused checks, then applicable unit/API/E2E, typecheck, assets/design and
-   build gates. Update the receipt with optional bug correlation/classification.
+   build checks. Record meaningful fixes and verification in `CHANGELOG.md`.
 8. Report localization, root cause, correction, visual and test evidence,
    validation, and any containment or backend/spec follow-up.

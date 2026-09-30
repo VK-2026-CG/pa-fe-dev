@@ -15,9 +15,13 @@ Contracts are **vendored** in `vendor/spec/` (`@spec/performance-vm`, `en.json`,
 MY screen config). Specs win over code. Never redeclare a view-model type and
 never hand-write contract shapes — import them.
 
-## Spec handoffs
+## Specs
 
-Consume only commit-pinned `READY` handoffs from `handoffs/inbox/spec`. Run `npm run handoff:validate`, implement only frontend actions, and update the correlated frontend receipt. Never edit inbound handoffs or vendored contracts.
+Read canonical contract files from the accessible `pa-spec-dev` working tree and
+run `npm run sync:specs` to refresh vendored artifacts, including uncommitted
+spec edits. Handoffs and receipts are historical records, not development gates.
+Do not hand-edit generated vendored contracts; update the spec source and record
+meaningful frontend changes in `CHANGELOG.md`.
 
 Use `/develop-frontend <SPEC-ID-or-JIRA-ID>` and
 `/fix-frontend-bug <BUG-JIRA-ID> [SPEC-ID]`. Shared workflows under

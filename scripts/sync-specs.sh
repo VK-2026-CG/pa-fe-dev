@@ -1,15 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 cd "$(dirname "$0")/.."
-SPEC="${SPEC_DIR:-../PruactionSpec}"
-REF="${SPEC_REF:-HEAD}"
-HANDOFF_REF="${HANDOFF_REF:-$REF}"
+SPEC="${SPEC_DIR:-../pa-spec-dev}"
 git -C "$SPEC" rev-parse --git-dir >/dev/null 2>&1 || { echo "PruactionSpec Git repo not found at $SPEC (set SPEC_DIR)"; exit 1; }
-COMMIT="$(git -C "$SPEC" rev-parse "${REF}^{commit}")"
-HANDOFF_COMMIT="$(git -C "$SPEC" rev-parse "${HANDOFF_REF}^{commit}")"
+COMMIT="$(git -C "$SPEC" rev-parse HEAD)"
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP" "${STAGE:-}"' EXIT
-extract() { git -C "$SPEC" show "$COMMIT:$1" > "$2"; }
+extract() { cp "$SPEC/$1" "$2"; }
 required=(
   domains/insights/bff/performance-vm.ts
   domains/insights/content/en.json
@@ -30,8 +27,8 @@ required=(
   domains/contests/screens/ContestPortfolio_CA-01/screen.manifest.json
   schemas/ux
 )
-for artifact in "${required[@]}"; do git -C "$SPEC" cat-file -e "$COMMIT:$artifact" 2>/dev/null || { echo "Spec commit $COMMIT lacks required Web artifact: $artifact"; exit 1; }; done
-mkdir -p "$TMP/vendor" "$TMP/spec" "$TMP/inbox" "$TMP/packages"
+for artifact in "${required[@]}"; do [ -e "$SPEC/$artifact" ] || { echo "Spec workspace lacks required Web artifact: $artifact"; exit 1; }; done
+mkdir -p "$TMP/vendor" "$TMP/spec/domains/contests/common" "$TMP/packages"
 extract domains/insights/bff/performance-vm.ts "$TMP/vendor/performance-vm.ts"
 extract domains/insights/content/en.json "$TMP/vendor/insights.en.json"
 extract domains/contests/content/en.json "$TMP/vendor/contests.en.json"
@@ -43,16 +40,19 @@ extract domains/insights/config/screen-config.schema.json "$TMP/vendor/screen-co
 extract domains/contests/bff/contest-admin-vm.ts "$TMP/vendor/contest-admin-vm.ts"
 extract domains/contests/api/contests.v1.yaml "$TMP/vendor/contests.v1.yaml"
 extract domains/contests/config/countries/MY/contest-admin.config.json "$TMP/vendor/contest-admin.config.json"
-git -C "$SPEC" archive "$COMMIT" domains/contests/common/fixtures | tar -x -C "$TMP/spec"
-git -C "$SPEC" archive "$COMMIT" common domains/contests/common domains/contests/screens domains/insights/common domains/insights/screens schemas/ux | tar -x -C "$TMP/packages"
+cp -R "$SPEC/domains/contests/common/fixtures" "$TMP/spec/domains/contests/common/"
+mkdir -p "$TMP/packages"
+cp -R "$SPEC/common" "$TMP/packages/"
+mkdir -p "$TMP/packages/domains/contests" "$TMP/packages/domains/insights" "$TMP/packages/schemas"
+cp -R "$SPEC/domains/contests/common" "$SPEC/domains/contests/screens" "$TMP/packages/domains/contests/"
+cp -R "$SPEC/domains/insights/common" "$SPEC/domains/insights/screens" "$TMP/packages/domains/insights/"
+cp -R "$SPEC/schemas/ux" "$TMP/packages/schemas/"
 node - "$TMP/packages" <<'NODE'
 const fs=require('fs'),path=require('path'),crypto=require('crypto');const root=process.argv[2],manifestPath=path.join(root,'common/assets/MY/manifest.json'),manifest=JSON.parse(fs.readFileSync(manifestPath));for(const asset of manifest.assets){const file=path.join(path.dirname(manifestPath),asset.file);if(!fs.existsSync(file))throw new Error('Missing Spec asset '+asset.file);const actual=crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');if(actual!==asset.sha256)throw new Error('Asset checksum mismatch '+asset.file);if(asset.mediaType==='image/svg+xml'&&/<script|<foreignObject|\son[a-z]+\s*=|(?:href|src)=["']https?:/i.test(fs.readFileSync(file,'utf8')))throw new Error('Unsafe SVG '+asset.file);}
 NODE
 printf '%s\n' '1.3.0' > "$TMP/vendor/SPEC_VERSION"
 grep -m1 'version:' "$TMP/vendor/contests.v1.yaml" | awk '{print $2}' > "$TMP/vendor/CONTEST_SPEC_VERSION"
 printf '%s\n' "$COMMIT" > "$TMP/vendor/SPEC_COMMIT"
-printf '%s\n' "$HANDOFF_COMMIT" > "$TMP/vendor/HANDOFF_COMMIT"
-if git -C "$SPEC" cat-file -e "$HANDOFF_COMMIT:handoffs/outbound" 2>/dev/null; then git -C "$SPEC" archive "$HANDOFF_COMMIT" handoffs/outbound | tar -x -C "$TMP/inbox"; fi
 cp -R "$TMP/vendor/." vendor/spec/
 rm -rf vendor/spec/contest-admin-fixtures
 cp -R "$TMP/spec/domains/contests/common/fixtures" vendor/spec/contest-admin-fixtures
@@ -89,7 +89,4 @@ done
 rm -rf "$STAGE"
 # Remove the retired pre-domain package root only after the canonical swap succeeds.
 rm -rf vendor/spec/screens
-rm -rf handoffs/inbox/spec
-mkdir -p handoffs/inbox/spec
-if [ -d "$TMP/inbox/handoffs/outbound" ]; then cp -R "$TMP/inbox/handoffs/outbound/." handoffs/inbox/spec/; fi
-echo "Synced contract $COMMIT and handoff publication $HANDOFF_COMMIT. Review the diff and run npm run handoff:validate."
+echo "Synced spec artifacts from working tree $SPEC. Review the diff and run application checks."

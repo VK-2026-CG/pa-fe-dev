@@ -12,7 +12,7 @@ this app calls it over HTTP at `/api/bff/v1/...`. Specs live in the separate
 
 ## Agent workflow
 
-Add `PruactionSpec` to the VS Code workspace or make it accessible to Claude
+Add `pa-spec-dev` to the VS Code workspace or make it accessible to Claude
 Code, then use:
 
 ```text
@@ -21,8 +21,8 @@ Code, then use:
 ```
 
 The same commands work in Copilot and Claude. Agents resolve canonical Spec
-Markdown/contracts, run synchronization and validation internally, and report
-AC plus visual/accessibility evidence. Bug commands trace UI, BFF, backend, data
+Markdown/contracts, sync directly from the spec working tree, and report AC plus
+visual/accessibility evidence. Bug commands trace UI, BFF, backend, data
 and configuration and redirect ownership rather than hiding upstream defects.
 See `docs/agent-workflows/`.
 

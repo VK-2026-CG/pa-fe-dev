@@ -18,8 +18,6 @@
     "test:report": "playwright show-report",
     "typecheck": "tsc --noEmit",
     "sync:specs": "bash scripts/sync-specs.sh",
-    "handoff:validate": "node scripts/validate-handoffs.mjs",
-    "handoff:receipt": "node scripts/create-handoff-receipt.mjs",
     "assets:generate": "node scripts/generate-spec-assets.mjs",
     "assets:validate": "node scripts/validate-spec-assets.mjs"
   },
