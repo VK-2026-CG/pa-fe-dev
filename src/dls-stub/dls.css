@@ -22,6 +22,17 @@
   --color-border: #e4e4e7;
   --color-border-strong: #d4d4d8; /* buttons */
   --color-badge-bg: #f4f4f5;
+  /* Chart palette — Figma Metric Drill downs (1:15845); bar/track tints sampled from the frames. */
+  --chart-success: #22c55e;
+  --chart-success-surface: #d8f9e3;
+  --chart-danger: #d2042d;
+  --chart-information: #3b82f6;
+  --chart-neutral: #a1a1aa;
+  --chart-bar-prior: #d8dfeb;
+  --chart-bar-prior-soft: #edf4fe;
+  --chart-grid: #efeff1;
+  --color-surface-track: #f4f4f5;
+  --color-text-success: #15803d;
   /* Figma "Elevation-Card" */
   --shadow-elevation-card: 0 1px 2px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(0, 0, 0, 0.08);
   --tone-success: #15803d;
@@ -5600,42 +5611,8 @@ svg text {
   }
 }
 
-/* Subteam drawer (w.team-drilldown.subteam-drawer) */
-.td-subteam .drawer-body {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
 .drawer-body .search-field {
   flex: 0 0 40px;
-}
-.td-subteam-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-/* The 608px drawer (≥768) uses the desktop card face (frame f12); the mobile
-   sheet keeps the mobile face, identical to the main list. */
-@media (min-width: 768px) {
-  .td-subteam .td-card-top .td-goal-top {
-    display: inline-flex;
-  }
-  .td-subteam .td-sub-line {
-    display: none;
-  }
-  .td-subteam .td-code-desktop,
-  .td-subteam .td-code-divider-desktop {
-    display: inline-flex;
-  }
-  .td-subteam .td-card-link {
-    padding: 15px 16px 15px 20px;
-  }
-  .td-subteam .td-card-top + .td-identity {
-    margin-top: 16px;
-  }
-  .td-subteam .td-values {
-    margin-top: 15px;
-  }
 }
 
 @media (min-width: 1024px) {
@@ -6033,4 +6010,136 @@ h1 {
   font-size: var(--fs-value);
   line-height: var(--lh-value);
   font-weight: var(--fw-bold);
+}
+
+/* ============================================================
+   Metric drill-down charts — Figma "Metric Drill downs - Mobile" (1:15845)
+   Ring gauge / grouped + stacked bars / "YTD Comparison" rows in one card.
+   ============================================================ */
+.dchart-card {
+  padding: 16px;
+  border: 0;
+  border-radius: 16px;
+  box-shadow: var(--shadow-elevation-card);
+}
+.dchart-card .gauge-legend {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 24px;
+  margin: 12px 0 0;
+}
+.legend-item {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.legend-pill {
+  width: 8px;
+  height: 20px;
+  border-radius: 4px;
+  flex: 0 0 8px;
+  margin-top: 0;
+}
+.legend-text {
+  display: flex;
+  flex-direction: column;
+}
+.legend-label {
+  font-size: var(--fs-caption);
+  line-height: var(--lh-caption);
+  font-weight: var(--fw-semibold);
+  color: var(--color-text-muted);
+}
+.legend-value {
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  font-weight: var(--fw-bold);
+  color: var(--color-text);
+}
+.legend-value.muted {
+  color: var(--color-text-muted);
+}
+.ring-wrap {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0 8px;
+}
+.ring-gauge {
+  display: block;
+  overflow: visible;
+}
+.bars-svg {
+  display: block;
+  margin-top: 12px;
+}
+.dchart-card .chart-grid {
+  stroke: var(--chart-grid);
+  stroke-width: 1;
+}
+.dchart-card .chart-axis {
+  font-size: var(--fs-caption-xs);
+  line-height: 16px;
+  font-weight: var(--fw-regular);
+  fill: var(--color-text-muted);
+}
+.dchart-card .chart-year {
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  font-weight: var(--fw-bold);
+  fill: var(--color-text);
+}
+.dchart-card .chart-bar-label {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: var(--fw-bold);
+}
+.dchart-card .chart-point {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: var(--fw-semibold);
+  fill: var(--color-text);
+}
+.dchart-card .chart-delta {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: var(--fw-semibold);
+}
+.dchart-divider {
+  height: 1px;
+  margin: 24px 0 0;
+  border: 0;
+  background: var(--color-border);
+}
+.ytd-rows {
+  padding-top: 24px;
+}
+.ytd-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 48px;
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  font-weight: var(--fw-regular);
+  color: var(--color-text);
+}
+.ytd-row.current {
+  min-height: 56px;
+}
+.ytd-value {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+.ytd-value b {
+  font-weight: var(--fw-bold);
+}
+.ytd-value b.subtle {
+  color: var(--color-text-secondary);
+}
+.ytd-value .delta-line {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: var(--fw-semibold);
 }

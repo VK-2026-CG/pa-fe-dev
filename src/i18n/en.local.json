@@ -1,1 +1,4 @@
-{}
+{
+  "insights.gaugeLegend.current": "Current",
+  "insights.detail.persistencyTitle": "{period} Persistency"
+}

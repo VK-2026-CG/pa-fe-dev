@@ -397,7 +397,7 @@ test.describe('Metric detail (S-P4-02)', () => {
   test('persistency at or above threshold tints the ring success (confirmatory, AC-P4-02-15/46)', async ({ context, page }) => {
     await setPersona(context, 'AGENT_P4');
     await page.goto('/insights/metric-detail?metricCode=PERSISTENCY_CY');
-    await expect(page.locator('svg[role="img"] path[stroke="var(--tone-success)"]')).toHaveCount(1);
+    await expect(page.locator('svg.ring-gauge path[stroke="var(--chart-success)"]')).toHaveCount(1);
   });
 
   test('persistency opened with MTD shows YTD in the Time pill; Back keeps the earlier page\'s period (AC-P4-02-47)', async ({ context, page }) => {

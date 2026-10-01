@@ -9,15 +9,19 @@ import { t } from "@/lib/i18n";
 import type { MemberBadgeCode, TeamDrilldownSortBy, TeamDrilldownVM, TeamMemberVM } from "@spec/performance-vm";
 import { FiltersDrawer } from "./parts/FiltersDrawer";
 import { MemberCard } from "./parts/MemberCard";
-import { SubteamDrawer } from "./parts/SubteamDrawer";
 import { SummaryTiles } from "./parts/SummaryTiles";
+
+const TEAM_PATH = "/insights/team-drilldown";
 
 /** URL-held list state (S-P4-07 0.2.0 §3.4): Back / Exit View restore it. */
 interface ListState {
   query: string;
   sortBy: TeamDrilldownSortBy;
   badges: MemberBadgeCode[];
-  /** Open subteam drawer (member agentId). */
+  /**
+   * Manager (member agentId) whose team is drilled into; absent ⇒ the caller's
+   * own team. Each level is its own history entry, so Back climbs one level.
+   */
   sub?: string;
 }
 
@@ -68,11 +72,13 @@ export default function TeamDrilldownMY() {
     return () => window.clearTimeout(timeout);
   }, [searchInput, state.query, update]);
 
-  const listKey = `${state.query}|${state.sortBy}|${state.badges.join(",")}`;
+  const listKey = `${state.sub ?? ""}|${state.query}|${state.sortBy}|${state.badges.join(",")}`;
   const load = useCallback(async () => {
     const seq = ++loadSeq.current;
     setLoading(true);
+    setFailed(false);
     const qs = new URLSearchParams({ sortBy: state.sortBy });
+    if (state.sub) qs.set("parentAgentId", state.sub);
     if (state.query) qs.set("query", state.query);
     if (state.badges.length) qs.set("badges", state.badges.join(","));
     try {
@@ -89,11 +95,34 @@ export default function TeamDrilldownMY() {
   }, [listKey]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { void load(); }, [load]);
 
-  const members = vm?.members ?? [];
-  const sortOptions = vm?.filterOptions;
-  const subteamParent: TeamMemberVM | undefined = state.sub
-    ? members.find((m) => m.agentId === state.sub) ?? { agentId: state.sub, displayName: "", hierarchyBasis: "UM", roleCode: "UM" }
-    : undefined;
+  // Moving between levels keeps the component mounted, so the previous level's
+  // list must not show under the new level's heading while it loads.
+  const current = vm && vm.filters.parentAgentId === state.sub ? vm : null;
+  const members = current?.members ?? [];
+  const sortOptions = current?.filterOptions ?? vm?.filterOptions;
+  const manager = current?.parent;
+  const title = !state.sub
+    ? t("insights.teamDrilldown.title")
+    : manager
+      ? t("insights.teamDrilldown.subteamTitle", {
+          name: manager.displayName,
+          count: String(manager.directReportCount ?? members.length),
+        })
+      : "";
+
+  /** Opens a manager's team as its own drill-down level; search/filters start clean there. */
+  const openTeam = (member: TeamMemberVM) => update({ sub: member.agentId, query: "", badges: [] }, false);
+
+  /** One level up through history (keeps each level's URL state); a cold-opened level falls back to the root list. */
+  const goBack = () => {
+    if (!state.sub) {
+      navigate("/insights/performance", { replace: true });
+      return;
+    }
+    const cameFromApp = (window.history.state?.idx ?? 0) > 0;
+    if (cameFromApp) navigate(-1);
+    else navigate(TEAM_PATH, { replace: true });
+  };
 
   const badgeLabels = useMemo(() => {
     if (!state.badges.length || !sortOptions) return t("insights.teamDrilldown.allAgent");
@@ -104,19 +133,27 @@ export default function TeamDrilldownMY() {
   return (
     <div className="td-page">
       <div className="td-header">
-        <button type="button" className="td-back" onClick={() => navigate('/insights/performance', { replace: true })}>
+        <button type="button" className="td-back" onClick={goBack}>
           <Icon token="arrow-upward" size={24} tone="var(--td-ink-soft)" style={{ transform: "rotate(-90deg)" }} />
           <span>{t("insights.common.back")}</span>
         </button>
         <nav className="td-breadcrumb" aria-label={t("insights.teamDrilldown.breadcrumb")}>
           <Link to="/insights/performance">{t("insights.dashboard.title")}</Link>
           <Icon token="arrow-right-s" size={16} tone="var(--td-muted)" />
-          <span aria-current="page">{t("insights.teamDrilldown.title")}</span>
+          {state.sub ? (
+            <>
+              <Link to={TEAM_PATH}>{t("insights.teamDrilldown.title")}</Link>
+              <Icon token="arrow-right-s" size={16} tone="var(--td-muted)" />
+              <span aria-current="page">{manager?.displayName ?? state.sub}</span>
+            </>
+          ) : (
+            <span aria-current="page">{t("insights.teamDrilldown.title")}</span>
+          )}
         </nav>
         {vm && <span className="td-asof">{formatDateAsOfNumeric(vm.meta.asOfDate)}</span>}
       </div>
 
-      <h1 className="td-title">{t("insights.teamDrilldown.title")}</h1>
+      {title && <h1 className="td-title">{title}</h1>}
 
       <div className="td-search-row">
         <SearchField
@@ -143,9 +180,9 @@ export default function TeamDrilldownMY() {
         />
       </div>
 
-      {vm?.summary && <SummaryTiles tiles={vm.summary} />}
+      {current?.summary && <SummaryTiles tiles={current.summary} />}
 
-      {failed && !vm && (
+      {failed && !current && (
         <div className="td-state">
           <p>{t("insights.notice.generic")}</p>
           <button type="button" className="td-btn-outline" onClick={() => void load()}>
@@ -153,17 +190,17 @@ export default function TeamDrilldownMY() {
           </button>
         </div>
       )}
-      {loading && !vm && !failed && <StateProcessing onRefresh={() => void load()} />}
+      {loading && !current && !failed && <StateProcessing onRefresh={() => void load()} />}
 
-      {vm && members.length === 0 && (
+      {current && members.length === 0 && (
         <div className="td-state">
           <p>{t("insights.teamDrilldown.emptySearch")}</p>
         </div>
       )}
-      {vm && members.length > 0 && (
+      {current && members.length > 0 && (
         <section className="td-panel" aria-label={t("insights.teamDrilldown.memberSection")}>
           {members.map((member) => (
-            <MemberCard key={member.agentId} member={member} onOpenSubteam={(m) => update({ sub: m.agentId })} />
+            <MemberCard key={member.agentId} member={member} onOpenSubteam={openTeam} />
           ))}
         </section>
       )}
@@ -179,9 +216,6 @@ export default function TeamDrilldownMY() {
             update(next);
           }}
         />
-      )}
-      {subteamParent && (
-        <SubteamDrawer parent={subteamParent} sortBy={state.sortBy} onClose={() => update({ sub: undefined })} />
       )}
     </div>
   );

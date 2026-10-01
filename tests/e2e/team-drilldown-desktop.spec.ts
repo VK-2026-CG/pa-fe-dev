@@ -30,6 +30,19 @@ test.describe('My Team (S-P4-07) — desktop', () => {
     expect(watch.errors, watch.errors.join('\n')).toEqual([]);
   });
 
+  test('AC-P4-07-13 team button drills into the manager; the breadcrumb carries the trail back', async ({ page }) => {
+    await page.goto('/insights/team-drilldown');
+    await page.getByRole('button', { name: "View Marcus Lee's team (24)" }).click();
+    await expect(page.getByRole('heading', { name: "Marcus Lee's Team (24)", level: 1 })).toBeVisible();
+    await expect(page.locator('.td-panel .td-card')).toHaveCount(24);
+    const crumb = page.getByRole('navigation', { name: 'Breadcrumb' });
+    await expect(crumb.locator('[aria-current="page"]')).toHaveText('Marcus Lee');
+    await crumb.getByRole('link', { name: 'My Team' }).click();
+    await expect(page).not.toHaveURL(/sub=/);
+    await expect(page.getByRole('heading', { name: 'My Team', level: 1 })).toBeVisible();
+    await expect(page.locator('.td-panel .td-card')).toHaveCount(10);
+  });
+
   test('AC-P4-07-12 Filters opens as a 608px right drawer', async ({ page }) => {
     await page.goto('/insights/team-drilldown');
     await page.getByRole('button', { name: 'Filter', exact: true }).click();

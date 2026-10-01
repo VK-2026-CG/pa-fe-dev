@@ -68,19 +68,84 @@ test.describe('My Team (S-P4-07) — mobile', () => {
     await expect(page.locator('.td-card')).not.toHaveCount(before);
   });
 
-  test('AC-P4-07-13 subteam drawer lists the member team with scoped search', async ({ page }) => {
+  test('AC-P4-07-13 team button opens that manager\'s drill-down view with scoped search; Back returns to the list', async ({ page }) => {
+    const watch = watchConsole(page);
     await page.goto('/insights/team-drilldown');
     await page.getByRole('button', { name: "View Marcus Lee's team (24)" }).click();
-    const drawer = page.getByRole('dialog', { name: "Marcus Lee's Team (24)" });
-    await expect(drawer).toBeVisible();
-    await expect(drawer.locator('.td-card')).toHaveCount(24);
-    // Same card face as the main list on mobile: goal status inline under the name.
-    await expect(drawer.locator('.td-card').first().locator('.td-goal-inline')).toBeVisible();
-    await drawer.getByPlaceholder('Search by Name/ID').fill('omar');
-    await expect(drawer.locator('.td-card')).toHaveCount(1);
-    await drawer.getByRole('button', { name: 'Close' }).click();
-    await expect(drawer).toBeHidden();
-    await expect(page).not.toHaveURL(/sub=/);
+    await expect(page).toHaveURL(/sub=KCM00101/);
+    // A view of its own, not an overlay: the manager's name leads the page and the list is their team.
+    await expect(page.getByRole('heading', { name: "Marcus Lee's Team (24)", level: 1 })).toBeVisible();
+    await expect(page.getByRole('dialog')).toHaveCount(0);
+    const cards = page.locator('.td-card');
+    await expect(cards).toHaveCount(24);
+    await expect(page.locator('.td-kpi-label')).toHaveCount(0); // KPI tiles belong to the caller's own team
+    await expect(cards.first().locator('.td-goal-inline')).toBeVisible();
+    await page.getByPlaceholder('Search by Name/ID').fill('omar');
+    await expect(cards).toHaveCount(1);
+    await page.getByRole('button', { name: 'Back' }).click();
+    await expect(page).not.toHaveURL(/sub=|query=/);
+    await expect(page.getByRole('heading', { name: 'My Team', level: 1 })).toBeVisible();
+    await expect(cards).toHaveCount(10);
+    await expect(page.getByPlaceholder('Search by Name/ID')).toHaveValue('');
+    expect(watch.errors, watch.errors.join('\n')).toEqual([]);
+  });
+
+  test('AC-P4-07-13 / AC-P4-07-14 an agent in a manager\'s team opens that agent\'s self view; Exit View returns to the team', async ({ page }) => {
+    const watch = watchConsole(page);
+    await page.goto('/insights/team-drilldown');
+    await page.getByRole('button', { name: "View Marcus Lee's team (24)" }).click();
+    await page.locator('.td-card', { hasText: 'Omar Hassan' }).getByRole('link').click();
+    await expect(page).toHaveURL(/insights\/performance\?subjectAgentId=KCM00201/);
+    const banner = page.getByRole('region', { name: 'Viewing Omar Hassan' });
+    await expect(banner).toContainText('Agent');
+    await expect(page.getByLabel('Scope switcher')).toHaveCount(0); // an agent's own (SELF) dashboard
+    await banner.getByRole('button', { name: 'Exit View' }).click();
+    await expect(page).toHaveURL(/team-drilldown\?sub=KCM00101/);
+    await expect(page.getByRole('heading', { name: "Marcus Lee's Team (24)", level: 1 })).toBeVisible();
+    await expect(page.locator('.td-card')).toHaveCount(24);
+    expect(watch.errors, watch.errors.join('\n')).toEqual([]);
+  });
+
+  test('AC-P4-07-13 a manager inside a team has its own team button; Back climbs one level at a time', async ({ page }) => {
+    // The mock tree has no manager under a UM, so shape one in (UM → UM1 → agents) at the BFF boundary.
+    const nested = 'KCM00201';
+    let nestedTeam: unknown[] = [];
+    await page.route(/\/api\/bff\/v1\/performance\/team-drilldown\?/, async (route) => {
+      const parent = new URL(route.request().url()).searchParams.get('parentAgentId');
+      if (parent !== 'KCM00101' && parent !== nested) return route.continue();
+      const res = await route.fetch();
+      const vm = await res.json();
+      if (parent === 'KCM00101') {
+        nestedTeam = vm.members.slice(1, 4);
+        vm.members[0] = { ...vm.members[0], displayName: 'Nina Lead', hierarchyBasis: 'UM', roleCode: 'UM', directReportCount: 3 };
+      } else {
+        vm.parent = { ...vm.parent, displayName: 'Nina Lead', hierarchyBasis: 'UM', roleCode: 'UM', directReportCount: 3 };
+        vm.members = nestedTeam;
+      }
+      return route.fulfill({ response: res, json: vm });
+    });
+
+    await page.goto('/insights/team-drilldown');
+    await page.getByRole('button', { name: "View Marcus Lee's team (24)" }).click();
+    await page.getByRole('button', { name: "View Nina Lead's team (3)" }).click();
+    await expect(page).toHaveURL(/sub=KCM00201/);
+    await expect(page.getByRole('heading', { name: "Nina Lead's Team (3)", level: 1 })).toBeVisible();
+    await expect(page.locator('.td-card')).toHaveCount(3);
+
+    await page.getByRole('button', { name: 'Back' }).click();
+    await expect(page.getByRole('heading', { name: "Marcus Lee's Team (24)", level: 1 })).toBeVisible();
+    await expect(page.locator('.td-card')).toHaveCount(24);
+    await page.getByRole('button', { name: 'Back' }).click();
+    await expect(page.getByRole('heading', { name: 'My Team', level: 1 })).toBeVisible();
+    await expect(page.locator('.td-card')).toHaveCount(10);
+  });
+
+  test('a drill-down link opened cold still works and Back falls back to the My Team list', async ({ page }) => {
+    await page.goto('/insights/team-drilldown?sub=KCM00101');
+    await expect(page.getByRole('heading', { name: "Marcus Lee's Team (24)", level: 1 })).toBeVisible();
+    await page.getByRole('button', { name: 'Back' }).click();
+    await expect(page).toHaveURL(/\/insights\/team-drilldown$/);
+    await expect(page.getByRole('heading', { name: 'My Team', level: 1 })).toBeVisible();
   });
 
   test('AC-P4-07-14 / AC-P4-01-85 / AC-P4-01-86 card opens read-only viewing mode; exit restores the list', async ({ page }) => {
@@ -108,14 +173,17 @@ test.describe('My Team (S-P4-07) — mobile', () => {
     await expect(page.locator('.td-card')).toHaveCount(0);
   });
 
-  test('Back exits directly to the performance landing page after drilldown search and subteam state', async ({ page }) => {
+  test('Back exits directly to the performance landing page after drilldown search and a drill into a team', async ({ page }) => {
     await page.goto('/insights/performance');
     await page.goto('/insights/team-drilldown');
     await page.getByPlaceholder('Search by Name/ID').fill('mar');
     await page.getByRole('button', { name: "View Marcus Lee's team (24)" }).click();
-    await expect(page.getByRole('dialog', { name: "Marcus Lee's Team (24)" })).toBeVisible();
-    await page.getByRole('button', { name: 'Close' }).click();
+    await expect(page.getByRole('heading', { name: "Marcus Lee's Team (24)", level: 1 })).toBeVisible();
+    // Back from the team restores the list exactly as it was left (search included)...
+    await page.getByRole('button', { name: 'Back' }).click();
     await expect(page.locator('.td-card', { hasText: 'Marcus Lee' })).toBeVisible();
+    await expect(page.getByPlaceholder('Search by Name/ID')).toHaveValue('mar');
+    // ...and Back from the list leaves My Team for the landing page in one step.
     await page.getByRole('button', { name: 'Back' }).click();
     await expect(page).toHaveURL(/\/insights\/performance(?:\?|$)/);
   });

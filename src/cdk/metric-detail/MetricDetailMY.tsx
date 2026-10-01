@@ -4,13 +4,12 @@ import { t } from "@/lib/i18n";
 import { formatDateAsOf } from "@/lib/format";
 import { apiFetch } from "@/lib/apiClient";
 import {
-  BarComparison,
   BreakdownTable,
   ComparisonCard,
+  DetailChartCard,
   GaugeComparisonCard,
   GaugeDonut,
   PendersCard,
-  ThresholdArc,
   VariantValueCard,
   comparisonLabelKey,
 } from "@/components/metrics";
@@ -190,25 +189,22 @@ export default function MetricDetailMY({
                 i += 1; // consumed the paired breakdown section too
                 continue;
               }
+              // Figma Metric Drill downs: ring/bar chart + its YTD rows share one card.
+              if (s.type === "THRESHOLD_GAUGE" || s.type === "BAR_COMPARISON") {
+                const comparison = next?.type === "COMPARISON" ? next : undefined;
+                nodes.push(
+                  <div className="section" key={s.id}>
+                    <DetailChartCard chart={s} comparison={comparison} metricCode={metricCode} period={c.period} />
+                  </div>,
+                );
+                if (comparison) i += 1; // consumed the paired comparison section too
+                continue;
+              }
               switch (s.type) {
                 case "GAUGE":
                   nodes.push(
                     <div className="section" key={s.id}>
                       <GaugeDonut s={s} metricCode={metricCode} />
-                    </div>,
-                  );
-                  break;
-                case "THRESHOLD_GAUGE":
-                  nodes.push(
-                    <div className="section" key={s.id}>
-                      <ThresholdArc s={s} metricCode={metricCode} />
-                    </div>,
-                  );
-                  break;
-                case "BAR_COMPARISON":
-                  nodes.push(
-                    <div className="section" key={s.id}>
-                      <BarComparison s={s} metricCode={metricCode} />
                     </div>,
                   );
                   break;

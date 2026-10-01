@@ -178,163 +178,221 @@ export function GaugeDonut({ s, metricCode }: { s: GaugeSectionVM; metricCode: s
   );
 }
 
-/* ── w.metric-detail.threshold-gauge ───────────────────────────────────── */
-export function ThresholdArc({ s, metricCode }: { s: ThresholdGaugeSectionVM; metricCode: string }) {
-  const pct = Math.max(0, Math.min(100, s.current.value));
-  const angle = Math.PI * (1 - pct / 100);
-  const R = 92; const cx = 135; const cy = 118;
-  const x = cx + R * Math.cos(angle); const y = cy - R * Math.sin(angle);
-  const thAngle = Math.PI * (1 - s.threshold.value / 100);
-  const tx1 = cx + (R - 14) * Math.cos(thAngle); const ty1 = cy - (R - 14) * Math.sin(thAngle);
-  const tx2 = cx + (R + 14) * Math.cos(thAngle); const ty2 = cy - (R + 14) * Math.sin(thAngle);
-  const tone = s.sentiment === 'POSITIVE' ? 'var(--tone-success)' : 'var(--tone-danger)';
+/* ── Metric Drill-down charts (Figma "Metric Drill downs - Mobile", 1:15845) ─────
+ * Ring gauge, grouped/stacked bars and the "YTD Comparison" rows share ONE card
+ * (chart · hairline · rows). Colours: Chart-Success #22C55E, Chart-Danger #D2042D,
+ * Chart-Information #3B82F6, Chart-Neutral #A1A1AA — see the --chart-* tokens. */
+
+const TWO_PI = Math.PI * 2;
+const polar = (r: number, turns: number) => ({ x: 100 + r * Math.sin(turns * TWO_PI), y: 100 - r * Math.cos(turns * TWO_PI) });
+
+/** Full-circle ring starting at 12 o'clock, clockwise, with an end dot and an optional threshold tick. */
+function RingGauge({ pct, threshold, tone, label }: { pct: number; threshold?: number; tone: string; label: string }) {
+  const R = 90; const W = 20;
+  const turns = Math.max(0, Math.min(100, pct)) / 100;
+  const end = polar(R, turns);
+  const arc = turns >= 1
+    ? null
+    : `M 100 ${100 - R} A ${R} ${R} 0 ${turns > 0.5 ? 1 : 0} 1 ${end.x} ${end.y}`;
+  const tick = threshold === undefined ? null : { a: polar(R - 14, threshold / 100), b: polar(R + 14, threshold / 100) };
   return (
-    <div className="card pad">
-      <div className="title16">{t(`insights.metric.${metricCode}.title`)}</div>
-      <div style={{ display: 'flex', justifyContent: 'center' }}>
-        <svg width="270" height="146" viewBox="0 0 270 138" role="img" aria-label={`${pct}%`}>
-          <path d={`M ${cx - R} ${cy} A ${R} ${R} 0 0 1 ${cx + R} ${cy}`} fill="none" stroke="var(--tone-muted-bg)" strokeWidth="16" strokeLinecap="round" />
-          <path d={`M ${cx - R} ${cy} A ${R} ${R} 0 0 1 ${x} ${y}`} fill="none" stroke={tone} strokeWidth="16" strokeLinecap="round" />
-          <line x1={tx1} y1={ty1} x2={tx2} y2={ty2} stroke="var(--color-text)" strokeWidth="2.5" strokeDasharray="3 3" />
-          <text x={cx} y={cy - 14} textAnchor="middle" className="chart-threshold-value">{pct}%</text>
-        </svg>
+    <svg className="ring-gauge" width="212" height="212" viewBox="-6 -6 212 212" role="img" aria-label={label}>
+      <circle cx="100" cy="100" r={R} fill="none" stroke="var(--color-surface-track)" strokeWidth={W} />
+      {turns >= 1 && <circle cx="100" cy="100" r={R} fill="none" stroke={tone} strokeWidth={W} />}
+      {arc && turns > 0 && <path d={arc} fill="none" stroke={tone} strokeWidth={W} strokeLinecap="round" />}
+      {tick && (
+        <>
+          <line x1={tick.a.x} y1={tick.a.y} x2={tick.b.x} y2={tick.b.y} stroke="var(--color-surface)" strokeWidth="10" strokeLinecap="round" />
+          <line x1={tick.a.x} y1={tick.a.y} x2={tick.b.x} y2={tick.b.y} stroke="var(--chart-neutral)" strokeWidth="6" strokeLinecap="round" />
+        </>
+      )}
+      {turns > 0 && <circle cx={end.x} cy={end.y} r="9" fill={tone} stroke="var(--color-surface)" strokeWidth="3" />}
+      <text x="100" y="100" textAnchor="middle" dominantBaseline="central" className="chart-threshold-value">{label}</text>
+    </svg>
+  );
+}
+
+/** Legend entry: coloured pill, muted label over a bold value (Figma "Current 95%" / "Threshold 90%"). */
+function LegendItem({ colour, label, value, muted }: { colour: string; label: string; value?: string; muted?: boolean }) {
+  return (
+    <span className="legend-item">
+      <i className="legend-pill" style={{ background: colour }} />
+      <span className="legend-text">
+        <span className="legend-label">{label}</span>
+        {value !== undefined && <>{' '}<span className={`legend-value${muted ? ' muted' : ''}`}>{value}</span></>}
+      </span>
+    </span>
+  );
+}
+
+/** "YTD Comparison" / "YTD Persistency" rows: year left, value right, delta under the current value. */
+function YtdRows({ s, metricCode, period }: { s: ComparisonSectionVM; metricCode: string; period?: string }) {
+  const persistency = metricCode.startsWith('PERSISTENCY_');
+  const per = period ? t(`insights.period.${period}`) : '';
+  return (
+    <div className="ytd-rows">
+      <div className="title14">
+        {persistency ? t('insights.detail.persistencyTitle', { period: per }) : t('insights.detail.comparisonTitle', { period: per })}
       </div>
-      <div className="gauge-legend">
-        <span className="k"><span className="dot" style={{ background: tone }} />{t('insights.gaugeLegend.currentValue')}</span>
-        <span className="k">┆ {t('insights.gaugeLegend.threshold')} {s.threshold.value}%</span>
+      <div className="ytd-row current">
+        <span>{s.currentYear}</span>
+        <span className="ytd-value">
+          <b>{formatDetailScalar(s.current, metricCode)}</b>
+          {!persistency && <DeltaLine delta={s.change} full />}
+        </span>
+      </div>
+      <div className="ytd-row">
+        <span>{s.priorYear}</span>
+        <span className="ytd-value"><b className="subtle">{formatDetailScalar(s.prior, metricCode)}</b></span>
       </div>
     </div>
   );
 }
 
-/* ── w.metric-detail.bar-comparison ────────────────────────────────────── */
-/** Series token per measure index — shared by bars and legend (no raw colors). */
-const seriesFill = (mi: number) => (mi === 0 ? 'var(--color-chart-prior)' : 'var(--color-chart-primary)');
-
-export function BarComparison({ s, metricCode }: { s: BarComparisonSectionVM; metricCode: string }) {
-  if (s.layout === 'STACKED' && s.totals) return <StackedBarComparison s={s} totals={s.totals} metricCode={metricCode} />;
-  const all = s.measures.flatMap((m) => m.points.map((p) => (p.value.kind === 'MONEY' ? Number(p.value.amount) : p.value.value)));
-  const max = Math.max(...all, 1);
-  const grouped = s.measures.length > 1;
-  const W = 311; const H = 160; const plotH = 100; const baseY = 130;
-  const groupW = W / s.years.length;
-  const barW = grouped ? 28 : 44;
+/** Chart + hairline + comparison rows in one card. */
+export function DetailChartCard({ chart, comparison, metricCode, period }: {
+  chart: ThresholdGaugeSectionVM | BarComparisonSectionVM; comparison?: ComparisonSectionVM; metricCode: string; period?: string;
+}) {
   return (
-    <div className="card pad">
-      <div className="title16">{t(`insights.metric.${metricCode}.title`)}</div>
-      <svg width="100%" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={t(`insights.metric.${metricCode}.title`)}>
-        {s.years.map((year, yi) => (
-          <g key={year}>
-            {s.measures.map((m, mi) => {
-              const p = m.points.find((pt) => pt.year === year);
-              if (!p) return null;
-              const v = p.value.kind === 'MONEY' ? Number(p.value.amount) : p.value.value;
-              const h = Math.max(4, (v / max) * plotH);
-              const cxg = yi * groupW + groupW / 2;
-              const xoff = grouped ? (mi === 0 ? -barW - 4 : 4) : -barW / 2;
-              const xpos = cxg + xoff;
-              const isAnchor = year === s.years[s.years.length - 1];
-              const fill = grouped
-                ? (mi === 0 ? 'var(--color-chart-prior)' : 'var(--color-chart-primary)')
-                : (isAnchor ? 'var(--color-chart-primary)' : 'var(--color-chart-prior)');
-              return (
-                <g key={`${year}-${m.measureCode ?? mi}`}>
-                  {p.change && (
-                    <text x={xpos + barW / 2} y={baseY - h - 18} textAnchor="middle" className="chart-delta"
-                      fill={p.change.sentiment === 'NEGATIVE' ? 'var(--tone-danger)' : 'var(--tone-success)'}>
-                      {formatDelta(p.change)}
-                    </text>
-                  )}
-                  <text x={xpos + barW / 2} y={baseY - h - 5} textAnchor="middle" className="chart-point">
-                    {p.value.kind === 'MONEY' ? formatScalar(p.value).replace('RM ', '') : formatScalar(p.value)}
-                  </text>
-                  <rect x={xpos} y={baseY - h} width={barW} height={h} rx="4" fill={fill} />
-                </g>
-              );
-            })}
-            <text x={yi * groupW + groupW / 2} y={H - 8} textAnchor="middle" className="chart-axis">{year}</text>
+    <div className={`card dchart-card${chart.type === 'BAR_COMPARISON' && chart.layout === 'STACKED' ? ' bars-stacked' : ''}`}>
+      {chart.type === 'THRESHOLD_GAUGE' ? <ThresholdRing s={chart} metricCode={metricCode} /> : <BarsChart s={chart} />}
+      {comparison && (
+        <>
+          <hr className="dchart-divider" />
+          <YtdRows s={comparison} metricCode={metricCode} period={period} />
+        </>
+      )}
+    </div>
+  );
+}
+
+/* ── w.metric-detail.threshold-gauge — ring (persistency, activity ratio) ─ */
+function ThresholdRing({ s, metricCode }: { s: ThresholdGaugeSectionVM; metricCode: string }) {
+  const pct = Math.max(0, Math.min(100, s.current.value));
+  // Persistency judges against its threshold (tick + legend); Activity Ratio shows the current value only.
+  const showThreshold = metricCode.startsWith('PERSISTENCY_');
+  const tone = showThreshold && s.sentiment !== 'POSITIVE' ? 'var(--chart-danger)' : 'var(--chart-success)';
+  return (
+    <>
+      <div className="gauge-legend">
+        <LegendItem colour={tone} label={t('insights.gaugeLegend.current')} value={`${pct}%`} />
+        {showThreshold && <LegendItem colour="var(--chart-neutral)" label={t('insights.gaugeLegend.threshold')} value={`${s.threshold.value}%`} muted />}
+      </div>
+      <div className="ring-wrap">
+        <RingGauge pct={pct} threshold={showThreshold ? s.threshold.value : undefined} tone={tone} label={`${pct}%`} />
+      </div>
+    </>
+  );
+}
+export function ThresholdArc({ s, metricCode }: { s: ThresholdGaugeSectionVM; metricCode: string }) {
+  return <DetailChartCard chart={s} metricCode={metricCode} />;
+}
+
+/* ── w.metric-detail.bar-comparison — grouped (prior vs current) and stacked ─ */
+const numOf = (v: BarComparisonSectionVM['measures'][number]['points'][number]['value']) => (v.kind === 'MONEY' ? Number(v.amount) : v.value);
+const label2 = (v: BarComparisonSectionVM['measures'][number]['points'][number]['value']) =>
+  v.kind === 'COUNT' && v.value >= 0 && v.value < 10 ? String(v.value).padStart(2, '0') : v.kind === 'MONEY' ? formatScalar(v).replace('RM ', '') : formatScalar(v);
+
+/** Axis scale with headroom for the chip above the tallest bar: ≤ ~5 intervals on a 1-2-5 step. */
+function niceScale(max: number, integers: boolean): { top: number; step: number } {
+  const target = Math.max(max * 1.15, 1) / 5;
+  const mag = 10 ** Math.floor(Math.log10(target));
+  const steps = (integers ? [1, 2, 5, 10] : [1, 2, 2.5, 5, 10]).map((m) => m * mag).filter((c) => !integers || c >= 1);
+  const step = steps.find((c) => c >= target) ?? 10 * mag;
+  return { top: Math.max(step, Math.ceil((max * 1.15) / step) * step), step };
+}
+
+/** Rounded top corners, flat bottom (Figma bars). */
+const barPath = (x: number, y: number, w: number, h: number, r: number) => {
+  const rr = Math.min(r, h, w / 2);
+  return `M ${x} ${y + h} V ${y + rr} Q ${x} ${y} ${x + rr} ${y} H ${x + w - rr} Q ${x + w} ${y} ${x + w} ${y + rr} V ${y + h} Z`;
+};
+
+function BarsChart({ s }: { s: BarComparisonSectionVM }) {
+  const stacked = s.layout === 'STACKED' && Boolean(s.totals);
+  const W = 311; const H = 202; const left = 32; const plotW = 260; const baseY = 160; const plotH = 120; const barW = 40;
+  const peaks = stacked ? s.totals!.map((tt) => numOf(tt.value)) : s.measures.flatMap((m) => m.points.map((p) => numOf(p.value)));
+  const integers = (s.measures[0]?.points[0]?.value.kind ?? 'COUNT') === 'COUNT';
+  const { top, step } = niceScale(Math.max(...peaks, 1), integers);
+  const ticks = Array.from({ length: Math.round(top / step) + 1 }, (_, i) => i * step);
+  const yOf = (v: number) => baseY - (v / top) * plotH;
+  // Slots are centred on the plot; the Figma frame sits the two bars slightly left of centre.
+  const slotW = plotW / 2; const centre = (yi: number) => left + slotW * yi + slotW / 2 - 11;
+  const lastYear = s.years[s.years.length - 1];
+  return (
+    <>
+      <div className="gauge-legend">
+        {stacked
+          ? s.measures.map((m, mi) => <LegendItem key={m.measureCode ?? mi} colour={mi === 0 ? 'var(--chart-bar-prior-soft)' : 'var(--chart-information)'} label={m.measureCode ? t(`insights.measure.${m.measureCode}`) : ''} />)
+          : s.years.map((y) => <LegendItem key={y} colour={y === lastYear ? 'var(--chart-information)' : 'var(--chart-bar-prior-soft)'} label={String(y)} />)}
+      </div>
+      <svg className="bars-svg" width="100%" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={s.years.join(' / ')}>
+        {ticks.map((tk) => (
+          <g key={tk}>
+            <line x1={left} x2={left + plotW} y1={yOf(tk)} y2={yOf(tk)} className="chart-grid" />
+            <text x={left - 8} y={yOf(tk)} textAnchor="end" dominantBaseline="central" className="chart-axis">{tk}</text>
           </g>
         ))}
-      </svg>
-      <div className="spread caption muted">
-        <span>{s.axisUnitCode ? t(`insights.axis.${s.axisUnitCode}`) : ''}</span>
-        {grouped && (
-          <span className="row" style={{ gap: 12 }}>
-            {s.measures.map((m, mi) => m.measureCode && (
-              <span key={m.measureCode}>
-                <span style={{ color: mi === 0 ? 'var(--color-chart-prior)' : 'var(--color-chart-primary)' }}>■</span>{' '}
-                {t(`insights.measure.${m.measureCode}`)}
-              </span>
-            ))}
-          </span>
-        )}
-      </div>
-    </div>
-  );
-}
-
-/**
- * `stacked-bars` face (S-P4-02 v1.13.0, AC-P4-02-42/43): each year's measures
- * stack bottom-up in `measures[]` order (MANPOWER: Existing Agents + New
- * Recruits). The total label and the only delta chip come from `totals[]` —
- * never summed here. Segment tokens are provisional (no approved baseline).
- */
-function StackedBarComparison({ s, totals, metricCode }: {
-  s: BarComparisonSectionVM; totals: NonNullable<BarComparisonSectionVM['totals']>; metricCode: string;
-}) {
-  const num = (v: BarComparisonSectionVM['measures'][number]['points'][number]['value']) =>
-    (v.kind === 'MONEY' ? Number(v.amount) : v.value);
-  const max = Math.max(...totals.map((t) => num(t.value)), 1);
-  const W = 311; const H = 160; const plotH = 100; const baseY = 130; const barW = 44;
-  const groupW = W / s.years.length;
-  return (
-    <div className="card pad bars-stacked">
-      <div className="title16">{t(`insights.metric.${metricCode}.title`)}</div>
-      <svg width="100%" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={t(`insights.metric.${metricCode}.title`)}>
         {s.years.map((year, yi) => {
-          const total = totals.find((tt) => tt.year === year);
-          const x = yi * groupW + groupW / 2 - barW / 2;
-          let y = baseY;
-          const segs = s.measures.map((m, mi) => {
-            const p = m.points.find((pt) => pt.year === year);
-            if (!p) return null;
-            const h = (num(p.value) / max) * plotH;
-            y -= h;
-            return <rect key={`${year}-${m.measureCode ?? mi}`} className="bar-seg" x={x} y={y} width={barW} height={h} fill={seriesFill(mi)} />;
-          });
-          const topY = total ? baseY - Math.max(4, (num(total.value) / max) * plotH) : y;
+          const cx = centre(yi);
+          const x = cx - barW / 2;
+          const current = year === lastYear;
+          if (stacked) {
+            const total = s.totals!.find((tt) => tt.year === year);
+            let y0 = baseY;
+            const segs = s.measures.map((m, mi) => {
+              const p = m.points.find((pt) => pt.year === year);
+              if (!p) return null;
+              const h = (numOf(p.value) / top) * plotH;
+              y0 -= h;
+              const first = mi === s.measures.length - 1; // top segment carries the rounded corners
+              return (
+                <g key={`${year}-${m.measureCode ?? mi}`}>
+                  <path className="bar-seg" d={first ? barPath(x, y0, barW, h, 8) : `M ${x} ${y0} h ${barW} v ${h} h ${-barW} Z`} fill={mi === 0 ? 'var(--chart-bar-prior)' : 'var(--chart-information)'} />
+                  {h >= 18 && <text x={cx} y={y0 + h / 2} textAnchor="middle" dominantBaseline="central" className="chart-bar-label" fill={mi === 0 ? 'var(--color-icon)' : 'var(--color-surface)'}>{label2(p.value)}</text>}
+                </g>
+              );
+            });
+            return (
+              <g key={year}>
+                {segs}
+                {total && (
+                  <g>
+                    <rect x={cx - 15} y={y0 - 26} width="30" height="20" rx="4" fill="var(--color-badge-bg)" />
+                    <text x={cx} y={y0 - 16} textAnchor="middle" dominantBaseline="central" className="chart-point">{label2(total.value)}</text>
+                  </g>
+                )}
+                <text x={cx} y={baseY + 22} textAnchor="middle" className="chart-year">{year}</text>
+              </g>
+            );
+          }
+          const point = s.measures[0]?.points.find((pt) => pt.year === year);
+          if (!point) return null;
+          const h = Math.max(6, (numOf(point.value) / top) * plotH);
+          const y = baseY - h;
+          // A bar too short to hold its label (zero / tiny values) carries the label above it instead.
+          const labelAbove = h < 24;
+          const chipY = labelAbove ? y - 48 : y - 26;
           return (
             <g key={year}>
-              {segs}
-              {total?.change && (
-                <text x={x + barW / 2} y={topY - 18} textAnchor="middle" className="chart-delta"
-                  fill={total.change.sentiment === 'NEGATIVE' ? 'var(--tone-danger)' : 'var(--tone-success)'}>
-                  {formatDelta(total.change)}
-                </text>
+              <path className="bar-seg" d={barPath(x, y, barW, h, 8)} fill={current ? 'var(--chart-information)' : 'var(--chart-bar-prior)'} />
+              <text x={cx} y={labelAbove ? y - 12 : y + 14} textAnchor="middle" dominantBaseline="central" className="chart-bar-label" fill={labelAbove ? 'var(--color-icon)' : current ? 'var(--color-surface)' : 'var(--color-icon)'}>{label2(point.value)}</text>
+              {point.change && (
+                <g>
+                  <rect x={cx - 16} y={chipY} width="32" height="20" rx="4" fill="var(--chart-success-surface)" />
+                  <text x={cx} y={chipY + 10} textAnchor="middle" dominantBaseline="central" className="chart-delta" fill={point.change.sentiment === 'NEGATIVE' ? 'var(--chart-danger)' : 'var(--color-text-success)'}>{formatDelta(point.change)}</text>
+                </g>
               )}
-              {total && (
-                <text x={x + barW / 2} y={topY - 5} textAnchor="middle" className="chart-point">
-                  {total.value.kind === 'MONEY' ? formatScalar(total.value).replace('RM ', '') : formatScalar(total.value)}
-                </text>
-              )}
-              <text x={yi * groupW + groupW / 2} y={H - 8} textAnchor="middle" className="chart-axis">{year}</text>
+              <text x={cx} y={baseY + 22} textAnchor="middle" className="chart-year">{year}</text>
             </g>
           );
         })}
       </svg>
-      <div className="spread caption muted">
-        <span>{s.axisUnitCode ? t(`insights.axis.${s.axisUnitCode}`) : ''}</span>
-        <span className="row" style={{ gap: 12 }}>
-          {s.measures.map((m, mi) => m.measureCode && (
-            <span key={m.measureCode}>
-              <span style={{ color: seriesFill(mi) }}>■</span>{' '}
-              {t(`insights.measure.${m.measureCode}`)}
-            </span>
-          ))}
-        </span>
-      </div>
-    </div>
+    </>
   );
+}
+export function BarComparison({ s, metricCode }: { s: BarComparisonSectionVM; metricCode: string }) {
+  return <DetailChartCard chart={s} metricCode={metricCode} />;
 }
 
 /* ── w.metric-detail.comparison — YoY card (rows 38h, growth Tag) ──────── */
