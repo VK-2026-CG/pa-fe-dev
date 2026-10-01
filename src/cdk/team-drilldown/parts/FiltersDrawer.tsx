@@ -66,7 +66,7 @@ export function FiltersDrawer({
         </>
       }
     >
-      <section className="td-filter-card">
+      <section className="td-filter-card td-filter-sort">
         <h3>{t("insights.teamDrilldown.sortBy.label")}</h3>
         <RadioRows
           className="td-filter-options"
@@ -88,7 +88,7 @@ export function FiltersDrawer({
         const groupOn = group.badges.some((b) => selected.has(b));
         const single = group.badges.length === 1 && group.badges[0] === group.groupCode;
         return (
-          <section key={group.groupCode} className="td-filter-card">
+          <section key={group.groupCode} className="td-filter-card" data-group={group.groupCode}>
             <CheckRow
               strong
               checked={groupOn}

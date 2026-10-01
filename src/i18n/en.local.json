@@ -1,4 +1,12 @@
 {
   "insights.gaugeLegend.current": "Current",
-  "insights.detail.persistencyTitle": "{period} Persistency"
+  "insights.detail.persistencyTitle": "{period} Persistency",
+  "insights.detail.filter.product": "Product",
+  "insights.detail.filter.time": "Time",
+  "insights.detail.businessLine.ALL": "Both",
+  "insights.detail.businessLine.INSURANCE": "Insurance",
+  "insights.detail.businessLine.TAKAFUL": "Takaful",
+  "insights.detail.variantHeading.WITHOUT_REPRICING": "Without repricing",
+  "insights.detail.variantHeading.WITH_REPRICING": "With repricing",
+  "insights.detail.productDistribution": "Product wise {metric} distribution"
 }

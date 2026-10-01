@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { t } from "@/lib/i18n";
-import { formatDateAsOf } from "@/lib/format";
+import { formatDateAsOfNumeric } from "@/lib/format";
 import { apiFetch } from "@/lib/apiClient";
 import {
   BreakdownTable,
@@ -14,6 +14,7 @@ import {
   comparisonLabelKey,
 } from "@/components/metrics";
 import { ContextPill } from "@/components/chrome";
+import { Icon } from "@/dls-stub";
 import { NoticeBanner, StateEmpty, StateProcessing } from "@/components/ui";
 import type { MetricDetailVM } from "@spec/performance-vm";
 
@@ -67,31 +68,46 @@ export default function MetricDetailMY({
   if (error) return <div className="section card pad">Error {error}</div>;
   if (!vm) return <div className="section muted">Loading…</div>;
   const c = vm.context;
+  // Ring drill-downs (persistency, activity ratio): the desktop frame (Figma 22:18658) carries only the
+  // Product chip and no "As of" date, so `.dd-page-ring` hides those two at breakpoint.desktop.
+  const ringPage = (vm.sections ?? []).some((sec) => sec.type === "THRESHOLD_GAUGE");
 
   return (
-    <>
+    <div className={`dd-page${ringPage ? " dd-page-ring" : ""}`}>
       {/* AC-P4-02-22: back row carries the as-of date; the metric title moved
-          out of the bar into the page body below it. */}
+          out of the bar into the page body below it. Figma 1:16115: a plain
+          24px row on the page background — Material arrow_back, "Back" 14/20
+          Medium, "As of dd/MM/yyyy" 11/16 on the right. */}
       <div className="appbar detail-appbar">
         <button className="back" aria-label={t("insights.common.back")} onClick={() => navigate(-1)}>
-          ←<span className="back-label">{t("insights.common.back")}</span>
+          <Icon token="arrow-back" size={24} className="back-icon-mobile" />
+          <Icon token="back" size={24} className="back-icon-desktop" />
+          <span className="back-label">{t("insights.common.back")}</span>
         </button>
-        <span className="detail-asof muted">{formatDateAsOf(c.asOfDate)}</span>
+        {/* Desktop (Figma 22:15209): back icon, a 1px divider, then "Performance > TPC"; the
+            labelled Back above is the mobile face. */}
+        <nav className="detail-breadcrumb" aria-label={t("insights.teamDrilldown.breadcrumb")}>
+          <Link to="/insights/performance">{t("insights.dashboard.title")}</Link>
+          <span className="detail-crumb-sep" aria-hidden="true">&gt;</span>
+          <span aria-current="page">{t(`insights.metric.${metricCode}.title`)}</span>
+        </nav>
+        <span className="detail-asof muted">{formatDateAsOfNumeric(c.asOfDate)}</span>
       </div>
-      <div className="section">
+      <div className="section dd-title-section">
         <h1 className="page-title">{t(`insights.metric.${metricCode}.title`)}</h1>
       </div>
-      {/* Context strip — the labelled Product/Time pills shared with S-P4-01
-          (AC-P4-02-22). No teamView chip at any scope (AC-P4-02-60); ALL
-          reads "Both" (AC-P4-02-61). */}
+      {/* Context strip — the labelled Product/Time pills (AC-P4-02-22). No
+          teamView chip at any scope (AC-P4-02-60); ALL reads "Both"
+          (AC-P4-02-61). The labels are this screen's own ("Product", "Time"),
+          not the dashboard's "Business"/"Period" (Figma 1:16155 / 1:16159). */}
       <div className="section">
-        <div className="filter-row">
+        <div className="filter-row dd-chips">
           <ContextPill
-            labelKey="insights.dashboard.filter.product"
-            value={t(`insights.businessLine.${c.businessLine}`)}
+            labelKey="insights.detail.filter.product"
+            value={t(`insights.detail.businessLine.${c.businessLine}`)}
           />
           <ContextPill
-            labelKey="insights.dashboard.filter.time"
+            labelKey="insights.detail.filter.time"
             value={t(`insights.period.${c.period}`)}
           />
         </div>
@@ -176,8 +192,8 @@ export default function MetricDetailMY({
               // variants (OQ-38 closed in v1.8.0); FYP emits only one.
               if (s.type === "BREAKDOWN" && next?.type === "BREAKDOWN") {
                 nodes.push(
-                  <div className="section" key={s.id}>
-                    <div className="title14" style={{ marginBottom: 8 }}>
+                  <div className="section dd-breakdown-section" key={s.id}>
+                    <div className="dd-section-title">
                       {t("insights.detail.breakdownByProduct")}
                     </div>
                     <div className="section-pair">
@@ -237,12 +253,25 @@ export default function MetricDetailMY({
                   );
                   break;
                 case "BREAKDOWN":
+                  // A metric with no repricing variants (FYP) has no "Without
+                  // repricing" table to name; its one card is headed
+                  // "Product wise {metric} distribution" (Figma 1:16325).
                   nodes.push(
-                    <div className="section" key={s.id}>
-                      <div className="title14" style={{ marginBottom: 8 }}>
+                    <div className="section dd-breakdown-section" key={s.id}>
+                      <div className="dd-section-title">
                         {t("insights.detail.breakdownByProduct")}
                       </div>
-                      <BreakdownTable s={s} metricCode={metricCode} />
+                      <BreakdownTable
+                        s={s}
+                        metricCode={metricCode}
+                        heading={
+                          REPRICING_METRICS.has(metricCode)
+                            ? undefined
+                            : t("insights.detail.productDistribution", {
+                                metric: t(`insights.metric.${metricCode}.title`),
+                              })
+                        }
+                      />
                     </div>,
                   );
                   break;
@@ -254,6 +283,6 @@ export default function MetricDetailMY({
           })()}
         </>
       )}
-    </>
+    </div>
   );
 }

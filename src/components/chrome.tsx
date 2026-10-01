@@ -53,9 +53,7 @@ export function ContextPill({
 }) {
   const content = (
     <>
-      <span className="muted" style={{ marginRight: 4 }}>
-        {t(labelKey)}
-      </span>
+      <span className="muted ctx-pill-label">{t(labelKey)}</span>
       {value}
     </>
   );
@@ -70,6 +68,18 @@ export function ContextPill({
     </span>
   );
 }
+
+/**
+ * Tile glyphs that are Figma exports (Top Navigation, frame 1:4931): drawn as
+ * plain images at their native size — the SVGs carry their own #ED1B2D fill, so
+ * no mask tint and no stretching (they use preserveAspectRatio="none").
+ */
+const FIGMA_QUICK_ICON: Record<string, { w: number; h: number }> = {
+  MILESTONES: { w: 25, h: 22 },
+  TEAM_DRILLDOWN: { w: 25, h: 24 },
+  COMP_BEN: { w: 36, h: 36 },
+  LEADERBOARD: { w: 28, h: 28 },
+};
 
 /* ── w.quick-links (tiles 80×122, icon 62, per Figma 6588:16556) ───────── */
 export function QuickLinkRail({
@@ -86,14 +96,17 @@ export function QuickLinkRail({
     <nav className={`quick ${wide ? "quick-wide" : ""}`.trim()} aria-label="Quick links">
       {links.map((l) => {
         const disabled = disabledIds.includes(l.id);
+        // Viewing mode's wide tiles keep a 26px icon box, so they stay on the tinted 26px mask.
+        // The wide tile is the Figma card (32:15280 / 32:19555) with the untinted 36px glyph.
+        const figma = FIGMA_QUICK_ICON[l.id];
         const content = (
           <>
             <span className="ic">
-              <Icon
-                token={`quick.${l.id}`}
-                size={26}
-                tone={disabled ? "var(--color-brand)" : "var(--color-brand)"}
-              />
+              {figma ? (
+                <Icon token={`quick.${l.id}`} size={figma.w} height={figma.h} />
+              ) : (
+                <Icon token={`quick.${l.id}`} size={26} tone="var(--color-brand)" />
+              )}
             </span>
             <span className="lbl">{t(`insights.quicklink.${l.id}`)}</span>
           </>
@@ -106,7 +119,6 @@ export function QuickLinkRail({
             aria-disabled={disabled}
             style={{
               cursor: disabled ? "no-drop" : undefined,
-              opacity: disabled ? 0.7 : 1,
             }}
             onClick={(event) => {
               if (disabled) {
@@ -338,7 +350,7 @@ export function ScopeSwitcher({
   if (isTabletUp) {
     return (
       <ScopePill
-        icon={scopeIcon(vm.current)}
+        icon={vm.current === "TEAM" ? "scope-team-sm" : scopeIcon(vm.current)}
         ariaLabel="Scope switcher"
         label={t(`insights.scope.${vm.current}`)}
         options={options}
@@ -361,7 +373,9 @@ export function ScopeSwitcher({
           setMobileOpen(true);
         }}
       >
-        <Icon token={scopeIcon(vm.current)} size={20} tone="var(--color-text)" />
+        {/* Figma "User" glyph (24, built-in padding) — the mobile button draws
+            one person icon for every scope; the sheet shows the selection. */}
+        <Icon token="scope-user" size={24} tone="var(--color-text)" />
         <Icon token="arrow-down-s" size={16} tone="var(--color-text)" />
       </button>
       {mobileOpen && (

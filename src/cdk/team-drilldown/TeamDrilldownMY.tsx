@@ -134,16 +134,16 @@ export default function TeamDrilldownMY() {
     <div className="td-page">
       <div className="td-header">
         <button type="button" className="td-back" onClick={goBack}>
-          <Icon token="arrow-upward" size={24} tone="var(--td-ink-soft)" style={{ transform: "rotate(-90deg)" }} />
+          <Icon token="arrow-back" size={24} tone="var(--td-ink-soft)" />
           <span>{t("insights.common.back")}</span>
         </button>
         <nav className="td-breadcrumb" aria-label={t("insights.teamDrilldown.breadcrumb")}>
           <Link to="/insights/performance">{t("insights.dashboard.title")}</Link>
-          <Icon token="arrow-right-s" size={16} tone="var(--td-muted)" />
+          <span className="td-crumb-sep" aria-hidden="true">&gt;</span>
           {state.sub ? (
             <>
               <Link to={TEAM_PATH}>{t("insights.teamDrilldown.title")}</Link>
-              <Icon token="arrow-right-s" size={16} tone="var(--td-muted)" />
+              <span className="td-crumb-sep" aria-hidden="true">&gt;</span>
               <span aria-current="page">{manager?.displayName ?? state.sub}</span>
             </>
           ) : (

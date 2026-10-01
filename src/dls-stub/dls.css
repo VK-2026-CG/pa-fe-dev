@@ -25,6 +25,7 @@
   /* Chart palette — Figma Metric Drill downs (1:15845); bar/track tints sampled from the frames. */
   --chart-success: #22c55e;
   --chart-success-surface: #d8f9e3;
+  --chart-danger-surface: #f7e4e8; /* Tag-Danger-Surface (mobile mode); used by negative delta chips */
   --chart-danger: #d2042d;
   --chart-information: #3b82f6;
   --chart-neutral: #a1a1aa;
@@ -33,6 +34,13 @@
   --chart-grid: #efeff1;
   --color-surface-track: #f4f4f5;
   --color-text-success: #15803d;
+  --color-surface-disabled-subtle: #f9fafb; /* Figma Surface-Disabled-Subtle: count badge */
+  --color-text-caption: #7c7c7c; /* Figma var(--pf-dls-theme-color-text-subtlest): year labels, "As of", change captions */
+  --color-text-strong-alt: #1a1a1a; /* Figma var(--pf-dls-theme-color-text-strong): current-year value */
+  --color-border-card: #e5e7eb; /* Figma coolgrey200: Historical Data card border */
+  --color-surface-input: #f3f4f6; /* Figma Surface-Input: table header / total row */
+  --shadow-elevation-card-lg: 0 4px 12px rgba(0, 0, 0, 0.03); /* desktop-mode Elevation-Card (y4 blur12 3%) */
+  --color-text-danger: #950320; /* Figma Colour/Text/Text-Danger (= Tag-Danger-Text), mobile Performance frame 1:4931 */
   /* Figma "Elevation-Card" */
   --shadow-elevation-card: 0 1px 2px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(0, 0, 0, 0.08);
   --tone-success: #15803d;
@@ -168,6 +176,36 @@
   --fs-chart-delta: 11px;
   --fs-chart-value: 12px; /* Body Small */
   --fs-state-glyph: 40px;
+
+  /* S-P4-02 drill-down (Figma 1:16115) — read with get_variable_defs and sampled from the native-size PNG. */
+  --color-heading: #1a1a1a; /* pf-dls theme text-strong: card + section headings */
+  --color-text-crumb: #666666; /* pf-dls theme text-subtle: desktop breadcrumb */
+  --color-border-outline: #dbdbdb; /* pf-dls theme outline-default: desktop breadcrumb divider */
+  --color-text-asof: #7c7c7c; /* pf-dls theme text-subtlest: "As of dd/MM/yyyy" */
+  --color-border-card: #e5e7eb; /* coolgrey200: drill-down card ring + hairlines */
+  --radius-drill: 16px;
+  /* The mobile (1:16115) and desktop (22:15202) frames resolve different variable modes, so these tokens
+     carry the mobile value here and the desktop value in the min-width: 1024px override just below. */
+  --dd-bg: #f4f4f5; /* Colour/Background/Background-Neutral (the shared --color-bg is the older #f4f5f7 sample) */
+  --dd-text-subtle: #52525b; /* Colour/Text/Text-Subtle */
+  --dd-text-success: #15803d; /* Colour/Text/Text-Success */
+  --dd-link: #1d4ed8; /* Colour/Text/Text-Information */
+  --dd-icon-info: #3b82f6; /* Colour/Icon/Icon-Information: Penders open_in_new */
+  --dd-chip-border: #e4e4e7; /* Colour/Outline/Outline-Subtle */
+  --dd-shadow-drop: 0 1px 2px 1px rgba(0, 0, 0, 0.12), 0 2px 4px 1px rgba(0, 0, 0, 0.1); /* Elevation-Card drops, cast from box + stroke */
+  --dd-shadow-top: rgba(0, 0, 0, 0.08); /* Elevation-Card inner shadow (0, 1, 0) */
+}
+@media (min-width: 1024px) {
+  :root {
+    --dd-bg: #f3f4f6;
+    --dd-text-subtle: #4b5563;
+    --dd-text-success: #22c55e;
+    --dd-link: #3b82f6;
+    --dd-icon-info: #2563eb;
+    --dd-chip-border: #f4f4f5;
+    --dd-shadow-drop: 0 4px 12px 1px rgba(0, 0, 0, 0.03); /* Effect/Y-2 4, Blur 12, Shadow 1 #00000008; Y-Outline/Blur-Outline are 0 */
+    --dd-shadow-top: transparent; /* Y-Outline 0: the inner shadow has no offset on desktop */
+  }
 }
 
 * {
@@ -416,6 +454,15 @@ svg text {
   .quick {
     justify-content: flex-start;
     gap: var(--tile-gap-tablet-desktop);
+  }
+  /* WIP-disabled tiles stay dimmed on tablet; the mobile and desktop Figma frames draw them at full strength. */
+  .quick a[aria-disabled="true"] {
+    opacity: 0.7;
+  }
+}
+@media (min-width: 1024px) {
+  .quick a[aria-disabled="true"] {
+    opacity: 1;
   }
 }
 
@@ -769,6 +816,9 @@ svg text {
    .pill, just an 8px corner radius instead of the fully-rounded --radius-
    chip; kept as its own class so History's .pill filter chips (HistoryMY)
    are unaffected. */
+.ctx-pill-label {
+  margin-right: 4px;
+}
 .filter-pill {
   flex: 0 0 auto;
   height: var(--pill-h);
@@ -1342,6 +1392,7 @@ svg text {
   line-height: var(--lh-body);
 }
 .yoy-row .sub {
+  display: block;
   font-size: var(--fs-caption);
   line-height: var(--lh-caption);
   color: var(--color-text-muted);
@@ -1445,22 +1496,41 @@ svg text {
 /* S-P4-02 header region (AC-P4-02-22): the back row carries the as-of date
    on the right, and the metric title renders as a page title in the body
    below the bar instead of inside the bar. */
+/* Figma 1:16142: no bar — a 24px row on the page background, 20px below the host header. */
+.appbar.detail-appbar {
+  position: static;
+  height: 44px;
+  padding: 20px var(--gutter) 0;
+  background: transparent;
+  box-shadow: none;
+}
+.detail-appbar .back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  color: var(--dd-text-subtle);
+  font-weight: var(--fw-medium);
+}
 .detail-appbar .detail-asof {
   margin-left: auto;
-  font-size: var(--fs-caption);
+  font-size: var(--fs-caption1);
   line-height: var(--lh-caption);
+  font-weight: var(--fw-regular);
+  color: var(--color-text-asof);
+  white-space: nowrap;
 }
 .page-title {
   font-size: var(--fs-page);
   line-height: var(--lh-page);
   font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-heading2);
   margin: 0;
 }
 .back .back-label {
-  margin-left: 6px;
   font-size: var(--fs-body);
   line-height: var(--lh-body);
-  font-weight: var(--fw-semibold);
+  font-weight: var(--fw-medium);
 }
 
 /* Penders card: its single row sits vertically centred when the card is
@@ -1471,18 +1541,23 @@ svg text {
   justify-content: center;
 }
 
-/* AC-P4-02-56: Penders "{count} Cases" + external-link glyph, link colour.
-   Icon ≈16px / gap ≈4px are requester estimates (OQ-76). */
+/* AC-P4-02-56: Penders "{count} Cases" + open_in_new glyph, link colour.
+   Figma 1:16319: text 16/24 SemiBold (-0.15px), 2px gap, glyph 16px (resolves OQ-76). */
 .penders-link {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  color: var(--color-link);
-  font-size: var(--fs-body);
-  line-height: var(--lh-body);
+  gap: 2px;
+  color: var(--dd-link);
+  font-size: var(--fs-button);
+  line-height: var(--lh-button);
+  letter-spacing: var(--ls-button);
   font-weight: var(--fw-semibold);
   text-decoration: none;
   cursor: pointer;
+}
+/* Figma 1:16319 "Icon After": the 16px glyph sits in a 2×4 padded box. */
+.penders-link .icon.penders-icon {
+  margin: 4px 2px;
 }
 
 /* AC-P4-02-27: variant.with-repricing + penders.primary share a row at
@@ -1490,7 +1565,7 @@ svg text {
 .section-pair {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 16px;
+  gap: 12px;
 }
 @media (min-width: 1024px) {
   .section-pair {
@@ -1503,12 +1578,12 @@ svg text {
 .gauge-value-only {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  margin-top: 8px;
+  gap: 0;
 }
 .gauge-value-only .k {
   font-size: var(--fs-caption);
   line-height: var(--lh-caption);
+  font-weight: var(--fw-medium);
 }
 .gauge-value-only .v {
   font-size: var(--fs-title);
@@ -1548,49 +1623,362 @@ svg text {
 .gauge-comparison {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 24px;
 }
 .gauge-comparison .gc-divider {
   height: 1px;
-  background: var(--color-border);
+  background: var(--color-border-card);
 }
 @media (min-width: 1024px) {
-  .gauge-comparison {
-    flex-direction: row;
-    align-items: stretch;
-    gap: 24px;
-    height: 336px; /* direct-instruction value, not measured/Figma — same convention as AC-P4-01-46 */
-  }
-  .gauge-comparison .gc-gauge,
-  .gauge-comparison .gc-comparison {
-    flex: 1;
-    min-width: 0;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-  }
-  /* Comparison content (heading + rows) centers as a block, vertically only. */
-  .gauge-comparison .gc-comparison {
-    justify-content: center;
-  }
-  /* Gauge heading stays top-left where it was; only the value fills and
-     centers within the remaining space below it. */
-  .gauge-comparison .gc-gauge .gauge-value-only {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
+  /* Figma 22:15227 (desktop): padding 24 and a 24px rhythm. The heading spans the card; below it a 240px
+     row holds the Collected panel centred in its half, a 1px #E5E7EB divider and the comparison centred in
+     the other half. `.gc-gauge` is display:contents so the heading and the panel are grid items of the card
+     (336px with a heading, 288px without — FYP/FYC/ACS have none). */
+  .card.pad.gauge-comparison {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr);
+    grid-template-rows: 240px;
+    column-gap: 24px;
+    row-gap: 24px;
     align-items: center;
-    justify-content: center;
-    text-align: center;
+    padding: 24px;
+  }
+  .card.pad.gauge-comparison.gc-titled {
+    grid-template-rows: auto 240px;
+  }
+  .card.pad.gauge-comparison.gauge-only {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .gauge-comparison .gc-gauge {
+    display: contents;
+  }
+  .gauge-comparison .dd-card-title {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    align-self: start;
+  }
+  .card.pad.gauge-comparison .gauge-value-only {
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: center;
+    align-items: flex-start;
+    margin-top: 0;
+    text-align: left;
+  }
+  .card.pad.gauge-comparison.gc-titled .gauge-value-only,
+  .card.pad.gauge-comparison.gc-titled .gc-divider,
+  .card.pad.gauge-comparison.gc-titled .gc-comparison {
+    grid-row: 2;
   }
   .gauge-comparison .gc-divider {
+    grid-column: 2;
+    grid-row: 1;
     width: 1px;
-    height: auto;
-    align-self: stretch;
+    height: 240px;
   }
-  /* Gauge half alone (no comparison section): content-sized, not 336px. */
-  .gauge-comparison.gauge-only {
+  .gauge-comparison .gc-comparison {
+    grid-column: 3;
+    grid-row: 1;
+    min-width: 0;
+  }
+  /* Metric Indicator: "Collected" Body Medium 14/20 Medium over the Heading 1 value, 32/44 Bold. */
+  .gauge-comparison .gauge-value-only .k {
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
+  }
+  .gauge-comparison .gauge-value-only .v {
+    font-size: var(--fs-heading1);
+    line-height: var(--lh-heading1);
+  }
+}
+
+/* The drill-down frame sits on Background-Neutral #F4F4F5 (the shell's shared token is #F4F5F7). */
+.shell:has(.dd-page),
+body:has(.dd-page) {
+  background: var(--dd-bg);
+}
+
+/* ── S-P4-02 drill-down cards — Figma 1:16115 (TPC; the same frame serves PTPC and FYP) ──
+   Drill-down card (1:16160): a 343px white box with its 1px #E5E7EB ring OUTSIDE it, so the
+   12px gaps between boxes stay 12, Elevation-Card shadows, and the inner top shadow drawn over
+   the ring's top row (Figma's inset-[-1px] overlay). Breakdown content card (1:16325): the same
+   shell with its 1px #D4D4D8 border INSIDE the box. Measured from the native-size PNG. */
+.card.dd-card {
+  position: relative;
+  border-radius: var(--radius-drill);
+  /* Figma casts the drop shadows from the card plus its outside stroke, hence the 1px spread. */
+  box-shadow:
+    0 0 0 1px var(--color-border-card),
+    var(--dd-shadow-drop);
+}
+.card.dd-card::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  box-shadow: inset 0 1px 0 0 var(--dd-shadow-top);
+  pointer-events: none;
+}
+.card.dd-card.dd-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 15px; /* Figma's 1px stroke overlays the 16px padding: content starts 16px in, not 17 */
+  border: 1px solid var(--color-border-strong);
+  box-shadow: var(--dd-shadow-drop);
+}
+.dd-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+/* Card heading: Heading 5, 18/24 Bold, #1A1A1A ("Without repricing" / "With repricing"). */
+.dd-card-title {
+  font-size: var(--fs-heading5);
+  line-height: var(--lh-heading5);
+  font-weight: var(--fw-bold);
+  color: var(--color-heading);
+  margin: 0;
+}
+.dd-card-title + .gauge-value-only {
+  margin-top: 8px;
+}
+/* Read-only context chips (Info Chip 1:16155): 28h, 8/4 padding, 4px label/value gap, 12px between chips,
+   all text Text-Subtlest #71717A — label Regular, value SemiBold. */
+.filter-row.dd-chips {
+  gap: 12px;
+  flex-wrap: nowrap;
+}
+.dd-chips .filter-pill {
+  height: 28px;
+  padding: 0 8px;
+  gap: 4px;
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  font-weight: var(--fw-semibold);
+  color: var(--color-text-muted);
+  border-color: var(--dd-chip-border);
+}
+.dd-chips .filter-pill .ctx-pill-label {
+  margin-right: 0;
+  font-weight: var(--fw-regular);
+}
+
+/* Year rows (Row 2028/2029): 6px above and below, year 14/20 over "Collected" 11/16; 12px between the
+   title and the rows; the delta line is 12/16 Medium under the current value. */
+.gc-comparison {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.gc-comparison .yoy-row,
+.dd-stack .yoy-row {
+  height: auto;
+  min-height: 0;
+  padding: 6px 0;
+  align-items: center;
+}
+.dd-card .yoy-row .sub {
+  font-size: var(--fs-caption1);
+  line-height: var(--lh-caption);
+}
+.dd-card .yoy-value {
+  gap: 0;
+}
+.dd-card .yoy-value .delta-line {
+  font-size: var(--fs-caption);
+  line-height: var(--lh-caption);
+  font-weight: var(--fw-medium);
+}
+.dd-card .yoy-value .delta-line .d {
+  font-weight: var(--fw-medium);
+}
+.dd-card .yoy-value .delta-line .d.success {
+  color: var(--dd-text-success);
+}
+.dd-card .yoy-row .v.subtle {
+  color: var(--dd-text-subtle);
+}
+/* Penders (1:16248): one 24px row — "Penders" 14/20 and the 16/24 link button. */
+.penders-card .yoy-row {
+  height: 24px;
+  padding: 0;
+}
+
+/* Breakdown by Product (1:16323): 12px above and below the 14/20 Medium heading, 12px gap to the cards. */
+.dd-breakdown-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px 0;
+}
+.dd-section-title {
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  font-weight: var(--fw-medium);
+  color: var(--color-heading);
+}
+/* Rows: 20px label/value pair, 11px, a 1px #E5E7EB hairline, 12px — a 44px pitch; the Total row is 24px
+   (value 16/24 Bold). Labels Medium #52525B on the left half, values Medium #18181B right-aligned on the right. */
+.dd-breakdown .scroll-x {
+  overflow: visible;
+  margin: 0;
+}
+.dd-breakdown .table {
+  table-layout: fixed;
+  width: 100%;
+  min-width: 0;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-weight: var(--fw-medium);
+}
+.dd-breakdown .table td {
+  height: auto;
+  padding: 0;
+  border: 0;
+  vertical-align: middle;
+}
+.dd-breakdown .table .colfirst {
+  width: 50%;
+  min-width: 0;
+  padding-right: 6px;
+  color: var(--dd-text-subtle);
+}
+.dd-breakdown .table .colval {
+  width: 50%;
+  min-width: 0;
+  padding-left: 6px;
+  color: var(--color-text);
+}
+.dd-breakdown .table tbody tr:not(:last-child) td {
+  padding-bottom: 11px;
+  border-bottom: 1px solid var(--color-border-card);
+}
+.dd-breakdown .table tbody tr + tr td {
+  padding-top: 12px;
+}
+.dd-breakdown .table td.total {
+  font-weight: var(--fw-bold);
+}
+.dd-breakdown .table td.colval.total {
+  font-size: var(--fs-title);
+  line-height: var(--lh-title);
+}
+@media (max-width: 1023px) {
+  .dd-card-title + .gauge-value-only {
+    margin-top: 24px; /* Figma 1:16160: 24px between the card heading and the Collected panel */
+  }
+  .gauge-comparison .gc-divider {
+    height: 0;
+    margin-top: -1px; /* Figma's Line is 0-high with its 1px drawn just above it */
+    border-top: 1px solid var(--color-border-card);
+    background: none;
+  }
+}
+
+/* ── S-P4-02 desktop — Figma 22:15202 (1440×1024; TPC, same frame for PTPC/FYP) ──────────────────
+   An 800px column centred in the content area (the frame's 240px nav and 64px header are host chrome and
+   not rendered): back row 32h 24px down, title 44h 24px below it, chips, the 336h card, the 394+12+394
+   pair, then Breakdown by Product. Tokens that resolve to different values than on mobile live in the
+   --dd-* overrides in :root. */
+.detail-breadcrumb,
+.back-icon-desktop {
+  display: none;
+}
+@media (min-width: 1024px) {
+  .dd-page {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .dd-page .section {
+    margin-left: 0;
+    margin-right: 0;
+  }
+  /* Back row (Figma 22:15208): back icon in a 32×32 box, 16px, a 1px #DBDBDB divider 24h, 16px, then
+     "Performance > TPC" 14/20 Regular (#666666 / #1A1A1A, 8px apart); "As of" on the right. */
+  .appbar.detail-appbar {
+    height: 56px;
+    padding: 24px 0 0;
+    gap: 0;
+  }
+  .detail-appbar .back {
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+  }
+  .detail-appbar .back-label,
+  .detail-appbar .back-icon-mobile {
+    display: none;
+  }
+  .detail-appbar .back-icon-desktop {
+    display: inline-block;
+  }
+  .detail-breadcrumb {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 16px;
+    padding-left: 17px;
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
+    color: var(--color-text-crumb);
+  }
+  .detail-breadcrumb::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 1px;
+    height: 24px;
+    transform: translateY(-50%);
+    background: var(--color-border-outline);
+  }
+  .detail-breadcrumb [aria-current] {
+    color: var(--color-heading);
+  }
+  .dd-title-section {
+    margin-top: 24px;
+  }
+  /* Page title: Display 3, 32/44 Bold #1A1A1A. */
+  .page-title {
+    font-size: var(--fs-heading1);
+    line-height: var(--lh-heading1);
+    letter-spacing: 0;
+    color: var(--color-heading);
+  }
+  /* Delta: "+11.4%" 12/16 SemiBold, "vs last year" 11/16 SemiBold #71717A, tops aligned. */
+  .dd-card .yoy-value .delta-line {
+    align-items: flex-start;
+    font-weight: var(--fw-semibold);
+  }
+  .dd-card .yoy-value .delta-line .d {
+    font-weight: var(--fw-semibold);
+  }
+  .dd-card .yoy-value .delta-line .muted {
+    font-size: var(--fs-caption1);
+  }
+  /* The combined card's year rows carry no "Collected" caption on desktop (Row 2028 / 2029). */
+  .gc-comparison .yoy-row .sub {
+    display: none;
+  }
+  /* 24px between the pair and the Breakdown block (Figma 22:15206), plus its own 12px padding. */
+  .dd-breakdown-section {
+    margin-top: 24px;
+  }
+  .dd-stack .yoy-row .sub {
+    font-weight: var(--fw-semibold);
+  }
+  /* Penders beside With repricing (22:15230): "Penders" top-left, the 14/24 link bottom-left. */
+  .section-pair .penders-card .yoy-row {
+    flex: 1;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
     height: auto;
+  }
+  .penders-link {
+    font-size: var(--fs-body);
   }
 }
 
@@ -5003,6 +5391,9 @@ svg text {
   height: 100%;
   object-fit: cover;
 }
+.avatar.avatar-default {
+  background: transparent;
+}
 
 .search-field {
   flex: 1;
@@ -5435,7 +5826,7 @@ svg text {
   align-items: flex-start;
   gap: 16px;
 }
-.td-identity .avatar {
+.td-identity .profile-avatar {
   margin-top: 4px;
 }
 .td-card-top + .td-identity {
@@ -5518,22 +5909,156 @@ svg text {
   line-height: 20px;
   cursor: pointer;
 }
-.td-caret {
-  width: 0;
-  height: 0;
-  margin-left: 1px;
-  border-left: 3px solid transparent;
-  border-right: 3px solid transparent;
-  border-top: 3.5px solid var(--td-secondary);
-}
 .td-subteam-btn .icon {
-  width: 16px !important;
-  height: 16px !important;
+  flex: 0 0 auto;
+}
+.td-subteam-btn .td-caret {
+  margin-left: 0;
 }
 .td-state {
   padding: 32px 16px;
   text-align: center;
   color: var(--td-muted);
+}
+
+/* ── My Team, mobile/tablet (<1024px) — Figma 32:14048 (375, My Team - AM/SAM) ─────────────────────────
+   Page padding 16 with a 16px rhythm (24px back row, 28px title, 40px search row), chips 28px, 66px KPI
+   tiles, then ONE white panel (radius 16, p16, Elevation-Card) holding the member cards: 1px #DBDBDB
+   border inside the 16px padding (165px with badges), no card shadow, 16px apart. Measured from the
+   native 375×984 render. Desktop keeps the rules above. */
+@media (max-width: 1023px) {
+  .td-page {
+    padding: 16px 16px 32px;
+  }
+  .td-header {
+    height: 24px;
+  }
+  .td-back {
+    gap: 8px;
+    font-weight: var(--fw-regular);
+  }
+  .td-asof {
+    color: #7c7c7c;
+    font-weight: var(--fw-regular);
+  }
+  .td-title {
+    margin: 16px 0 0;
+    letter-spacing: var(--ls-heading2);
+  }
+  .td-search-row {
+    margin-top: 16px;
+  }
+  /* Search field: Figma Search glyph (24px) 9px in, text at 40px */
+  .td-search-row .search-field {
+    gap: 7px;
+    padding: 0 8px;
+  }
+  .td-search-row .search-field-glyph {
+    width: 24px;
+    height: 24px;
+    flex: 0 0 24px;
+    background: url(/icons/search.svg) center / contain no-repeat;
+  }
+  .td-search-row .search-field-glyph::before,
+  .td-search-row .search-field-glyph::after {
+    display: none;
+  }
+  .td-search-row .filter-btn .icon {
+    width: 24px !important;
+    height: 24px !important;
+  }
+  .td-chips {
+    margin: 16px 0 11px; /* the frame's 12px gaps measure 11px in the render */
+  }
+  .filter-pill.td-chip {
+    height: 28px;
+    padding: 4px 8px;
+    gap: 4px;
+    border-radius: 8px;
+  }
+  .td-kpis {
+    margin-bottom: 11px;
+  }
+  .td-kpi {
+    height: auto;
+    padding: 8px 12px;
+    gap: 4px;
+  }
+  .td-kpi-label {
+    display: flex;
+    align-items: center;
+    height: 24px;
+    font-weight: var(--fw-medium);
+  }
+  .td-panel {
+    padding: 16px;
+    border-radius: 16px;
+    background: var(--color-surface);
+    box-shadow: var(--shadow-elevation-card);
+  }
+  .td-card {
+    border-color: #dbdbdb;
+    box-shadow: none;
+  }
+  .td-card-link {
+    padding: 15px;
+  }
+  .tag.td-badge {
+    font-weight: var(--fw-medium);
+  }
+  .td-card-top + .td-identity {
+    margin-top: 16px;
+  }
+  .td-identity {
+    align-items: center;
+  }
+  .td-identity .profile-avatar {
+    margin-top: 0;
+  }
+  .td-name-line,
+  .td-sub-line {
+    gap: 8px;
+  }
+  .td-name {
+    font-weight: var(--fw-semibold);
+  }
+  .td-divider {
+    height: 13.5px;
+  }
+  /* Figma holds the sub-line at 20px; the 24px goal icon overflows it. */
+  .td-goal {
+    gap: 8px;
+    height: 20px;
+    line-height: 20px;
+  }
+  .td-sub-line {
+    height: 20px;
+  }
+  .td-values {
+    min-height: 28px;
+    margin-top: 16px;
+    gap: 6px;
+  }
+  .td-value {
+    padding: 0 2px;
+  }
+  .td-value-label {
+    margin-right: 4px; /* label → value gap in Figma */
+  }
+  .td-subteam-btn {
+    bottom: 14px;
+    gap: 4px;
+    padding: 0 8px;
+    border-radius: 7px;
+    color: var(--td-secondary);
+  }
+}
+/* Desktop has no frame for this pass: the goal icon keeps its previous 20px. */
+@media (min-width: 1024px) {
+  .td-goal .icon {
+    width: 20px !important;
+    height: 20px !important;
+  }
 }
 .td-empty {
   margin: 24px 0;
@@ -5853,11 +6378,15 @@ svg text {
   }
   .scope-pill {
     /* Figma fixes the button at 60×38; its listed 12/9px padding can't hold
-       24 + 2 + 16px of icons at that width, so the padding is trimmed. */
+       24 + 2 + 16px of icons at that width, so Figma overflows and centres
+       the row — which lands the 24px User glyph 8.5px from the edge and the
+       16px arrow at 36.5 (2px gap + the arrow's own 2px inset). Pinned here
+       as 1px border + 7.5px padding, 4px between the two glyphs. */
     width: 60px;
     height: 38px;
-    padding: 4px 6px 4px 8px;
-    gap: 2px;
+    padding: 4px 6px 4px 7.5px;
+    gap: 4px;
+    justify-content: flex-start;
     border-color: var(--color-border-strong);
   }
   .scope-pill .icon:first-child {
@@ -5931,6 +6460,11 @@ svg text {
   .filter-pill .muted {
     font-weight: var(--fw-regular);
   }
+  /* Dashboard chips only: label→value spacing is the 4px flex gap alone (the
+     component's inline margin-right would double it to 8px). */
+  .perf-context .filter-pill .muted {
+    margin-right: 0 !important;
+  }
 
   /* Metric panels (Priority / Other Focus) */
   .metric-panel {
@@ -5966,6 +6500,10 @@ svg text {
     padding: 11px;
     gap: 12px;
   }
+  /* Figma centres the 20px title line in its 24px header row (2px down). */
+  .mcard .head {
+    align-items: center;
+  }
   .mcard .name {
     font-size: 14px;
     line-height: 20px;
@@ -5989,10 +6527,30 @@ svg text {
     font-weight: var(--fw-bold);
     color: var(--color-text);
   }
+  /* Delta: Body Small SemiBold (the sign + % are SemiBold too, not Bold). Figma
+     centres the 16px line in a 20px box that is bottom-aligned to the 24px
+     value row, so the text rides 2px above the row's bottom edge. */
   .mcard .delta-line {
+    margin-bottom: 2px;
     font-size: 12px;
     line-height: 16px;
     font-weight: var(--fw-semibold);
+  }
+  .mcard .delta-line .d {
+    font-weight: var(--fw-semibold);
+  }
+  .mcard .delta-line .d.danger {
+    color: var(--color-text-danger);
+  }
+  /* Other Focus Metrics cards are a fixed 106px: title row on top, value row
+     pinned to the bottom; their "vs last year" suffix is the 10/16 Caption. */
+  .carousel-track.focus-grid .mcard {
+    min-height: 106px;
+    justify-content: space-between;
+  }
+  .carousel-track.focus-grid .mcard .delta-line .muted {
+    font-size: var(--fs-caption-xs);
+    line-height: var(--lh-caption);
   }
 }
 
@@ -6003,6 +6561,198 @@ svg text {
   line-height: var(--lh-value);
   font-weight: var(--fw-bold);
   color: var(--color-text);
+}
+
+/* ============================================================
+   Desktop Performance dashboard (>=1024px) — Figma frame 21:8393 (1440).
+   An 800px column; it resolves its own token mode (Large radius 24, success
+   #22c55e, Text-Subtle #4b5563), so desktop values are scoped here.
+   ============================================================ */
+@media (min-width: 1024px) {
+  .perf-page {
+    --dash-text-subtle: #4b5563; /* Text-Subtle: card titles */
+    --dash-success: #22c55e;
+    --dash-danger: #d2042d;
+    max-width: 800px;
+    margin: 0 auto;
+    padding-top: 24px;
+  }
+  .perf-page .section {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  /* Title row: Display 3 + the outlined scope pill */
+  .perf-head {
+    min-height: 44px;
+    margin-top: 0;
+  }
+  .perf-head h1 {
+    color: var(--color-text-strong-alt);
+    font-size: var(--fs-heading1);
+    line-height: var(--lh-heading1);
+    letter-spacing: 0;
+  }
+  .scope-pill {
+    height: 40px;
+    min-width: 122px; /* the Figma instance is 122 wide */
+    padding: 8px 16px;
+    gap: 2px;
+    border-radius: 56px;
+    border-color: var(--color-border-strong);
+    font-size: var(--fs-body);
+    line-height: var(--lh-button);
+    letter-spacing: var(--ls-button);
+    font-weight: var(--fw-semibold);
+    color: var(--color-text);
+  }
+  .scope-pill .icon {
+    margin: 0 2px;
+    background-color: var(--color-text-muted) !important; /* Icon-Subtle */
+  }
+  .scope-pill .icon:first-child {
+    width: 16px !important;
+    height: 16px !important;
+  }
+  .scope-pill-label {
+    padding: 0 4px;
+  }
+
+  /* Top Navigation: 76×64 icon cards, 4px to a 12/16 label, 64px apart */
+  .perf-quick {
+    margin-top: 24px;
+  }
+  .perf-quick .quick a {
+    width: 76px;
+    height: auto;
+  }
+  .perf-quick .quick .ic {
+    width: 76px;
+    height: 64px;
+    margin-top: 0;
+    border-radius: 16px;
+    box-shadow: var(--shadow-elevation-card-lg);
+  }
+
+  /* Metric Tracking: Heading 4 + Filter pill + 40×40 round more button */
+  .perf-tracking {
+    margin-top: 24px;
+    min-height: 40px;
+  }
+  .perf-tracking .title16 {
+    font-size: var(--fs-page);
+    line-height: var(--lh-page);
+  }
+  .perf-tracking > .row {
+    gap: 8px !important;
+  }
+  .more-actions-btn {
+    width: 40px;
+    min-width: 40px;
+    height: 40px;
+    border-radius: 56px;
+    border-color: var(--color-border-strong);
+  }
+  .more-actions-btn .icon {
+    width: 24px !important;
+    height: 24px !important;
+    background-color: var(--color-text-muted) !important;
+  }
+
+  /* Context strip: 28px chips, Outline-Subtle in this mode is #F4F4F5 */
+  .perf-context .filter-pill {
+    height: 28px;
+    padding: 4px 8px;
+    gap: 4px;
+    border-color: var(--color-badge-bg);
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: var(--fw-semibold);
+    color: var(--color-text-muted);
+  }
+  .perf-context .filter-pill .muted {
+    margin-right: 0 !important;
+    font-weight: var(--fw-regular);
+  }
+
+  /* Panels: 800 wide, pad 16, header 24, 16 to the two-column grid */
+  .metric-panel {
+    border-radius: 24px; /* Corner Radius/Large in this frame's mode; corner sampled from the native render */
+    box-shadow: var(--shadow-elevation-card-lg);
+  }
+  .metric-panel-head {
+    min-height: 24px;
+    margin-bottom: 16px;
+  }
+  .metric-panel-head .icon-btn {
+    width: 24px;
+    height: 24px;
+    padding: 0;
+  }
+  .metric-panel-head .icon-btn .icon {
+    width: 24px !important;
+    height: 24px !important;
+    background-color: var(--color-icon) !important;
+  }
+  .count-badge {
+    min-width: 24px;
+    height: 20px;
+    padding: 2px 6px;
+    border-radius: 56px;
+    background: var(--color-surface-disabled-subtle);
+    font-weight: var(--fw-semibold);
+  }
+
+  /* Metric cards: same anatomy as mobile (84px, 106px in Other Focus), desktop tokens */
+  .mcard {
+    padding: 11px; /* the 1px border sits inside Figma's 12px padding */
+    gap: 12px;
+    border-color: var(--color-badge-bg);
+    box-shadow: none;
+  }
+  .mcard .head {
+    align-items: center;
+  }
+  .mcard .name {
+    color: var(--dash-text-subtle);
+  }
+  .mcard .variant {
+    font-weight: var(--fw-regular);
+    color: var(--color-text-muted);
+  }
+  .mcard .foot {
+    padding-top: 0;
+    margin-top: 0;
+  }
+  .mcard .value,
+  .mcard.simple .value {
+    font-size: var(--fs-heading5);
+    line-height: var(--lh-heading5);
+    color: var(--color-text);
+  }
+  .mcard .delta-line {
+    margin-bottom: 2px;
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: var(--fw-semibold);
+  }
+  .mcard .delta-line .d {
+    font-weight: var(--fw-semibold);
+  }
+  .mcard .delta-line .d.success {
+    color: var(--dash-success);
+  }
+  .mcard .delta-line .d.danger {
+    color: var(--dash-danger);
+  }
+  .carousel-track.focus-grid .mcard {
+    min-height: 106px;
+    justify-content: space-between;
+  }
+  .carousel-track.focus-grid .mcard .delta-line .muted {
+    font-size: var(--fs-caption-xs);
+    line-height: var(--lh-caption);
+  }
 }
 
 /* Unstyled headings (e.g. the 404 page) use Heading 4 instead of the browser default. */
@@ -6142,4 +6892,1188 @@ h1 {
   font-size: 12px;
   line-height: 16px;
   font-weight: var(--fw-semibold);
+}
+
+/* ── S-P4-02 desktop bar-comparison card — Figma 22:16535 (New Recruits, Case Count, Manpower, Productivity) ──
+   One 800×288 card (24px padding, 1px #E5E7EB ring outside, desktop Elevation-Card): legend column + a fixed
+   311×202 chart centred in the 403px chart region, a 1px×240 divider, and the 301px "YTD Comparison" column,
+   24px apart. Measured from the native 826×314 render (plot origin 113.5,43 inside the card). */
+@media (min-width: 1024px) {
+  :root {
+    --chart-success-surface: #f0fdf4; /* Tag/Surface-Success in this mode */
+    --chart-danger-surface: #fcf2f4; /* Tag-Danger-Surface in this mode */
+  }
+  .card.dchart-card:is(.dchart-bars, .dchart-ring) {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 24px;
+    border-radius: var(--radius-drill);
+    box-shadow:
+      0 0 0 1px var(--color-border-card),
+      var(--dd-shadow-drop);
+  }
+  /* Legend hugs the left edge; the fixed 311px chart is centred in what remains (Figma: flex-1 chart box). */
+  :is(.dchart-bars, .dchart-ring) .dchart-chart {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 40px;
+  }
+  /* Legend: stacked, 24px apart; 8×18 pills, 12px to the 12/16 SemiBold label (Icon-Subtle grey) */
+  :is(.dchart-bars, .dchart-ring) .gauge-legend {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 24px;
+    margin: 0;
+  }
+  :is(.dchart-bars, .dchart-ring) .legend-item {
+    gap: 12px;
+  }
+  :is(.dchart-bars, .dchart-ring) .legend-text {
+    padding-top: 2px; /* the 16px label sits 2px into the 18px pill row */
+  }
+  :is(.dchart-bars, .dchart-ring) .legend-pill {
+    height: 18px;
+    border-radius: 133px;
+  }
+  .dchart-bars .bars-svg {
+    flex: 0 0 311px;
+    width: 311px;
+    height: 202px;
+    margin: 0 auto;
+  }
+  .dchart-bars .chart-grid {
+    stroke: var(--color-badge-bg);
+  }
+  .dchart-bars .chart-grid.zero {
+    stroke: var(--color-border-card);
+  }
+  .dchart-bars .chart-axis {
+    font-size: 9px;
+    line-height: normal;
+    font-weight: var(--fw-bold);
+    fill: var(--color-text-muted);
+  }
+  .dchart-bars .chart-year {
+    font-size: var(--fs-caption);
+    line-height: var(--lh-caption);
+    font-weight: var(--fw-semibold);
+    fill: var(--dd-text-subtle);
+  }
+  .dchart-bars .chart-bar-label {
+    font-weight: var(--fw-semibold);
+  }
+  .dchart-bars .chart-bar-label.prior {
+    fill: var(--dd-text-subtle);
+  }
+  .dchart-bars .chart-bar-label.current {
+    fill: var(--color-surface);
+  }
+  /* Figma's divider is a 240×0 line rotated 90°: no layout width, a 1px stroke at its left edge
+     (a left border plus a -1px margin keeps the 403px chart region). */
+  :is(.dchart-bars, .dchart-ring) .dchart-divider {
+    flex: 0 0 0;
+    box-sizing: border-box;
+    width: 0;
+    height: 240px;
+    margin: 0 -1px 0 0;
+    border: 0;
+    border-left: 1px solid var(--color-border-card);
+    background: none;
+  }
+  /* YTD Comparison: 14/20 Bold heading, 12px, then rows padded 6px (year 14/20, value 16/24 Bold,
+     delta 12/16 SemiBold under the current value with the 11/16 caption). */
+  :is(.dchart-bars, .dchart-ring) .ytd-rows {
+    flex: 0 0 301px;
+    width: 301px;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  :is(.dchart-bars, .dchart-ring) .ytd-row,
+  :is(.dchart-bars, .dchart-ring) .ytd-row.current {
+    min-height: 0;
+    padding: 6px 0;
+  }
+  :is(.dchart-bars, .dchart-ring) .ytd-value b {
+    font-size: var(--fs-title);
+    line-height: var(--lh-title);
+    color: var(--color-text);
+  }
+  :is(.dchart-bars, .dchart-ring) .ytd-value b.subtle {
+    color: var(--dd-text-subtle);
+  }
+  :is(.dchart-bars, .dchart-ring) .ytd-value .delta-line .d.success {
+    color: var(--dd-text-success);
+  }
+  :is(.dchart-bars, .dchart-ring) .ytd-value .delta-line .d.danger {
+    color: var(--chart-danger);
+  }
+  :is(.dchart-bars, .dchart-ring) .ytd-value .delta-line .muted {
+    font-size: var(--fs-caption1);
+    font-weight: var(--fw-semibold);
+  }
+}
+
+/* ── S-P4-02 desktop ring card — Figma 22:18658 (Current Year Persistency; the same frame serves Activity Ratio) ──
+   Same 800×288 shell as the bar card (it reuses the shared rules above): the Metric Panel legend (value
+   16/24 Bold) and a flex-1 Radial Ring box 202 high, then the 1px×240 divider and the 301px "YTD Persistency"
+   column. The 200px ring sits in the box at left 50%-0.5, top 0 (the SVG's 6px margin is pulled back). */
+@media (min-width: 1024px) {
+  .card.dchart-card.dchart-ring {
+    min-height: 288px; /* the 240 row + 24 padding, kept when there is no comparison column */
+  }
+  .dchart-ring .legend-value {
+    font-size: var(--fs-title);
+    line-height: var(--lh-title);
+  }
+  /* Two-line items (12/16 label over a 16/24 value) sit flush with the pill: 40 high, 24 apart. */
+  .dchart-ring .legend-text {
+    padding-top: 0;
+  }
+  .dchart-ring .legend-label {
+    position: relative;
+    top: 1px; /* measured: Figma's label ink sits 1px lower against the pill than a flush 16px box */
+    color: var(--color-text-muted);
+  }
+  .dchart-ring .ring-wrap {
+    position: relative;
+    display: block;
+    flex: 1 1 0;
+    min-width: 0;
+    height: 202px;
+    margin: 0;
+  }
+  .dchart-ring .ring-gauge {
+    position: absolute;
+    top: -6px;
+    left: calc(50% - 106.5px);
+  }
+  /* Heading 2 28/40 Bold, its box centred 2px above the ring centre (Figma 1:12699: top 50% - 3px of 202). */
+  .dchart-ring .chart-threshold-value {
+    font-size: 28px;
+    line-height: 40px;
+    transform: translateY(-2px);
+  }
+  /* The frame has the Product chip only (no Time chip) and no "As of" date. */
+  .dd-page-ring .detail-asof,
+  .dd-page-ring .dd-chips .filter-pill:nth-child(n + 2) {
+    display: none;
+  }
+}
+
+/* ── S-P4-03 §B · Team Historical Data (ARVIJ-1450-SP01) ───────────────────
+   Below 1024px: header row, title bar with the Filter icon button, read-only
+   context chips, then 12 month cards (Figma 9:11700). From 1024px: breadcrumb,
+   Heading-1 title and one card holding a six-column table (Figma 9:11300).
+   Every colour/type token is an existing DLS token. Sizes tagged "est." were
+   read off the Figma PNGs / node metadata (the Figma MCP hit its call limit
+   before tokens could be read) — re-check them against the real DLS values.
+   The desktop table matches the requester's 1440 image (headers, centring,
+   RM prefix, hairlines, grey bold Total row). */
+.hd-page {
+  --hd-chip-h: 28px; /* node metadata: context strip 28 high */
+  --hd-btn: 40px; /* node metadata: 40×40 icon buttons */
+  --hd-pill-h: 24px; /* est. */
+  --hd-card-pad: 12px; /* est. (card = 142 high with a change row, 94 without) */
+  --hd-card-gap: 12px;
+  --hd-table-head-h: 56px; /* desktop node metadata */
+  --hd-table-row-h: 72px;
+  --hd-table-min-w: 840px; /* keeps six columns readable if the region ever scrolls */
+  /* Tags (Figma mobile 9:11700): Tag-Success-Surface/Text, Tag-Danger-Surface/Text */
+  --hd-tag-success-bg: #dcfce7;
+  --hd-tag-success-fg: #15803d;
+  --hd-tag-danger-bg: #f7e4e8;
+  --hd-tag-danger-fg: #950320;
+  padding: 16px var(--gutter) 32px;
+}
+.hd-header {
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.hd-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  font-weight: var(--fw-regular);
+  cursor: pointer;
+}
+.hd-breadcrumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-text-muted);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  font-weight: var(--fw-regular);
+}
+.hd-breadcrumb [aria-current] {
+  color: var(--color-text-secondary);
+}
+.hd-asof {
+  margin-left: auto;
+  color: var(--color-text-caption);
+  font-size: var(--fs-caption1);
+  line-height: var(--lh-caption);
+  font-weight: var(--fw-regular);
+  white-space: nowrap;
+}
+.hd-titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 12px 0;
+}
+.hd-title {
+  margin: 0;
+  font-size: var(--fs-page);
+  line-height: var(--lh-page);
+  letter-spacing: var(--ls-heading2); /* Heading 2: 20/28 Bold, -0.25 */
+  font-weight: var(--fw-bold);
+}
+.hd-titlebar .filter-btn {
+  width: var(--hd-btn);
+  min-width: var(--hd-btn);
+  height: var(--hd-btn);
+  border-color: var(--color-border-strong);
+  border-radius: 8px;
+}
+.hd-titlebar .filter-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.hd-titlebar .filter-btn .icon {
+  width: 24px !important;
+  height: 24px !important;
+}
+/* Mobile: Filter glyph is brand red (Icon-Brand), Download glyph Icon-Subtle. */
+.hd-titlebar .download-btn .icon {
+  background-color: var(--color-text-muted) !important;
+}
+.hd-chips {
+  display: flex;
+  gap: 8px;
+  margin: 0 calc(var(--gutter) * -1) 12px;
+  padding: 0 var(--gutter);
+  list-style: none;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.hd-chips::-webkit-scrollbar {
+  display: none;
+}
+.hd-chip {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: var(--hd-chip-h);
+  padding: 0 8px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  white-space: nowrap;
+}
+.hd-chip-label {
+  color: var(--color-text-muted);
+}
+.hd-chip-value {
+  /* Chips Text: SemiBold, same muted grey as the label (Figma Text-Subtlest) */
+  font-weight: var(--fw-semibold);
+  color: var(--color-text-muted);
+}
+.hd-banner {
+  margin: 0 0 12px;
+}
+.hd-banner .hd-retry {
+  margin-left: auto;
+  padding: 2px 12px;
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  letter-spacing: 0;
+}
+
+/* Month cards */
+.hd-cards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hd-card-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.hd-card {
+  /* Figma draws the 1px border inside the 12px padding (343 wide, 319 content). */
+  padding: calc(var(--hd-card-pad) - 1px);
+  border: 1px solid var(--color-border-card);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-elevation-card);
+}
+.hd-card-month {
+  margin: 0 0 12px;
+  color: var(--color-text-muted);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  font-weight: var(--fw-regular);
+}
+.hd-card-values {
+  /* Figma: three 82px columns spread edge to edge (justify-between). */
+  display: flex;
+  justify-content: space-between;
+  margin: 0 0 12px;
+}
+.hd-card-value {
+  width: 82px;
+  min-width: 0;
+}
+.hd-card-value dt {
+  margin-bottom: 2px;
+  color: var(--color-text-caption);
+  font-size: var(--fs-caption);
+  line-height: var(--lh-caption);
+  font-weight: var(--fw-medium); /* Body Small (Medium), ink-matched against the Figma render */
+}
+.hd-card-value dd {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  font-weight: var(--fw-bold);
+  font-variant-numeric: tabular-nums;
+}
+.hd-card-value:first-child dd {
+  color: var(--color-text-strong-alt); /* current year reads stronger */
+}
+/* Figma draws the hairline as a 0-height frame with the 1px stroke centred on
+   it: 12px gap above and below, the line straddling the half pixel. */
+.hd-card-rule {
+  height: 1px;
+  margin: -0.5px 0 11.5px;
+}
+.hd-card-changes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 24px;
+  min-height: var(--hd-pill-h);
+}
+.hd-change {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+.hd-change-caption {
+  /* Figma text is "  vs 2025": two leading spaces (2 × 0.26em) after the 2px gap */
+  padding-left: 0.52em;
+  color: var(--color-text-caption);
+  font-size: var(--fs-caption1);
+  line-height: var(--lh-caption);
+}
+.tag.hd-pill {
+  height: var(--hd-pill-h);
+  padding: 0 8px;
+  border-radius: 4px;
+  font-size: var(--fs-caption);
+  line-height: var(--lh-caption);
+  font-weight: var(--fw-medium);
+}
+.tag.hd-pill.badge-success {
+  background: var(--hd-tag-success-bg);
+  color: var(--hd-tag-success-fg);
+}
+.tag.hd-pill.badge-danger {
+  background: var(--hd-tag-danger-bg);
+  color: var(--hd-tag-danger-fg);
+}
+.hd-na {
+  color: var(--color-text-muted);
+  font-size: var(--fs-caption);
+  line-height: var(--lh-caption);
+  font-weight: var(--fw-regular);
+}
+
+/* Desktop table card (Figma 9:11300 desktop frame): white 16-radius card, grey
+   bold header row, left-aligned regular Month column, centred value/change
+   columns of equal width, hairlines between rows, grey bold Total row. */
+.hd-table-card {
+  /* Figma 9:11329: 1127×1072, 24px inside padding (the 1px #E5E7EB border is part of it), radius 16 */
+  padding: 23px;
+  border: 1px solid var(--color-border-card);
+  border-radius: 16px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-elevation-card-lg);
+}
+.hd-table-title {
+  margin: 0 0 24px;
+  color: var(--color-text-strong-alt);
+  font-size: var(--fs-heading5);
+  line-height: var(--lh-heading5);
+  font-weight: var(--fw-bold);
+}
+.hd-table-scroll {
+  overflow-x: auto;
+  /* border-collapse adds half of the outer 1px line (976.5 instead of Figma's 976). */
+  margin-bottom: -0.5px;
+}
+.hd-table {
+  width: 100%;
+  min-width: var(--hd-table-min-w);
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+.hd-table th,
+.hd-table td {
+  padding: 0 16px;
+  text-align: center;
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  white-space: nowrap;
+}
+.hd-table tbody th,
+.hd-table tbody td {
+  height: var(--hd-table-row-h);
+  border-bottom: 1px solid var(--color-border-strong);
+}
+.hd-table tbody tr:last-child th,
+.hd-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+.hd-table thead th,
+.hd-table tfoot th,
+.hd-table tfoot td {
+  height: var(--hd-table-head-h);
+  background: var(--color-surface-input);
+  color: var(--hd-text-subtle, var(--color-text-secondary));
+  font-weight: var(--fw-bold);
+}
+.hd-table thead th {
+  border-bottom: 1px solid var(--color-border-strong);
+}
+/* Figma: the last body row and the Total row each carry their own 1px bottom line. */
+.hd-table tfoot th,
+.hd-table tfoot td {
+  border-top: 1px solid var(--color-border-strong);
+  border-bottom: 1px solid var(--color-border-strong);
+}
+/* Total-row change: bold toned text, no pill background (desktop image) */
+.hd-total-change {
+  font-weight: var(--fw-bold);
+}
+.hd-total-change.hd-tone-success {
+  color: var(--hd-tag-success-fg);
+}
+.hd-total-change.hd-tone-danger {
+  color: var(--hd-tag-danger-fg);
+}
+.hd-total-change.hd-tone-muted {
+  color: var(--tone-muted);
+}
+.hd-table tbody th {
+  background: var(--color-surface);
+}
+.hd-table th:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  text-align: left;
+}
+.hd-table tbody th {
+  font-weight: var(--fw-regular);
+}
+.hd-table td {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Title-bar actions: Filter + Download side by side (Figma 9:11700: two 40×40 icon buttons, 8 apart;
+   9:11300: two outlined pills) */
+.hd-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Download sheet: masked password field (S-P4-03 §D) */
+.hd-field-label {
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  font-weight: var(--fw-semibold);
+}
+.hd-input {
+  width: 100%;
+  height: 48px;
+  padding: 0 16px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+}
+.hd-input:focus-visible {
+  outline: 2px solid var(--color-text);
+  outline-offset: 1px;
+}
+.hd-input[aria-invalid="true"] {
+  border-color: var(--tone-danger);
+}
+.hd-input:disabled {
+  background: var(--color-bg);
+}
+.hd-field-hint,
+.hd-field-error {
+  margin: 0;
+  font-size: var(--fs-caption);
+  line-height: var(--lh-caption);
+}
+.hd-field-hint {
+  color: var(--color-text-muted);
+}
+.hd-field-error {
+  color: var(--tone-danger);
+}
+.hd-btn-primary:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.hd-download .hd-filter-options {
+  grid-template-columns: 1fr;
+}
+.hd-filter-card.hd-field {
+  gap: 8px;
+}
+
+/* Loading skeleton */
+@keyframes hd-pulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+.hd-skel-bar {
+  display: block;
+  height: 16px;
+  margin-bottom: 12px;
+  border-radius: 4px;
+  background: var(--color-surface-track);
+  animation: hd-pulse 1.2s ease-in-out infinite;
+}
+.hd-skel-short {
+  width: 30%;
+}
+.hd-skel-mid {
+  width: 55%;
+}
+.hd-skel-long {
+  width: 85%;
+}
+.hd-skel-title {
+  width: 40%;
+  height: 24px;
+}
+.hd-skel-row {
+  height: 40px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hd-skel-bar {
+    animation: none;
+  }
+}
+
+/* Filter & Selection sheet (Drawer: bottom sheet < 768, right drawer above) */
+.hd-filters .drawer-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.hd-filter-card {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px 24px 28px;
+  border: 1px solid var(--drawer-line);
+  border-radius: 16px;
+  box-shadow: var(--shadow-card);
+}
+.hd-filter-card h3 {
+  margin: 0;
+  font-size: var(--fs-heading5);
+  line-height: var(--lh-heading5);
+  font-weight: var(--fw-bold);
+}
+.hd-filter-options {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+.hd-btn-primary {
+  flex: 1;
+  height: 48px;
+  padding: 0 24px;
+  border: 1px solid var(--color-brand);
+  border-radius: 8px;
+  background: var(--color-brand);
+  color: var(--color-surface);
+  font-size: var(--fs-button);
+  line-height: var(--lh-button);
+  letter-spacing: var(--ls-button);
+  font-weight: var(--fw-semibold);
+  cursor: pointer;
+}
+@media (min-width: 768px) {
+  .hd-filter-options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .hd-btn-primary {
+    flex: 0 0 auto;
+    height: 40px;
+    min-width: 100px;
+  }
+}
+
+@media (min-width: 1024px) {
+  /* Desktop-mode tokens of Figma 9:11300 (it resolves a different variable mode than the mobile frame). */
+  .hd-page {
+    --hd-text-subtle: #4b5563; /* Text-Subtle: breadcrumb current, table headers, Total row */
+    --hd-tag-success-bg: #f0fdf4;
+    --hd-tag-success-fg: #22c55e;
+    --hd-tag-danger-bg: #fcf2f4;
+    --hd-tag-danger-fg: #d2042d;
+    padding: 36px 36px 48px;
+  }
+  .hd-header {
+    height: 20px;
+  }
+  .hd-breadcrumb [aria-current] {
+    color: var(--hd-text-subtle);
+  }
+  .hd-titlebar {
+    margin: 24px 0 12px;
+  }
+  .hd-title {
+    color: var(--color-text-strong-alt);
+    font-size: var(--fs-heading1);
+    line-height: var(--lh-heading1);
+    letter-spacing: 0; /* Display 3: 32/44 Bold */
+  }
+  /* Outlined pills: min 100×40, 16px side padding, 2px between the 2px-inset 16px glyph and the 4px-inset label. */
+  .hd-titlebar .filter-btn,
+  .perf-tracking .filter-btn {
+    width: auto;
+    height: 40px;
+    min-width: 100px;
+    padding: 0 16px;
+    gap: 2px;
+    border-radius: 56px;
+    color: var(--color-text);
+    font-size: var(--fs-body);
+    line-height: var(--lh-button);
+    letter-spacing: var(--ls-button);
+    font-weight: var(--fw-semibold);
+    --filter-icon-color: var(--color-icon);
+  }
+  .hd-titlebar .filter-btn .icon,
+  .perf-tracking .filter-btn .icon {
+    width: 16px !important;
+    height: 16px !important;
+    margin: 0 2px;
+    background-color: var(--color-icon) !important;
+  }
+  .hd-titlebar .filter-btn-label,
+  .perf-tracking .filter-btn-label {
+    padding: 0 4px;
+  }
+  .hd-chips {
+    margin: 0 0 24px;
+    padding: 0;
+    overflow: visible;
+  }
+  .hd-chip {
+    border-color: var(--color-badge-bg); /* Outline-Subtle in this mode: #F4F4F5 */
+  }
+  .hd-crumb-sep {
+    color: var(--color-text-muted);
+  }
+  /* Table text per Figma: N/A is a 14/20 body value, tags are SemiBold radius 8. */
+  .hd-table .hd-na {
+    color: var(--color-text);
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
+  }
+  .hd-table .tag.hd-pill {
+    border-radius: 8px;
+    font-weight: var(--fw-semibold);
+  }
+}
+
+/* ── S-P4-01 viewing mode below breakpoint.desktop — Figma 32:15242 (My Team - Agent Leader - Self) ──
+   Banner (32:15457): white band, 1px #E5E7EB border, 12/16 padding, a 36px avatar, 16px, then "Viewing {name}"
+   16/24 Regular over "{id} | {role}" 14/20 (2px apart) and a 24px close. Compensation & Benefits (32:15280):
+   one full-width 16px-radius card, 16 padding, the 36px glyph, 12px, then a 12/16 Medium label. */
+.profile-avatar {
+  display: block;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+@media (max-width: 1023px) {
+  .viewing-banner {
+    box-sizing: border-box;
+    min-height: 0;
+    padding: 12px 16px;
+  }
+  /* 15px under the banner (Figma: the 16px group padding overlaps its border), then 12px (not 24) to the Metric Tracking row. */
+  .perf-quick:has(.quick-wide) {
+    margin-top: 15px;
+  }
+  .perf-quick:has(.quick-wide) + .perf-tracking {
+    margin-top: 12px;
+  }
+  .viewing-banner-copy {
+    gap: 2px;
+  }
+  .viewing-banner-title {
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: var(--fw-regular);
+  }
+  .viewing-banner-sub {
+    font-weight: var(--fw-medium);
+  }
+  .viewing-banner-sub i {
+    height: 13.5px;
+  }
+  .viewing-close {
+    width: 24px;
+    height: 24px;
+  }
+  .perf-quick .quick.quick-wide a {
+    width: 100%;
+    height: auto;
+    box-sizing: border-box;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 16px;
+    border-radius: 16px;
+    background: var(--color-surface);
+    box-shadow: var(--shadow-elevation-card);
+  }
+  .perf-quick .quick.quick-wide .ic {
+    width: 36px;
+    height: 36px;
+    margin: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+  }
+  .perf-quick .quick.quick-wide .lbl {
+    width: auto;
+    margin: 0;
+    color: var(--color-text-strong, #18181b);
+    font-size: var(--fs-caption);
+    line-height: var(--lh-caption);
+    font-weight: var(--fw-medium);
+    text-align: left;
+    position: relative;
+    top: 1px; /* measured: Figma's 12/16 label ink sits 1px below a flush box */
+  }
+}
+
+/* ── My Team list at breakpoint.desktop — Figma 32:18433 (Desktop) ──────────────────────────────────────
+   Content column 36px in from the host nav, 1271 wide in the frame. Back row 20h at 36, title 32/44 at +44,
+   search row 40h at +68 (a 730px field, a 100×40 pill Filter at the far right), chips 28h 12 below, summary
+   tiles 64h inside a 2px inset 16 below, then one white panel (16 padding, 16 gap) of 611.5×152 cards. */
+@media (min-width: 1024px) {
+  .td-page {
+    padding: 36px 36px 48px;
+  }
+  .td-header {
+    height: 20px;
+  }
+  .td-breadcrumb {
+    gap: 8px;
+    color: var(--td-muted);
+    font-weight: var(--fw-medium);
+  }
+  .td-breadcrumb [aria-current] {
+    color: #4b5563;
+  }
+  .td-asof {
+    color: #7c7c7c;
+    font-weight: var(--fw-regular);
+  }
+  .td-title {
+    margin: 24px 0 24px;
+    font-size: var(--fs-heading1);
+    line-height: var(--lh-heading1);
+    letter-spacing: 0;
+    color: var(--td-ink);
+  }
+  .td-search-row {
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .td-search-row .td-search {
+    flex: 0 0 730px;
+    width: 730px;
+  }
+  .td-search-row .filter-btn {
+    height: 40px;
+    min-width: 100px;
+    padding: 8px 16px;
+    gap: 2px;
+    border-radius: 56px;
+    border-color: var(--td-line);
+    letter-spacing: var(--ls-button);
+    line-height: var(--lh-button);
+  }
+  .td-search-row .filter-btn {
+    justify-content: center;
+  }
+  .td-search-row .filter-btn .icon {
+    margin: 0 2px;
+  }
+  .td-search-row .filter-btn-label {
+    padding: 0 4px;
+  }
+  /* Search Components: white, 16px radius, 40px left padding around the 24px glyph at x9. */
+  .td-search-row .search-field {
+    position: relative;
+    padding: 0 8px 0 40px;
+    border-radius: 16px;
+    background: #fff;
+  }
+  .td-search-row .search-field-glyph {
+    position: absolute;
+    left: 9px;
+    top: 50%;
+    width: 24px;
+    height: 24px;
+    transform: translateY(-50%);
+    background: url("/icons/search-lg.svg") no-repeat center / 24px 24px;
+  }
+  .td-search-row .search-field-glyph::before,
+  .td-search-row .search-field-glyph::after {
+    display: none;
+  }
+  .td-chips {
+    gap: 8px;
+    margin: 12px 0 16px;
+  }
+  .filter-pill.td-chip {
+    height: 28px;
+    border-radius: 8px;
+    border-color: #f4f4f5;
+    color: var(--td-muted);
+  }
+  .td-kpis {
+    gap: 16px;
+    margin: 0 0 16px;
+    padding: 2px;
+  }
+  .td-kpi {
+    height: 64px;
+    padding: 8px 12px;
+    gap: 4px;
+    border-color: #f4f4f5;
+    border-radius: 12px;
+    justify-content: center;
+  }
+  .td-kpi-label {
+    color: #4b5563;
+    line-height: 24px; /* Figma: a 24px header row around the 12/16 title */
+  }
+  .td-panel {
+    gap: 16px;
+    padding: 16px;
+    border-radius: 16px;
+  }
+  .td-card-link {
+    padding: 15px;
+    height: 150px; /* + the 1px border = the 152px TaskCard */
+    box-sizing: border-box;
+  }
+  .td-card {
+    border-color: #dbdbdb;
+  }
+  .td-identity .profile-avatar {
+    margin-top: 0;
+  }
+  .td-values {
+    margin-top: 16px;
+    min-height: 28px;
+  }
+  .td-crumb-sep {
+    color: var(--td-muted);
+    font-weight: var(--fw-medium);
+  }
+  .tag.td-badge {
+    border-radius: 8px;
+    font-weight: var(--fw-semibold);
+  }
+  .td-badge-info {
+    background: #eff6ff;
+    color: #3b82f6;
+  }
+  .td-badge-qualification {
+    background: #f5f3ff;
+    color: #8b5cf6;
+  }
+  .td-goal {
+    color: #4b5563;
+    font-size: 14px;
+    line-height: 20px;
+  }
+  .td-name {
+    color: var(--td-ink);
+  }
+}
+
+/* ── My Team Filters sidesheet at breakpoint.desktop — Figma 32:18654 ───────────────────────────────────
+   608px sheet: 72px header (24 padding, 18/24 title, 40px close), 24px body padding, a Sort By card (20 padding,
+   two radio columns), the "All Agent" master row, 16px-spaced group cards (16 padding, a 48px header row and
+   44px option rows 2px apart, indented 20) and an 88px bar of 100×40 pill buttons. Glyphs are the Figma
+   Check Box Filled / Radio Button exports. */
+@media (min-width: 1024px) {
+  .drawer-backdrop:has(.td-filters) {
+    background: rgba(0, 0, 0, 0.45); /* measured: the frame's page background 243 → 133 */
+  }
+  .td-filters .drawer-head {
+    box-sizing: border-box;
+    height: 72px;
+    padding: 24px;
+    border-bottom: 1px solid #dbdbdb;
+  }
+  .td-filters .drawer-head h2 {
+    font-weight: var(--fw-bold);
+    color: var(--td-ink-strong, #18181b);
+  }
+  .td-filters .drawer-close {
+    width: 40px;
+    height: 40px;
+    margin: 0;
+    border-radius: 56px;
+  }
+  .td-filters .drawer-close .icon {
+    background-color: #71717a !important;
+  }
+  .td-filters .drawer-body {
+    padding: 24px;
+    gap: 16px;
+  }
+  .td-filters .td-filter-card {
+    gap: 2px;
+    padding: 15px; /* + the 1px border = Figma's 16px inside-stroke padding */
+    border: 1px solid #d4d4d8;
+    border-radius: 16px;
+    box-shadow: 0 0 1px rgba(0, 0, 0, 0.12);
+  }
+  .td-filters .td-filter-card.td-filter-sort {
+    gap: 12px;
+    padding: 19px;
+  }
+  .td-filters .td-filter-sort h3 {
+    padding: 0 12px;
+    color: #1a1a1a;
+  }
+  .td-filters .td-filter-sort + .td-filter-master {
+    margin-top: -4px;
+  }
+  .td-filters .td-filter-master {
+    padding: 2px 0 0;
+  }
+  .td-filters .td-filter-card .td-filter-options {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+    padding-left: 20px;
+  }
+  /* Figma indents the PruWealth Planner options 16px, the MDRT ones 20px. */
+  .td-filters .td-filter-card[data-group="PRUWEALTH_PLANNER"] .td-filter-options {
+    padding-left: 16px;
+  }
+  .td-filters .td-filter-card.td-filter-sort .td-filter-options {
+    grid-template-columns: 249px minmax(0, 1fr);
+    gap: 0;
+    padding-left: 0;
+  }
+  .td-filters .check-row,
+  .td-filters .radio-row {
+    box-sizing: border-box;
+    display: flex !important;
+    width: 100%;
+    min-height: 0;
+    padding: 12px !important; /* the headless Checkbox sets padding/background inline */
+    gap: 8px;
+    border-radius: 8px;
+    background: #fff !important;
+    color: #18181b;
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: var(--fw-medium);
+  }
+  .td-filters .check-row.strong {
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: var(--fw-bold);
+  }
+  .td-filters .td-filter-master .check-row.strong {
+    font-size: 18px;
+  }
+  .td-filters .check-box {
+    flex: 0 0 20px;
+    width: 15px;
+    height: 15px;
+    margin: 2.5px;
+    border-width: 2px;
+    border-radius: 3px;
+  }
+  .td-filters .check-box.on {
+    flex-basis: 20px;
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    background: url("/icons/filter-checkbox-on.svg") no-repeat center / 20px 20px;
+  }
+  .td-filters .check-box.on .icon {
+    display: none;
+  }
+  .td-filters .radio-dot {
+    flex: 0 0 20px;
+    width: 20px;
+    height: 20px;
+    border: 0;
+    border-radius: 0;
+    background: url("/icons/filter-radio-off.svg") no-repeat center / 16.67px 16.67px;
+  }
+  .td-filters .radio-dot.on {
+    border: 0;
+    background: url("/icons/filter-radio-on.svg") no-repeat center / 20px 20px;
+  }
+  .td-filters .drawer-foot {
+    box-sizing: border-box;
+    height: 88px;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 23px 24px 24px; /* the 1px top border sits inside Figma's 24px padding */
+  }
+  .td-filters .td-btn-outline,
+  .td-filters .td-btn-primary {
+    height: 40px;
+    min-width: 100px;
+    padding: 8px 16px;
+    border-radius: 56px;
+    font-size: 14px;
+    line-height: 24px;
+  }
+}
+
+/* ── Agent view (viewing mode) at breakpoint.desktop — Figma 32:19505 (My Team - Desktop) ───────────────
+   Full-width column 36px in from the host nav (1127 wide in the frame, not the dashboard's 800 column).
+   Banner 70h (12px radius, 1px #E5E7EB, 36px avatar, Exit View pill), 24px to a 255×68 Compensation card
+   (24px radius, 12/16 SemiBold label), 24px to Metric Tracking. */
+@media (min-width: 1024px) {
+  .perf-page.perf-page-viewing {
+    max-width: none;
+    margin: 0;
+    padding: 36px 36px 48px;
+  }
+  .perf-page-viewing .viewing-banner {
+    box-sizing: border-box;
+    min-height: 0;
+    height: 70px;
+    margin: 0;
+    padding: 11px 15px; /* + the 1px border = Figma's 16px inside-stroke padding */
+    gap: 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+  }
+  .perf-page-viewing .viewing-banner-copy {
+    gap: 2px;
+  }
+  .perf-page-viewing .viewing-banner-title {
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: var(--fw-regular);
+  }
+  .perf-page-viewing .viewing-banner-sub {
+    font-weight: var(--fw-medium);
+  }
+  .perf-page-viewing .viewing-banner-sub i {
+    height: 13.5px;
+  }
+  .perf-page-viewing .viewing-exit {
+    min-width: 80px;
+    height: 32px;
+    justify-content: center;
+    padding: 4px 15px;
+    border-radius: 56px;
+    border-color: #d4d4d8;
+    line-height: 24px;
+  }
+  .perf-page-viewing .perf-quick {
+    margin-top: 24px;
+  }
+  /* 16px (not 12) between the context chips and the Priority panel. */
+  .perf-page-viewing .perf-context {
+    padding-bottom: 4px;
+  }
+  /* Figma's 20/28 title and 12/16 tile label ink sit 2px / 1px below the same boxes here. */
+  .perf-page-viewing .perf-tracking .title16 {
+    position: relative;
+    top: 2px;
+  }
+  .perf-page-viewing .perf-quick .quick.quick-wide .lbl {
+    position: relative;
+    top: 1px;
+  }
+  .perf-page-viewing .perf-quick .quick.quick-wide a {
+    width: 255px;
+    height: auto;
+    box-sizing: border-box;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 16px;
+    border-radius: 24px;
+    background: var(--color-surface);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03);
+  }
+  .perf-page-viewing .perf-quick .quick.quick-wide .ic {
+    width: 36px;
+    height: 36px;
+    margin: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+  }
+  .perf-page-viewing .perf-quick .quick.quick-wide .lbl {
+    width: auto;
+    margin: 0;
+    color: #18181b;
+    font-size: var(--fs-caption);
+    line-height: var(--lh-caption);
+    font-weight: var(--fw-semibold);
+    text-align: left;
+  }
 }

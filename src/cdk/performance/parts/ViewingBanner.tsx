@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Avatar, Icon } from "@/dls-stub";
+import { Icon, ProfileAvatar } from "@/dls-stub";
 import { t } from "@/lib/i18n";
 import { href } from "@/lib/nav";
 import type { DashboardViewingVM } from "@spec/performance-vm";
@@ -20,7 +20,7 @@ export function ViewingBanner({ viewing }: { viewing: DashboardViewingVM }) {
   const { member } = viewing;
   return (
     <div className="viewing-banner" role="region" aria-label={t("insights.viewing.title", { name: member.displayName })}>
-      <Avatar name={member.displayName} src={member.photoUrl} />
+      <ProfileAvatar />
       <span className="viewing-banner-copy">
         <span className="viewing-banner-title">{t("insights.viewing.title", { name: member.displayName })}</span>
         <span className="viewing-banner-sub">

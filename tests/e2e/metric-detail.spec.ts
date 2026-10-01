@@ -221,7 +221,7 @@ test.describe('Metric detail (S-P4-02)', () => {
     // Every other section still renders as its own independent card
     // (AC-P4-02-21). Addressed via the card class, not the word "Penders" —
     // AC-P4-02-23 removed the gauge legend that text used to match.
-    await expect(page.locator('.card').filter({ hasText: 'With Repricing' })).toBeVisible();
+    await expect(page.locator('.card').filter({ hasText: 'With repricing' }).filter({ hasNot: page.locator('table') })).toBeVisible();
   });
 
   test('header region: as-of in the back row, page title below, labelled pills (AC-P4-02-22)', async ({ context, page }) => {
@@ -260,7 +260,8 @@ test.describe('Metric detail (S-P4-02)', () => {
     await page.goto('/insights/metric-detail?metricCode=TPC');
 
     const combined = page.locator('.gauge-comparison');
-    await expect(combined.locator('.title16')).toHaveText('Without Repricing');
+    // Figma 1:16160: the drill-down card heading is sentence case.
+    await expect(combined.locator('.title16')).toHaveText('Without repricing');
     // AC-P4-02-28: comparison half is headed "{period} Comparison".
     await expect(combined.locator('.gc-comparison .title14')).toHaveText('YTD Comparison');
     // Bare year, no "YTD " prefix.
@@ -457,8 +458,11 @@ test.describe('Metric detail (S-P4-02)', () => {
       await expect(rows.nth(n - 1).locator('td.colval.total')).toHaveText(COMPACT);
       await expect(table).not.toContainText('RM');
     }
-    // The weightPct suffix is untouched (AC-P4-02-06; OQ-72 still open).
-    await expect(page.getByText('Credit Points (10%)').first()).toBeVisible();
+    // Figma 1:16325: only PSA and Single Premium read "(10%)"; Credit Points has no suffix (closes OQ-72).
+    await expect(page.getByText('PSA (10%)').first()).toBeVisible();
+    await expect(page.getByText('Single Premium (10%)').first()).toBeVisible();
+    await expect(page.getByText('Credit Points', { exact: true }).first()).toBeVisible();
+    await expect(page.getByText('Credit Points (10%)')).toHaveCount(0);
   });
 
   test('FYP: gauge collected and penders are compact; its 7 breakdown rows are plain (AC-P4-02-54/55)', async ({ context, page }) => {
@@ -495,7 +499,7 @@ test.describe('Metric detail (S-P4-02)', () => {
       const icon = value.locator('.icon');
       await expect(icon).toHaveCount(1);
       await expect(icon).toHaveAttribute('aria-hidden', 'true');
-      await expect(icon).toHaveCSS('mask-image', /external-link-line\.svg/);
+      await expect(icon).toHaveCSS('mask-image', /open-in-new\.svg/); // Figma's own glyph (closes OQ-76)
 
       expect(watch.errors, watch.errors.join('\n')).toEqual([]);
       expect(watch.warnings, watch.warnings.join('\n')).toEqual([]);
@@ -545,4 +549,114 @@ test.describe('Metric detail (S-P4-02)', () => {
     await link.click();
     await expect(page).toHaveURL(/\/insights\/history\?metricCode=TPC/);
   });
+  // ── Figma 1:16115 (Metric Detail › Mobile, TPC; the same frame serves PTPC and FYP) ──────────────
+  // Sizes are the Figma frame's own numbers: back row 24h 20px below the host header, title 28h, chips
+  // 28h, drill-down cards 312 / 128 / 56 high, breakdown cards 312 high with a 44px row pitch.
+  test('Figma 1:16115: header row, title and chips (TPC)', async ({ context, page }) => {
+    await setPersona(context, 'AGENT_P4');
+    const watch = watchConsole(page);
+    await page.goto('/insights/metric-detail?metricCode=TPC');
+
+    const back = (await page.locator('.detail-appbar .back').boundingBox())!;
+    expect([back.y, back.height]).toEqual([20, 24]);
+    const arrow = page.locator('.detail-appbar .back .back-icon-mobile img');
+    await expect(arrow).toHaveAttribute('src', '/icons/arrow-back.svg');
+    expect((await arrow.boundingBox())!).toMatchObject({ width: 24, height: 24 });
+    await expect(page.locator('.detail-appbar .back-label')).toHaveCSS('color', 'rgb(82, 82, 91)');
+    // "As of dd/MM/yyyy" (not "27 Jul 2026"), 11/16 in #7C7C7C.
+    const asOf = page.locator('.detail-appbar .detail-asof');
+    await expect(asOf).toHaveText(/^As of \d{2}\/\d{2}\/\d{4}$/);
+    await expect(asOf).toHaveCSS('color', 'rgb(124, 124, 124)');
+    await expect(asOf).toHaveCSS('font-size', '11px');
+
+    const title = page.locator('h1.page-title');
+    expect((await title.boundingBox())!.y).toBe(56);
+    await expect(title).toHaveCSS('letter-spacing', '-0.25px');
+
+    const chips = page.locator('.dd-chips .filter-pill');
+    await expect(chips).toHaveCount(2);
+    await expect(chips.first()).toHaveAttribute('aria-label', 'Product: Both');
+    await expect(chips.last()).toHaveAttribute('aria-label', 'Time: YTD');
+    const [first, second] = [(await chips.first().boundingBox())!, (await chips.last().boundingBox())!];
+    expect([first.y, first.height, second.y]).toEqual([96, 28, 96]);
+    expect(Math.round(second.x - (first.x + first.width))).toBe(12);
+    await expect(chips.first()).toHaveCSS('color', 'rgb(113, 113, 122)');
+    expect(watch.errors, watch.errors.join('\n')).toEqual([]);
+  });
+
+  test('Figma 1:16160/16247/16248: Without repricing, With repricing and Penders cards (TPC)', async ({ context, page }) => {
+    await setPersona(context, 'AGENT_P4');
+    await page.goto('/insights/metric-detail?metricCode=TPC');
+
+    const cards = page.locator('.card.dd-card:not(.dd-breakdown)');
+    await expect(cards).toHaveCount(3);
+    const boxes = [];
+    for (const card of await cards.all()) boxes.push((await card.boundingBox())!);
+    expect(boxes.map((b) => [b.x, b.width, b.height])).toEqual([[16, 343, 312], [16, 343, 128], [16, 343, 56]]);
+    expect(boxes.map((b) => b.y)).toEqual([136, 460, 600]); // 12px between boxes
+    await expect(cards.first()).toHaveCSS('border-radius', '16px');
+
+    // Heading 5 (18/24 Bold, #1A1A1A), sentence case, on both repricing cards.
+    for (const [i, text] of ['Without repricing', 'With repricing'].entries()) {
+      const heading = cards.nth(i).locator('.dd-card-title');
+      await expect(heading).toHaveText(text);
+      await expect(heading).toHaveCSS('font-size', '18px');
+      await expect(heading).toHaveCSS('line-height', '24px');
+      await expect(heading).toHaveCSS('color', 'rgb(26, 26, 26)');
+    }
+    // 24px between the heading and the Collected panel; the hairline sits 24px below it with nothing between the year rows.
+    const combined = page.locator('.gauge-comparison');
+    const heading = (await combined.locator('.dd-card-title').boundingBox())!;
+    const panel = (await combined.locator('.gauge-value-only').boundingBox())!;
+    expect(panel.y - (heading.y + heading.height)).toBe(24);
+    await expect(combined.locator('.gc-divider')).toHaveCSS('border-top-color', 'rgb(229, 231, 235)');
+    await expect(combined.locator('.gc-comparison hr')).toHaveCount(0);
+    // "+27% vs last year" in full, the prior-year value in Text-Subtle.
+    await expect(combined.locator('.yoy-value .delta-line')).toContainText('vs last year');
+    await expect(combined.locator('.yoy-value .delta-line')).not.toContainText('vs LY');
+    await expect(combined.locator('.v.subtle')).toHaveCSS('color', 'rgb(82, 82, 91)');
+
+    // Penders: "Penders" 14/20 and the 16/24 SemiBold link with Figma's open_in_new at 16×16.
+    const link = cards.nth(2).locator('.penders-link');
+    await expect(link).toHaveCSS('font-size', '16px');
+    await expect(link).toHaveCSS('letter-spacing', '-0.15px');
+    expect((await link.locator('.icon').boundingBox())!).toMatchObject({ width: 16, height: 16 });
+  });
+
+  test('Figma 1:16323/16325: Breakdown by Product — heading, rows, 44px pitch, Total (TPC)', async ({ context, page }) => {
+    await setPersona(context, 'AGENT_P4');
+    await page.goto('/insights/metric-detail?metricCode=TPC');
+
+    const title = page.locator('.dd-section-title');
+    await expect(title).toHaveText('Breakdown by Product');
+    await expect(title).toHaveCSS('font-weight', '500');
+    await expect(title).toHaveCSS('color', 'rgb(26, 26, 26)');
+
+    const cards = page.locator('.dd-breakdown');
+    await expect(cards).toHaveCount(2);
+    await expect(cards.locator('.title14')).toHaveText(['Without Repricing', 'With Repricing']);
+    for (const card of await cards.all()) {
+      expect((await card.boundingBox())!).toMatchObject({ width: 343, height: 312 });
+      await expect(card).toHaveCSS('border-top-color', 'rgb(212, 212, 216)');
+      const heights = [];
+      for (const row of await card.locator('tbody tr').all()) heights.push((await row.boundingBox())!.height);
+      expect(heights).toEqual([32, 44, 44, 44, 44, 36]); // 20 + 11 + 1px rule, then 12 + 20 + 11 + 1; Total 12 + 24
+      // The rule between rows is the #E5E7EB hairline; the Total row has none.
+      await expect(card.locator('tbody tr:first-child td').first()).toHaveCSS('border-bottom-color', 'rgb(229, 231, 235)');
+      await expect(card.locator('tbody tr:last-child td').first()).toHaveCSS('border-bottom-width', '0px');
+      await expect(card.locator('td.colfirst').first()).toHaveCSS('color', 'rgb(82, 82, 91)');
+      await expect(card.locator('td.colval.total')).toHaveCSS('font-size', '16px');
+    }
+  });
+
+  test('FYP: one breakdown card headed "Product wise FYP distribution", on the same card shell (Figma 1:16325)', async ({ context, page }) => {
+    await setPersona(context, 'AGENT_P4');
+    await page.goto('/insights/metric-detail?metricCode=FYP');
+    await expect(page.locator('.dd-breakdown')).toHaveCount(1);
+    await expect(page.locator('.dd-breakdown .title14')).toHaveText('Product wise FYP distribution');
+    await expect(page.locator('.dd-section-title')).toHaveText('Breakdown by Product');
+    // No repricing variants ⇒ no "Without repricing" heading anywhere on the page.
+    await expect(page.getByText(/without repricing/i)).toHaveCount(0);
+  });
+
 });

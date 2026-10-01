@@ -7,6 +7,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { t } from "@/lib/i18n";
 import { href } from "@/lib/nav";
+import { withHistoricalNav } from "@/lib/historical-data";
 import { apiFetch } from "@/lib/apiClient";
 import {
   getPerformanceSample,
@@ -173,7 +174,7 @@ export default function PerformanceMY({
 
   const f = vm.filters;
   return (
-    <>
+    <div className={`perf-page${vm.viewing ? " perf-page-viewing" : ""}`}>
       {toast && <Toast message={toast} onDone={() => setToast(undefined)} />}
       {/* <div
         style={{
@@ -263,7 +264,7 @@ export default function PerformanceMY({
             onClick={() => setFilterOpen(true)}
           />
           <MoreActionsControl
-            actions={vm.moreActions}
+            actions={withHistoricalNav(vm.moreActions, vm.filters)}
             interceptActionIds={CUSTOMIZE_METRICS_ACTION_ID}
             onIntercept={() => setCustomizeOpen(true)}
           />
@@ -273,13 +274,14 @@ export default function PerformanceMY({
           not controls, and intentionally rendered with their own dedicated
           class so the History screen's pills remain unchanged. */}
       <div className="section">
-        <div className="filter-row">
+        <div className="filter-row perf-context">
+          {/* Viewing mode (Figma 32:15242 / 32:19505) reads "Product Both" / "Time YTD", the drill-down wording. */}
           <ContextPill
-            labelKey="insights.dashboard.filter.product"
-            value={t(`insights.businessLine.${f.businessLine}`)}
+            labelKey={vm.viewing ? "insights.detail.filter.product" : "insights.dashboard.filter.product"}
+            value={t(vm.viewing ? `insights.detail.businessLine.${f.businessLine}` : `insights.businessLine.${f.businessLine}`)}
           />
           <ContextPill
-            labelKey="insights.dashboard.filter.time"
+            labelKey={vm.viewing ? "insights.detail.filter.time" : "insights.dashboard.filter.time"}
             value={t(`insights.period.${f.period}`)}
           />
         </div>
@@ -418,6 +420,6 @@ export default function PerformanceMY({
           }}
         />
       )}
-    </>
+    </div>
   );
 }

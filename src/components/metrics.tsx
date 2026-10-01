@@ -4,7 +4,7 @@ import { t } from '@/lib/i18n';
 import { href } from '@/lib/nav';
 import { formatScalar, formatDetailScalar, formatDelta, toneFor } from '@/lib/format';
 import { Icon, ProgressBar, Tag } from '@/dls-stub';
-import { clampPct } from '@/headless';
+import { clampPct, useIsDesktop } from '@/headless';
 import type {
   BarComparisonSectionVM, BreakdownSectionVM, ComparisonSectionVM, DeltaVM, GaugeSectionVM,
   MetricCardVM, MilestoneCardVM, PendersSectionVM, ThresholdGaugeSectionVM, VariantValueSectionVM,
@@ -126,9 +126,11 @@ function GaugeCardBody({ s, metricCode, valueOnly = false, repricing = true }: {
   // "With repricing" counterpart — and keep their money penders
   // (AC-P4-02-39) as a second value line, since the donut legend is gone.
   if (valueOnly) {
+    // Figma 1:16160: the drill-down card heading is the sentence-case variant name ("Without repricing"), 18/24.
+    const cardHeading = s.variant ? t(`insights.detail.variantHeading.${s.variant}`) : heading;
     return (
       <>
-        {repricing && <div className="title16">{heading}</div>}
+        {repricing && <div className="title16 dd-card-title">{cardHeading}</div>}
         <div className="gauge-value-only">
           <span className="k muted">{t('insights.gauge.collected')}</span>
           <span className="v">{formatDetailScalar(s.collected, metricCode)}</span>
@@ -186,27 +188,49 @@ export function GaugeDonut({ s, metricCode }: { s: GaugeSectionVM; metricCode: s
 const TWO_PI = Math.PI * 2;
 const polar = (r: number, turns: number) => ({ x: 100 + r * Math.sin(turns * TWO_PI), y: 100 - r * Math.cos(turns * TWO_PI) });
 
-/** Full-circle ring starting at 12 o'clock, clockwise, with an end dot and an optional threshold tick. */
-function RingGauge({ pct, threshold, tone, label }: { pct: number; threshold?: number; tone: string; label: string }) {
+/** Full-circle ring starting at 12 o'clock, clockwise, with an end dot and an optional threshold tick.
+ *  Desktop (Figma 22:18658 Radial Ring): the end dot is a 3px white ring around the round cap (r10), the tick a
+ *  30×5 Chart-Neutral pill with a 2px white outline, and both cast the component's soft drop shadows. */
+function RingGauge({ pct, threshold, tone, label, desktop }: { pct: number; threshold?: number; tone: string; label: string; desktop?: boolean }) {
   const R = 90; const W = 20;
   const turns = Math.max(0, Math.min(100, pct)) / 100;
   const end = polar(R, turns);
   const arc = turns >= 1
     ? null
     : `M 100 ${100 - R} A ${R} ${R} 0 ${turns > 0.5 ? 1 : 0} 1 ${end.x} ${end.y}`;
-  const tick = threshold === undefined ? null : { a: polar(R - 14, threshold / 100), b: polar(R + 14, threshold / 100) };
+  // Mobile tick: 28px line; desktop tick spans R±15 (30 long) with round caps folded into the length.
+  const tick = threshold === undefined ? null : desktop
+    ? { a: polar(R - 12.5, threshold / 100), b: polar(R + 12.5, threshold / 100) }
+    : { a: polar(R - 14, threshold / 100), b: polar(R + 14, threshold / 100) };
   return (
     <svg className="ring-gauge" width="212" height="212" viewBox="-6 -6 212 212" role="img" aria-label={label}>
+      {desktop && (
+        <defs>
+          <filter id="ring-dot-shadow" x="-60%" y="-60%" width="220%" height="220%" colorInterpolationFilters="sRGB">
+            <feDropShadow dx="0" dy="2.67" stdDeviation="5.33" floodColor="#000" floodOpacity="0.12" />
+          </filter>
+          <filter id="ring-tick-shadow" x="-150%" y="-60%" width="400%" height="220%" colorInterpolationFilters="sRGB">
+            <feDropShadow dx="0" dy="4" stdDeviation="2" floodColor="#000" floodOpacity="0.15" />
+          </filter>
+        </defs>
+      )}
       <circle cx="100" cy="100" r={R} fill="none" stroke="var(--color-surface-track)" strokeWidth={W} />
       {turns >= 1 && <circle cx="100" cy="100" r={R} fill="none" stroke={tone} strokeWidth={W} />}
       {arc && turns > 0 && <path d={arc} fill="none" stroke={tone} strokeWidth={W} strokeLinecap="round" />}
-      {tick && (
+      {tick && desktop && (
+        <g filter="url(#ring-tick-shadow)">
+          <line x1={tick.a.x} y1={tick.a.y} x2={tick.b.x} y2={tick.b.y} stroke="var(--color-surface)" strokeWidth="9" strokeLinecap="round" />
+          <line x1={tick.a.x} y1={tick.a.y} x2={tick.b.x} y2={tick.b.y} stroke="var(--chart-neutral)" strokeWidth="5" strokeLinecap="round" />
+        </g>
+      )}
+      {tick && !desktop && (
         <>
           <line x1={tick.a.x} y1={tick.a.y} x2={tick.b.x} y2={tick.b.y} stroke="var(--color-surface)" strokeWidth="10" strokeLinecap="round" />
           <line x1={tick.a.x} y1={tick.a.y} x2={tick.b.x} y2={tick.b.y} stroke="var(--chart-neutral)" strokeWidth="6" strokeLinecap="round" />
         </>
       )}
-      {turns > 0 && <circle cx={end.x} cy={end.y} r="9" fill={tone} stroke="var(--color-surface)" strokeWidth="3" />}
+      {turns > 0 && desktop && <circle cx={end.x} cy={end.y} r="10" fill="none" stroke="var(--color-surface)" strokeWidth="3" filter="url(#ring-dot-shadow)" />}
+      {turns > 0 && !desktop && <circle cx={end.x} cy={end.y} r="9" fill={tone} stroke="var(--color-surface)" strokeWidth="3" />}
       <text x="100" y="100" textAnchor="middle" dominantBaseline="central" className="chart-threshold-value">{label}</text>
     </svg>
   );
@@ -254,7 +278,7 @@ export function DetailChartCard({ chart, comparison, metricCode, period }: {
   chart: ThresholdGaugeSectionVM | BarComparisonSectionVM; comparison?: ComparisonSectionVM; metricCode: string; period?: string;
 }) {
   return (
-    <div className={`card dchart-card${chart.type === 'BAR_COMPARISON' && chart.layout === 'STACKED' ? ' bars-stacked' : ''}`}>
+    <div className={`card dchart-card${chart.type === 'BAR_COMPARISON' ? ' dchart-bars' : ' dchart-ring'}${chart.type === 'BAR_COMPARISON' && chart.layout === 'STACKED' ? ' bars-stacked' : ''}`}>
       {chart.type === 'THRESHOLD_GAUGE' ? <ThresholdRing s={chart} metricCode={metricCode} /> : <BarsChart s={chart} />}
       {comparison && (
         <>
@@ -269,19 +293,20 @@ export function DetailChartCard({ chart, comparison, metricCode, period }: {
 /* ── w.metric-detail.threshold-gauge — ring (persistency, activity ratio) ─ */
 function ThresholdRing({ s, metricCode }: { s: ThresholdGaugeSectionVM; metricCode: string }) {
   const pct = Math.max(0, Math.min(100, s.current.value));
+  const desktop = useIsDesktop();
   // Persistency judges against its threshold (tick + legend); Activity Ratio shows the current value only.
   const showThreshold = metricCode.startsWith('PERSISTENCY_');
   const tone = showThreshold && s.sentiment !== 'POSITIVE' ? 'var(--chart-danger)' : 'var(--chart-success)';
   return (
-    <>
+    <div className="dchart-chart">
       <div className="gauge-legend">
         <LegendItem colour={tone} label={t('insights.gaugeLegend.current')} value={`${pct}%`} />
         {showThreshold && <LegendItem colour="var(--chart-neutral)" label={t('insights.gaugeLegend.threshold')} value={`${s.threshold.value}%`} muted />}
       </div>
       <div className="ring-wrap">
-        <RingGauge pct={pct} threshold={showThreshold ? s.threshold.value : undefined} tone={tone} label={`${pct}%`} />
+        <RingGauge pct={pct} threshold={showThreshold ? s.threshold.value : undefined} tone={tone} label={`${pct}%`} desktop={desktop} />
       </div>
-    </>
+    </div>
   );
 }
 export function ThresholdArc({ s, metricCode }: { s: ThresholdGaugeSectionVM; metricCode: string }) {
@@ -310,17 +335,24 @@ const barPath = (x: number, y: number, w: number, h: number, r: number) => {
 
 function BarsChart({ s }: { s: BarComparisonSectionVM }) {
   const stacked = s.layout === 'STACKED' && Boolean(s.totals);
-  const W = 311; const H = 202; const left = 32; const plotW = 260; const baseY = 160; const plotH = 120; const barW = 40;
+  // Desktop (Figma 22:16535, 311×202 plot): axis labels at x12, gridlines 33→293, zero line at y159,
+  // bars 106px apart about the plot centre, year labels 8px under the bars. Mobile keeps 1:15845.
+  const desktop = useIsDesktop();
+  const W = 311; const H = 202; const left = desktop ? 33 : 32; const plotW = 260; const baseY = desktop ? 159 : 160; const plotH = 120; const barW = 40;
   const peaks = stacked ? s.totals!.map((tt) => numOf(tt.value)) : s.measures.flatMap((m) => m.points.map((p) => numOf(p.value)));
   const integers = (s.measures[0]?.points[0]?.value.kind ?? 'COUNT') === 'COUNT';
   const { top, step } = niceScale(Math.max(...peaks, 1), integers);
   const ticks = Array.from({ length: Math.round(top / step) + 1 }, (_, i) => i * step);
   const yOf = (v: number) => baseY - (v / top) * plotH;
   // Slots are centred on the plot; the Figma frame sits the two bars slightly left of centre.
-  const slotW = plotW / 2; const centre = (yi: number) => left + slotW * yi + slotW / 2 - 11;
+  const slotW = plotW / 2;
+  const centre = (yi: number) => (desktop
+    ? 151.5 + (yi - (s.years.length - 1) / 2) * 106
+    : left + slotW * yi + slotW / 2 - 11);
+  const yearY = baseY + (desktop ? 21 : 22); // text baseline (desktop: 16px box centred 16px under the bars)
   const lastYear = s.years[s.years.length - 1];
   return (
-    <>
+    <div className="dchart-chart">
       <div className="gauge-legend">
         {stacked
           ? s.measures.map((m, mi) => <LegendItem key={m.measureCode ?? mi} colour={mi === 0 ? 'var(--chart-bar-prior-soft)' : 'var(--chart-information)'} label={m.measureCode ? t(`insights.measure.${m.measureCode}`) : ''} />)
@@ -329,8 +361,9 @@ function BarsChart({ s }: { s: BarComparisonSectionVM }) {
       <svg className="bars-svg" width="100%" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={s.years.join(' / ')}>
         {ticks.map((tk) => (
           <g key={tk}>
-            <line x1={left} x2={left + plotW} y1={yOf(tk)} y2={yOf(tk)} className="chart-grid" />
-            <text x={left - 8} y={yOf(tk)} textAnchor="end" dominantBaseline="central" className="chart-axis">{tk}</text>
+            {/* desktop lines sit on the pixel below the tick (a 1px line centred in its 24px row) */}
+            <line x1={left} x2={left + plotW} y1={yOf(tk) + (desktop ? 0.5 : 0)} y2={yOf(tk) + (desktop ? 0.5 : 0)} className={`chart-grid${tk === 0 ? ' zero' : ''}`} />
+            <text x={desktop ? 12 : left - 8} y={yOf(tk) + (desktop ? 0.5 : 0)} textAnchor={desktop ? 'start' : 'end'} dominantBaseline="central" className="chart-axis">{tk}</text>
           </g>
         ))}
         {s.years.map((year, yi) => {
@@ -362,7 +395,7 @@ function BarsChart({ s }: { s: BarComparisonSectionVM }) {
                     <text x={cx} y={y0 - 16} textAnchor="middle" dominantBaseline="central" className="chart-point">{label2(total.value)}</text>
                   </g>
                 )}
-                <text x={cx} y={baseY + 22} textAnchor="middle" className="chart-year">{year}</text>
+                <text x={cx} y={yearY} textAnchor="middle" className="chart-year">{year}</text>
               </g>
             );
           }
@@ -372,23 +405,27 @@ function BarsChart({ s }: { s: BarComparisonSectionVM }) {
           const y = baseY - h;
           // A bar too short to hold its label (zero / tiny values) carries the label above it instead.
           const labelAbove = h < 24;
-          const chipY = labelAbove ? y - 48 : y - 26;
+          const chipY = desktop ? (labelAbove ? y - 46 : y - 24) : (labelAbove ? y - 48 : y - 26);
+          const negative = point.change?.sentiment === 'NEGATIVE';
+          const chipText = point.change ? formatDelta(point.change) : '';
+          // Desktop chip is 4px/2px padding around the text (radius 6); mobile keeps the 32×20 chip.
+          const chipW = desktop ? Math.round(chipText.length * 7.4 + 8) : 32;
           return (
             <g key={year}>
               <path className="bar-seg" d={barPath(x, y, barW, h, 8)} fill={current ? 'var(--chart-information)' : 'var(--chart-bar-prior)'} />
-              <text x={cx} y={labelAbove ? y - 12 : y + 14} textAnchor="middle" dominantBaseline="central" className="chart-bar-label" fill={labelAbove ? 'var(--color-icon)' : current ? 'var(--color-surface)' : 'var(--color-icon)'}>{label2(point.value)}</text>
+              <text x={cx} y={labelAbove ? y - 12 : y + (desktop ? 12 : 14)} textAnchor="middle" dominantBaseline="central" className={`chart-bar-label ${current ? 'current' : 'prior'}`} fill={labelAbove ? 'var(--color-icon)' : current ? 'var(--color-surface)' : 'var(--color-icon)'}>{label2(point.value)}</text>
               {point.change && (
                 <g>
-                  <rect x={cx - 16} y={chipY} width="32" height="20" rx="4" fill="var(--chart-success-surface)" />
-                  <text x={cx} y={chipY + 10} textAnchor="middle" dominantBaseline="central" className="chart-delta" fill={point.change.sentiment === 'NEGATIVE' ? 'var(--chart-danger)' : 'var(--color-text-success)'}>{formatDelta(point.change)}</text>
+                  <rect x={cx - chipW / 2} y={chipY} width={chipW} height="20" rx={desktop ? 6 : 4} fill={negative ? 'var(--chart-danger-surface)' : 'var(--chart-success-surface)'} />
+                  <text x={cx} y={chipY + 10} textAnchor="middle" dominantBaseline="central" className="chart-delta" fill={negative ? 'var(--chart-danger)' : 'var(--dd-text-success)'}>{chipText}</text>
                 </g>
               )}
-              <text x={cx} y={baseY + 22} textAnchor="middle" className="chart-year">{year}</text>
+              <text x={cx} y={yearY} textAnchor="middle" className="chart-year">{year}</text>
             </g>
           );
         })}
       </svg>
-    </>
+    </div>
   );
 }
 export function BarComparison({ s, metricCode }: { s: BarComparisonSectionVM; metricCode: string }) {
@@ -423,27 +460,28 @@ function ComparisonCardBody({
           </div>
         )
       )}
-      <div className={`yoy-row${deltaLine ? ' yoy-row-tall' : ''}`} style={{ marginTop: 8 }}>
+      <div className={`yoy-row${deltaLine ? ' yoy-row-tall' : ''}`} style={deltaLine ? undefined : { marginTop: 8 }}>
         <span>
           <span className="k">{yearLabel(s.currentYear)}</span>
-          <span className="sub" style={{ display: 'block' }}>{t('insights.comparison.collected')}</span>
+          <span className="sub">{t('insights.comparison.collected')}</span>
         </span>
         {deltaLine ? (
           <span className="yoy-value">
             <span className="v">{formatDetailScalar(s.current, metricCode)}</span>
-            <DeltaLine delta={s.change} />
+            <DeltaLine delta={s.change} full />
           </span>
         ) : (
           <span className="v">{formatDetailScalar(s.current, metricCode)}</span>
         )}
       </div>
-      <hr className="hairline" />
+      {/* Figma 1:16160: the two year rows sit 12px apart with no hairline between them. */}
+      {!deltaLine && <hr className="hairline" />}
       <div className="yoy-row">
         <span>
           <span className="k">{yearLabel(s.priorYear)}</span>
-          <span className="sub" style={{ display: 'block' }}>{t('insights.comparison.collected')}</span>
+          <span className="sub">{t('insights.comparison.collected')}</span>
         </span>
-        <span className="v text-semibold">{formatDetailScalar(s.prior, metricCode)}</span>
+        <span className={`v text-semibold${deltaLine ? ' subtle' : ''}`}>{formatDetailScalar(s.prior, metricCode)}</span>
       </div>
       {/* AC-P4-02-25 replaces this labelled row with the delta line above, but
           only for the TPC/PTPC combined card — AC-P4-02-13/-03 still require
@@ -488,7 +526,7 @@ export function GaugeComparisonCard({
   // keeps its value-only face, content-sized, rather than falling back to
   // the standalone donut.
   return (
-    <div className={`card pad gauge-comparison${comparison ? '' : ' gauge-only'}`}>
+    <div className={`card pad dd-card gauge-comparison${comparison ? '' : ' gauge-only'}${repricing ? ' gc-titled' : ''}`}>
       <div className="gc-gauge">
         <GaugeCardBody s={gauge} metricCode={metricCode} valueOnly repricing={repricing} />
       </div>
@@ -510,13 +548,13 @@ export function GaugeComparisonCard({
 /* ── Variant value / penders — single-row YoY cards (6588:18661) ───────── */
 export function VariantValueCard({ s, metricCode }: { s: VariantValueSectionVM; metricCode?: string }) {
   return (
-    <div className="card pad">
-      {/* AC-P4-02-24: variant-only heading, bare year. */}
-      <div className="title14">{t(`insights.variant.${s.variant}`)}</div>
-      <div className="yoy-row" style={{ marginTop: 8 }}>
+    <div className="card pad dd-card dd-stack">
+      {/* AC-P4-02-24: variant-only heading, bare year. Sentence case, 18/24 (Figma 1:16247). */}
+      <div className="title14 dd-card-title">{t(`insights.detail.variantHeading.${s.variant}`)}</div>
+      <div className="yoy-row">
         <span>
           <span className="k">{s.periodLabelYear}</span>
-          <span className="sub" style={{ display: 'block' }}>{t('insights.comparison.collected')}</span>
+          <span className="sub">{t('insights.comparison.collected')}</span>
         </span>
         <span className="v">{formatDetailScalar(s.value, metricCode)}</span>
       </div>
@@ -534,7 +572,7 @@ export function VariantValueCard({ s, metricCode }: { s: VariantValueSectionVM; 
 export function PendersCard({ s, linkFace = false }: { s: PendersSectionVM; linkFace?: boolean }) {
   if (!linkFace || s.value.kind !== 'COUNT') {
     return (
-      <div className="card pad penders-card">
+      <div className="card pad dd-card penders-card">
         <div className="yoy-row">
           <span className="k">{t('insights.detail.penders')}</span>
           <span className="v">{formatScalar(s.value)}</span>
@@ -545,11 +583,11 @@ export function PendersCard({ s, linkFace = false }: { s: PendersSectionVM; link
   const face = (
     <>
       {t('insights.detail.pendersCases', { count: formatScalar(s.value) })}
-      <Icon token="external-link-line" size={16} tone="currentColor" />
+      <Icon token="open-in-new" size={16} tone="var(--dd-icon-info)" className="penders-icon" />
     </>
   );
   return (
-    <div className="card pad penders-card">
+    <div className="card pad dd-card penders-card">
       <div className="yoy-row">
         <span className="k">{t('insights.detail.penders')}</span>
         {s.nav ? (
@@ -562,21 +600,23 @@ export function PendersCard({ s, linkFace = false }: { s: PendersSectionVM; link
   );
 }
 
-/* ── w.metric-detail.breakdown-table — header 40h / rows 48h / 177+116 ─── */
+/* ── w.metric-detail.breakdown-table — Figma 1:16325 "Content Card" ──────────
+ * One bordered card per variant: 14/20 Bold heading, then one row per product
+ * (label left, plain value right, 1px hairline between rows) and a Total row
+ * (14/20 Bold label, 16/24 Bold compact value). Rows stay a real <table> so
+ * the screen-reader header and column semantics survive.
+ */
 /**
  * S-P4-02 v1.18.0: for the compact-money metrics, product rows show the plain
  * value (AC-P4-02-55) and only the Total is compact (AC-P4-02-54).
+ * `heading` is the card title: the variant name for the repricing metrics
+ * (TPC/PTPC, AC-P4-02-30), "Product wise {metric} distribution" otherwise.
  */
-export function BreakdownTable({ s, metricCode }: { s: BreakdownSectionVM; metricCode?: string }) {
+export function BreakdownTable({ s, metricCode, heading }: { s: BreakdownSectionVM; metricCode?: string; heading?: string }) {
   return (
-    <div className="card pad">
-      {/* AC-P4-02-30: card heading is the variant alone, matching the
-          variant-only convention already used for variant.with-repricing
-          (AC-P4-02-24). The shared "Breakdown by Product" heading lives once
-          above the card(s), in MetricDetailMY. */}
-      <div className="title14" style={{ marginBottom: 8 }}>
-        {t(`insights.variant.${s.variant}`)}
-      </div>
+    <div className="card pad dd-card dd-breakdown">
+      {/* The shared "Breakdown by Product" heading lives once above the card(s), in MetricDetailMY. */}
+      <div className="title14">{heading ?? t(`insights.variant.${s.variant}`)}</div>
       <div className="scroll-x">
         <table className="table">
           {/* AC-P4-02-62 (v1.21.0): header row is screen-reader only — the
@@ -586,7 +626,7 @@ export function BreakdownTable({ s, metricCode }: { s: BreakdownSectionVM; metri
               <th className="colfirst"><span className="sr-only">{t('insights.detail.product')}</span></th>
               {s.columns.map((c) => (
                 <th key={c} className="num colval">
-                  <span className="sr-only">{t(`insights.businessLine.${c}`)}</span>
+                  <span className="sr-only">{t(`insights.detail.businessLine.${c}`)}</span>
                 </th>
               ))}
             </tr>
@@ -594,7 +634,8 @@ export function BreakdownTable({ s, metricCode }: { s: BreakdownSectionVM; metri
           <tbody>
             {s.rows.map((r) => (
               <tr key={r.productCode}>
-                <td className="colfirst">{t(`insights.product.${r.productCode}`)}{r.weightPct !== undefined ? ` (${r.weightPct}%)` : ''}</td>
+                {/* Figma 1:16325: only PSA and Single Premium read "(10%)"; "Credit Points" carries no suffix (closes OQ-72). */}
+                <td className="colfirst">{t(`insights.product.${r.productCode}`)}{r.weightPct !== undefined && r.productCode !== 'CREDIT_POINTS' ? ` (${r.weightPct}%)` : ''}</td>
                 {s.columns.map((c) => {
                   const cell = r.cells.find((x) => x.businessLine === c);
                   return <td key={c} className="num colval">{cell ? formatDetailScalar(cell.value, metricCode, 'row') : '-'}</td>;

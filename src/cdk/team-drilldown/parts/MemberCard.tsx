@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Avatar, Icon, Tag } from "@/dls-stub";
+import { Icon, ProfileAvatar, Tag } from "@/dls-stub";
 import { formatScalarCompact } from "@/lib/format";
 import { t } from "@/lib/i18n";
 import { href } from "@/lib/nav";
@@ -18,8 +18,8 @@ function GoalStatus({ status }: { status: NonNullable<TeamMemberVM["goalStatus"]
   return (
     <span className={`td-goal ${status === "SET" ? "set" : "not-set"}`}>
       <Icon
-        token={status === "SET" ? "check" : "info"}
-        size={20}
+        token={status === "SET" ? "goal-set" : "goal-not-set"}
+        size={24}
         tone={status === "SET" ? "var(--td-goal-set)" : "var(--td-goal-not-set)"}
       />
       <span>{t(`insights.teamDrilldown.goalStatus.${status}`)}</span>
@@ -62,7 +62,7 @@ export function MemberCard({
         </div>
       )}
       <div className="td-identity">
-        <Avatar name={member.displayName} src={member.photoUrl} className="td-avatar" />
+        <ProfileAvatar className="td-avatar" />
         <span className="td-identity-copy">
           <span className="td-name-line">
             <span className="td-name">{member.displayName}</span>
@@ -112,9 +112,10 @@ export function MemberCard({
           aria-label={t("insights.teamDrilldown.subteamButton", { name: member.displayName, count: String(reports) })}
           onClick={() => onOpenSubteam(member)}
         >
-          <Icon token="scope-team" size={18} tone="var(--td-ink-soft)" />
+          <Icon token="team-group" size={18} />
           <span>{reports}</span>
-          <span className="td-caret" aria-hidden />
+          {/* Figma "mdi:menu-down": the exported triangle points up and the frame rotates it 180°. */}
+          <Icon token="menu-down" size={16} className="td-caret" style={{ transform: "rotate(180deg)" }} />
         </button>
       )}
     </article>

@@ -32,7 +32,8 @@ test.describe('My Team (S-P4-07) — mobile', () => {
     await page.goto('/insights/team-drilldown');
     const marcus = page.locator('.td-card', { hasText: 'Marcus Lee' });
     await expect(marcus.locator('.td-badge')).toHaveText(['MDRT', 'PWP']);
-    await expect(marcus.locator('.td-avatar img')).toHaveAttribute('src', '/mock-avatars/marcus-lee.png');
+    // The default profile avatar stands in for the member photo everywhere.
+    await expect(marcus.locator('img.td-avatar')).toHaveAttribute('src', '/icons/avatar-default.png');
     await expect(marcus.locator('.td-goal-inline')).toHaveText('Goal set');
     await expect(marcus.locator('.td-goal-top')).toBeHidden(); // top-right placement is desktop-only
     await expect(marcus.locator('.td-role')).toHaveText('UM');
@@ -68,7 +69,7 @@ test.describe('My Team (S-P4-07) — mobile', () => {
     await expect(page.locator('.td-card')).not.toHaveCount(before);
   });
 
-  test('AC-P4-07-13 team button opens that manager\'s drill-down view with scoped search; Back returns to the list', async ({ page }) => {
+  test('AC-P4-07-19 / AC-P4-07-21 team button opens that manager\'s team view with scoped search; Back returns to the list', async ({ page }) => {
     const watch = watchConsole(page);
     await page.goto('/insights/team-drilldown');
     await page.getByRole('button', { name: "View Marcus Lee's team (24)" }).click();
@@ -90,7 +91,7 @@ test.describe('My Team (S-P4-07) — mobile', () => {
     expect(watch.errors, watch.errors.join('\n')).toEqual([]);
   });
 
-  test('AC-P4-07-13 / AC-P4-07-14 an agent in a manager\'s team opens that agent\'s self view; Exit View returns to the team', async ({ page }) => {
+  test('AC-P4-07-22 / AC-P4-07-14 an agent in a manager\'s team opens that agent\'s self view; Exit View returns to the team', async ({ page }) => {
     const watch = watchConsole(page);
     await page.goto('/insights/team-drilldown');
     await page.getByRole('button', { name: "View Marcus Lee's team (24)" }).click();
@@ -106,7 +107,7 @@ test.describe('My Team (S-P4-07) — mobile', () => {
     expect(watch.errors, watch.errors.join('\n')).toEqual([]);
   });
 
-  test('AC-P4-07-13 a manager inside a team has its own team button; Back climbs one level at a time', async ({ page }) => {
+  test('AC-P4-07-20 / AC-P4-07-21 a manager inside a team has its own team button; Back climbs one level at a time', async ({ page }) => {
     // The mock tree has no manager under a UM, so shape one in (UM → UM1 → agents) at the BFF boundary.
     const nested = 'KCM00201';
     let nestedTeam: unknown[] = [];
@@ -140,12 +141,26 @@ test.describe('My Team (S-P4-07) — mobile', () => {
     await expect(page.locator('.td-card')).toHaveCount(10);
   });
 
-  test('a drill-down link opened cold still works and Back falls back to the My Team list', async ({ page }) => {
+  test('AC-P4-07-21 a team view opened cold still works and Back falls back to the My Team list', async ({ page }) => {
     await page.goto('/insights/team-drilldown?sub=KCM00101');
     await expect(page.getByRole('heading', { name: "Marcus Lee's Team (24)", level: 1 })).toBeVisible();
     await page.getByRole('button', { name: 'Back' }).click();
     await expect(page).toHaveURL(/\/insights\/team-drilldown$/);
     await expect(page.getByRole('heading', { name: 'My Team', level: 1 })).toBeVisible();
+  });
+
+  test('AC-P4-07-23 a team view that fails to load shows the notice, never the previous level\'s members', async ({ page }) => {
+    await page.route(/\/api\/bff\/v1\/performance\/team-drilldown\?.*parentAgentId=KCM00101/, route =>
+      route.fulfill({ status: 403, contentType: 'application/json', body: JSON.stringify({ code: 'BFF-4033', title: 'Member is not in the caller\'s team' }) }));
+    await page.goto('/insights/team-drilldown');
+    await expect(page.locator('.td-card')).toHaveCount(10);
+    await page.getByRole('button', { name: "View Marcus Lee's team (24)" }).click();
+    await expect(page.getByText('Some data is temporarily unavailable.')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Refresh' })).toBeVisible();
+    await expect(page.locator('.td-card')).toHaveCount(0); // the root list must not linger under the failed level
+    await expect(page.getByRole('heading', { level: 1 })).toHaveCount(0);
+    await page.getByRole('button', { name: 'Back' }).click();
+    await expect(page.locator('.td-card')).toHaveCount(10);
   });
 
   test('AC-P4-07-14 / AC-P4-01-85 / AC-P4-01-86 card opens read-only viewing mode; exit restores the list', async ({ page }) => {

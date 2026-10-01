@@ -289,13 +289,15 @@ export function Layer({
 
 /* ── RadioGroup ────────────────────────────────────────────────────────── */
 export function RadioGroup<T extends string>({
-  value, options, onChange, renderOption, className,
+  value, options, onChange, renderOption, className, labelledBy,
 }: {
   value: T; options: T[]; onChange: (v: T) => void; className?: string;
   renderOption: (opt: T, selected: boolean) => ReactNode;
+  /** id of the element that names the group (e.g. its section heading). */
+  labelledBy?: string;
 }) {
   return (
-    <div role="radiogroup" className={className}>
+    <div role="radiogroup" className={className} aria-labelledby={labelledBy}>
       {options.map((opt) => (
         <div key={opt} role="radio" aria-checked={opt === value} tabIndex={0}
           onClick={() => onChange(opt)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onChange(opt); }}

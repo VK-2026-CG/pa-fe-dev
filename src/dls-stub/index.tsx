@@ -14,6 +14,7 @@ import {
   Switch as HSwitch,
   useEscapeKey,
   useFocusTrap,
+  useIsTabletUp,
   type CarouselApi,
 } from "@/headless";
 
@@ -21,12 +22,16 @@ import {
 export function Icon({
   token,
   size = 20,
+  height = size,
   className,
   style,
   tone,
 }: {
   token: string;
+  /** Width in px (also the height unless `height` is given). */
   size?: number;
+  /** Height in px for non-square glyphs (e.g. the 25×22 Milestones tile icon). */
+  height?: number;
   className?: string;
   style?: CSSProperties;
   /** CSS color for monochrome glyphs (uses mask so currentColor-like tint works). */
@@ -40,7 +45,7 @@ export function Icon({
         className={`icon ${className ?? ""}`}
         style={{
           width: size,
-          height: size,
+          height,
           backgroundColor: tone,
           WebkitMask: `url(${src}) no-repeat center / contain`,
           mask: `url(${src}) no-repeat center / contain`,
@@ -53,9 +58,9 @@ export function Icon({
     <span
       aria-hidden
       className={`icon ${className ?? ""}`}
-      style={{ width: size, height: size, ...style }}
+      style={{ width: size, height, ...style }}
     >
-      <img src={src} alt="" width={size} height={size} />
+      <img src={src} alt="" width={size} height={height} />
     </span>
   );
 }
@@ -439,13 +444,40 @@ export function PeriodButton({
 export function FilterButton({
   label,
   onClick,
+  disabled,
 }: {
   label: string;
   onClick: () => void;
+  disabled?: boolean;
 }) {
+  const tabletUp = useIsTabletUp();
   return (
-    <button className="filter-btn" aria-label={label} onClick={onClick}>
-      <Icon token="filter" size={16} tone="var(--filter-icon-color, var(--color-text))" />
+    <button className="filter-btn" aria-label={label} onClick={onClick} disabled={disabled}>
+      {/* Icon-only 24px glyph below 768px (Figma "Filter" icon button), the 16px pill glyph from tablet up. */}
+      <Icon token={tabletUp ? "filter-sm" : "filter"} size={16} tone="var(--filter-icon-color, var(--color-text))" />
+      <span className="filter-btn-label">{label}</span>
+    </button>
+  );
+}
+
+/**
+ * Download action — same outlined button as `FilterButton` (icon-only 40×40 on
+ * mobile, labelled pill from tablet up) with the `download` glyph; used beside
+ * Filter on Historical Data (ARVIJ-1450-SP02).
+ */
+export function DownloadButton({
+  label,
+  onClick,
+  disabled,
+}: {
+  label: string;
+  onClick: () => void;
+  disabled?: boolean;
+}) {
+  const tabletUp = useIsTabletUp();
+  return (
+    <button className="filter-btn download-btn" aria-label={label} onClick={onClick} disabled={disabled}>
+      <Icon token={tabletUp ? "download-sm" : "download"} size={16} tone="var(--color-text)" />
       <span className="filter-btn-label">{label}</span>
     </button>
   );
@@ -744,14 +776,23 @@ export function ScopePill({
   );
 }
 
-/* ── Avatar (S-P4-07 0.2.0): photo when supplied, else initials ─────────── */
-export function Avatar({ name, src, className }: { name: string; src?: string; className?: string }) {
-  const initials = name.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join("");
+/* ── Avatar (S-P4-07 0.2.0): photo when supplied, else the default avatar ──
+   The default is the requester-supplied circle-user artwork (public/icons/avatar-default.png, the same file
+   the viewing banner uses); a photo that fails to load falls back to it too. */
+const DEFAULT_AVATAR_SRC = "/icons/avatar-default.png";
+export function Avatar({ src, className }: { name?: string; src?: string; className?: string }) {
+  const [failed, setFailed] = useState(false);
+  const photo = src && !failed ? src : undefined;
   return (
-    <span className={`avatar ${className ?? ""}`.trim()} aria-hidden>
-      {src ? <img src={src} alt="" /> : initials}
+    <span className={`avatar${photo ? "" : " avatar-default"} ${className ?? ""}`.trim()} aria-hidden>
+      <img src={photo ?? DEFAULT_AVATAR_SRC} alt="" onError={photo ? () => setFailed(true) : undefined} />
     </span>
   );
+}
+
+/** Default profile picture (the mobile "Avatar Inner" glyph) used wherever a member's photo would sit. */
+export function ProfileAvatar({ className }: { className?: string }) {
+  return <img className={`profile-avatar ${className ?? ""}`.trim()} src="/icons/avatar-default.png" alt="" aria-hidden />;
 }
 
 /* ── SearchField: leading glyph + borderless input in a bordered box ───── */
@@ -853,12 +894,15 @@ export function RadioRows<T extends string>({
   onChange,
   label,
   className,
+  labelledBy,
 }: {
   value: T;
   options: T[];
   onChange: (value: T) => void;
   label: (option: T) => string;
   className?: string;
+  /** id of the heading that names this group for assistive tech. */
+  labelledBy?: string;
 }) {
   return (
     <RadioGroup
@@ -866,6 +910,7 @@ export function RadioRows<T extends string>({
       options={options}
       onChange={onChange}
       className={className}
+      labelledBy={labelledBy}
       renderOption={(option, selected) => (
         <span className="radio-row">
           <span className={`radio-dot ${selected ? "on" : ""}`} aria-hidden />

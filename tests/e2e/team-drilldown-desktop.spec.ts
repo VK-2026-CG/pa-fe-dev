@@ -30,7 +30,7 @@ test.describe('My Team (S-P4-07) — desktop', () => {
     expect(watch.errors, watch.errors.join('\n')).toEqual([]);
   });
 
-  test('AC-P4-07-13 team button drills into the manager; the breadcrumb carries the trail back', async ({ page }) => {
+  test('AC-P4-07-19 / AC-P4-07-21 team button drills into the manager; the breadcrumb carries the trail back', async ({ page }) => {
     await page.goto('/insights/team-drilldown');
     await page.getByRole('button', { name: "View Marcus Lee's team (24)" }).click();
     await expect(page.getByRole('heading', { name: "Marcus Lee's Team (24)", level: 1 })).toBeVisible();
@@ -65,5 +65,30 @@ test.describe('My Team (S-P4-07) — desktop', () => {
     await expect(page).toHaveURL(/team-drilldown/);
     await page.getByRole('navigation', { name: 'Breadcrumb' }).getByRole('link', { name: 'Performance' }).click();
     await expect(page).toHaveURL(/insights\/performance/);
+  });
+
+  test('Figma 32:18433 / 32:18654 / 32:19505: card geometry, Filters sheet rows and the agent-view banner', async ({ page }) => {
+    await page.setViewportSize({ width: 1343, height: 1391 });
+    await page.goto('/insights/team-drilldown');
+    const card = (await page.locator('.td-card').first().boundingBox())!;
+    expect([card.width, card.height]).toEqual([611.5, 152]);
+    await expect(page.locator('.td-card img.td-avatar').first()).toHaveAttribute('src', '/icons/avatar-default.png');
+
+    await page.getByRole('button', { name: /filter/i }).first().click();
+    const sheet = page.locator('.td-filters');
+    expect((await sheet.boundingBox())!.width).toBe(608);
+    const rows = await sheet.locator('.td-filter-card:not(.td-filter-sort) .check-row.strong').all();
+    expect((await rows[0]!.boundingBox())!.height).toBe(48);
+    const option = (await sheet.locator('.td-filter-card[data-group="MDRT"] .td-filter-options .check-row').first().boundingBox())!;
+    expect(option.height).toBe(44);
+    await sheet.getByRole('button', { name: /cancel/i }).click();
+
+    await page.setViewportSize({ width: 1199, height: 1391 });
+    await page.goto('/insights/performance?subjectAgentId=KCM00101');
+    const banner = (await page.locator('.viewing-banner').boundingBox())!;
+    expect([banner.x, banner.y, banner.width, banner.height]).toEqual([36, 36, 1127, 70]);
+    await expect(page.locator('.viewing-banner img.profile-avatar')).toHaveAttribute('src', '/icons/avatar-default.png');
+    const tile = (await page.locator('.quick-wide a').first().boundingBox())!;
+    expect([tile.width, tile.height]).toEqual([255, 68]);
   });
 });

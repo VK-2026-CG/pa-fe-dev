@@ -4,7 +4,7 @@
  * Replace any file with a DLS export later — the manifest maps each token to
  * its Figma node id for `download_assets`.
  */
-import { copyFileSync, existsSync, mkdirSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 
@@ -46,14 +46,20 @@ const MAP = {
   'flag': MD('outlined/flag.svg'),
   // Desktop Filter action (v1.4.0, screenshot-derived — no Figma node id)
   'filter': RX('System/filter-line.svg'),
+  // Historical Data Download control (ARVIJ-1450-SP02; Figma 9:11700 icon button — node id pending)
+  'download': RX('System/download-2-line.svg'),
   // Scope switcher trigger icon (S-P4-01 v1.5.9, AC-P4-01-42) — unapproved
   // placeholder pending a Figma-exported avatar asset (README OQ-24).
   'scope-avatar': RX('User & Faces/user-line.svg'),
 };
 
 mkdirSync('public/icons', { recursive: true });
+// Tokens whose MANIFEST entry names a `figmaFile` are Figma exports: never overwrite them
+// with the open-source stand-ins above.
+const manifest = JSON.parse(readFileSync('public/icons/MANIFEST.json', 'utf8'));
 let n = 0;
 for (const [token, src] of Object.entries(MAP)) {
+  if (manifest[token]?.figmaFile) { console.log(`skip ${token} (Figma export)`); continue; }
   const dest = `public/icons/${token}.svg`;
   if (!existsSync(src)) { console.warn('missing source', token, src); continue; }
   copyFileSync(src, dest); n++;
