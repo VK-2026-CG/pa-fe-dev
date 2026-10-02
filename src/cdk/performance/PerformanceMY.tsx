@@ -278,7 +278,7 @@ export default function PerformanceMY({
           {/* Viewing mode (Figma 32:15242 / 32:19505) reads "Product Both" / "Time YTD", the drill-down wording. */}
           <ContextPill
             labelKey={vm.viewing ? "insights.detail.filter.product" : "insights.dashboard.filter.product"}
-            value={t(vm.viewing ? `insights.detail.businessLine.${f.businessLine}` : `insights.businessLine.${f.businessLine}`)}
+            value={t(`insights.detail.businessLine.${f.businessLine}`)}
           />
           <ContextPill
             labelKey={vm.viewing ? "insights.detail.filter.time" : "insights.dashboard.filter.time"}
