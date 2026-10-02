@@ -96,18 +96,17 @@ export default function MetricDetailMY({
       <div className="section dd-title-section">
         <h1 className="page-title">{t(`insights.metric.${metricCode}.title`)}</h1>
       </div>
-      {/* Context strip — the labelled Product/Time pills (AC-P4-02-22). No
+      {/* Context strip — the labelled Business/Period pills (AC-P4-02-22). No
           teamView chip at any scope (AC-P4-02-60); ALL reads "Both"
-          (AC-P4-02-61). The labels are this screen's own ("Product", "Time"),
-          not the dashboard's "Business"/"Period" (Figma 1:16155 / 1:16159). */}
+          (AC-P4-02-61). Labels match the dashboard's "Business"/"Period". */}
       <div className="section">
         <div className="filter-row dd-chips">
           <ContextPill
-            labelKey="insights.detail.filter.product"
+            labelKey="insights.dashboard.filter.product"
             value={t(`insights.detail.businessLine.${c.businessLine}`)}
           />
           <ContextPill
-            labelKey="insights.detail.filter.time"
+            labelKey="insights.dashboard.filter.time"
             value={t(`insights.period.${c.period}`)}
           />
         </div>

@@ -185,7 +185,7 @@ export function FilterSheet({
           value={businessLine}
           options={f.businessLineOptions}
           onChange={setBusinessLine}
-          label={(bl) => t(`insights.businessLine.${bl}`)}
+          label={(bl) => t(`insights.detail.businessLine.${bl}`)}
         />
       </div>
       <div className="filter-card">

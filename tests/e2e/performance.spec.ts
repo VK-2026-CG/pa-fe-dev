@@ -116,11 +116,11 @@ test.describe("Performance dashboard (S-P4-01) on the 375 mobile shell", () => {
 
     const productPill = page
       .locator(".filter-pill")
-      .filter({ hasText: "Product" })
+      .filter({ hasText: "Business" })
       .first();
     const timePill = page
       .locator(".filter-pill")
-      .filter({ hasText: "Time" })
+      .filter({ hasText: "Period" })
       .first();
     await expect(productPill).toContainText("Both");
     await expect(timePill).toContainText("YTD");

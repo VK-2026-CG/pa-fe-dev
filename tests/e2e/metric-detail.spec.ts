@@ -166,7 +166,7 @@ test.describe('Metric detail (S-P4-02)', () => {
     });
   }
 
-  test('TEAM drilldown renders no Direct/Group chip; the strip is exactly Product then Time (AC-P4-02-60)', async ({ context, page }) => {
+  test('TEAM drilldown renders no Direct/Group chip; the strip is exactly Business then Period (AC-P4-02-60)', async ({ context, page }) => {
     await setPersona(context, 'LEADER_P2');
     const watch = watchConsole(page);
     for (const teamView of ['DIRECT', 'GROUP'] as const) {
@@ -175,8 +175,8 @@ test.describe('Metric detail (S-P4-02)', () => {
 
       const strip = page.locator('.filter-row');
       await expect(strip.locator('> *')).toHaveCount(2);
-      await expect(strip.locator('.filter-pill').first()).toContainText('Product');
-      await expect(strip.locator('.filter-pill').last()).toContainText('Time');
+      await expect(strip.locator('.filter-pill').first()).toContainText('Business');
+      await expect(strip.locator('.filter-pill').last()).toContainText('Period');
       await expect(strip.getByText(/^(Direct|Group)$/)).toHaveCount(0);
     }
 
@@ -236,12 +236,12 @@ test.describe('Metric detail (S-P4-02)', () => {
     // Back affordance carries a visible label, not just an aria-label.
     await expect(page.locator('.appbar .back .back-label')).toHaveText('Back');
 
-    // Labelled Product/Time pills replace the bare value chips.
+    // Labelled Business/Period pills replace the bare value chips.
     const pills = page.locator('.filter-pill');
     await expect(pills).toHaveCount(2);
-    await expect(pills.first()).toContainText('Product');
+    await expect(pills.first()).toContainText('Business');
     await expect(pills.first()).toContainText('Both'); // AC-P4-02-61 (v1.21.0)
-    await expect(pills.last()).toContainText('Time');
+    await expect(pills.last()).toContainText('Period');
     await expect(pills.last()).toContainText('YTD');
   });
 
@@ -575,8 +575,8 @@ test.describe('Metric detail (S-P4-02)', () => {
 
     const chips = page.locator('.dd-chips .filter-pill');
     await expect(chips).toHaveCount(2);
-    await expect(chips.first()).toHaveAttribute('aria-label', 'Product: Both');
-    await expect(chips.last()).toHaveAttribute('aria-label', 'Time: YTD');
+    await expect(chips.first()).toHaveAttribute('aria-label', 'Business: Both');
+    await expect(chips.last()).toHaveAttribute('aria-label', 'Period: YTD');
     const [first, second] = [(await chips.first().boundingBox())!, (await chips.last().boundingBox())!];
     expect([first.y, first.height, second.y]).toEqual([96, 28, 96]);
     expect(Math.round(second.x - (first.x + first.width))).toBe(12);
