@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { t } from '@/lib/i18n';
+import { t, dashboardMetricTitle } from '@/lib/i18n';
 import { href } from '@/lib/nav';
 import { formatScalar, formatDetailScalar, formatDelta, toneFor } from '@/lib/format';
 import { Icon, ProgressBar, Tag } from '@/dls-stub';
@@ -53,7 +53,7 @@ export function MetricCard({ vm, variant = 'priority', navigable = true }: {
     <CardShell navigable={navigable} to={href(vm.nav)} className={`mcard ${variant === 'simple' ? 'simple' : ''} ${navigable ? '' : 'static'}`}>
       <div className="head">
         <span>
-          <span className="name">{t(`insights.metric.${vm.metricCode}.title`)}</span>
+          <span className="name">{dashboardMetricTitle(vm.metricCode)}</span>
           {variant === 'priority' && vm.variant && (
             <span className="variant"> ({t(`insights.variant.${vm.variant}`)})</span>
           )}

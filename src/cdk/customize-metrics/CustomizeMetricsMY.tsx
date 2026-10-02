@@ -7,7 +7,7 @@
  */
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { t } from '@/lib/i18n';
+import { t, dashboardMetricTitle } from '@/lib/i18n';
 import { apiFetch } from '@/lib/apiClient';
 import { Toast } from '@/components/ui';
 import {
@@ -18,7 +18,7 @@ import type { CustomizeItemVM, CustomizeMetricsVM, Scope } from '@spec/performan
 
 /** "TPC without repricing" — title + variant, both from the vendored bundle. */
 function metricLabel(item: CustomizeItemVM): string {
-  const title = t(`insights.metric.${item.metricCode}.title`);
+  const title = dashboardMetricTitle(item.metricCode);
   if (!item.variant) return title;
   return `${title} ${t(`insights.variant.${item.variant}`).toLowerCase()}`;
 }

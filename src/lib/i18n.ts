@@ -19,3 +19,9 @@ export function t(key: string, params?: Record<string, string | number>): string
   return s;
 }
 export function hasKey(key: string): boolean { return bundle[key] !== undefined; }
+
+/** S-P4-01 metric name: the dashboard-owned "Manpower (M)" form for MAPA, else the shared `.title`. */
+export function dashboardMetricTitle(metricCode: string): string {
+  const key = `insights.dashboard.metric.${metricCode}`;
+  return hasKey(key) ? t(key) : t(`insights.metric.${metricCode}.title`);
+}
