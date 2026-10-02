@@ -1,6 +1,7 @@
 {
   "insights.gaugeLegend.current": "Current",
   "insights.detail.persistencyTitle": "{period} Persistency",
+  "insights.dashboard.persistencyNote": "*Persistency is calculated yearly",
   "insights.detail.filter.product": "Product",
   "insights.detail.filter.time": "Time",
   "insights.detail.businessLine.ALL": "Both",

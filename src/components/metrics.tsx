@@ -47,6 +47,8 @@ export function MetricCard({ vm, variant = 'priority', navigable = true }: {
   // Every currency value on a priority or focus card uses TPC's compact form
   // ("11.9K"), at both SELF and TEAM scope; other kinds still follow `valueDisplay`.
   const compact = vm.valueDisplay === 'COMPACT' || vm.value?.kind === 'MONEY';
+  // Persistency (CY / Y1 / Y2) is a yearly measure: no "vs last year" delta, a note under the value instead.
+  const persistency = vm.metricCode.startsWith('PERSISTENCY_');
   return (
     <CardShell navigable={navigable} to={href(vm.nav)} className={`mcard ${variant === 'simple' ? 'simple' : ''} ${navigable ? '' : 'static'}`}>
       <div className="head">
@@ -60,6 +62,11 @@ export function MetricCard({ vm, variant = 'priority', navigable = true }: {
       {dataState !== 'OK' ? (
         <div className="value-block">
           <div className="goal-line">{stateText}</div>
+        </div>
+      ) : persistency ? (
+        <div className="foot persistency-foot">
+          <span className="value">{formatScalar(vm.value, compact)}</span>
+          <span className="persistency-note">{t('insights.dashboard.persistencyNote')}</span>
         </div>
       ) : (
         <div className="spread foot" style={{ alignItems: 'flex-end' }}>
@@ -262,7 +269,7 @@ function YtdRows({ s, metricCode, period }: { s: ComparisonSectionVM; metricCode
         <span>{s.currentYear}</span>
         <span className="ytd-value">
           <b>{formatDetailScalar(s.current, metricCode)}</b>
-          {!persistency && <DeltaLine delta={s.change} full />}
+          <DeltaLine delta={s.change} full />
         </span>
       </div>
       <div className="ytd-row">

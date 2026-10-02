@@ -660,6 +660,18 @@ svg text {
 .mcard.simple .foot {
   padding-top: 2px;
 }
+/* Persistency card: value with the yearly-calculation note beneath it (no delta). */
+.mcard .persistency-foot {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+.mcard .persistency-note {
+  font-size: var(--fs-caption-xs);
+  line-height: var(--lh-caption);
+  color: var(--color-text-muted);
+}
 .delta-line {
   display: flex;
   gap: 4px;
